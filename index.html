@@ -294,6 +294,7 @@
     <div class="nav-item" onclick="showSection('calendario')"><span class="nav-icon">📅</span> Calendario Turnos</div>
     <div class="nav-item" onclick="showSection('inventario')"><span class="nav-icon">📦</span> Inventario</div>
     <div class="nav-item" onclick="showSection('telefonos')"><span class="nav-icon">📞</span> Teléfonos</div>
+    <div class="nav-item" onclick="showSection('backup')"><span class="nav-icon">💾</span> Copia de Seguridad</div>
     <div class="nav-item" onclick="showSection('config')"><span class="nav-icon">⚙️</span> Configuración</div>
     <div class="nav-item" id="adminNavItem" style="display:none;color:var(--blue);" onclick="openAdmin()"><span class="nav-icon">🔐</span> Panel Admin</div>
   </div>
@@ -512,6 +513,24 @@
     </div>
   </div>
 
+  <!-- BACKUP -->
+  <div id="sec-backup" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Copia de Seguridad</div><div class="page-subtitle">Descarga o restaura todos tus datos</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:8px;">⬇️ Descargar copia de seguridad</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Descarga un archivo JSON con todos tus datos actuales.</div>
+      <button class="btn btn-primary" onclick="downloadBackup()">⬇️ Descargar JSON</button>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:8px;">⬆️ Restaurar copia de seguridad</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Sube un archivo JSON previamente descargado. <strong>Atención: esto reemplazará todos los datos existentes.</strong></div>
+      <input type="file" id="backupInput" accept=".json" style="display:none" onchange="uploadBackup(event)">
+      <button class="btn btn-secondary" onclick="document.getElementById('backupInput').click()">⬆️ Subir JSON</button>
+    </div>
+  </div>
+
   <!-- CONFIG -->
   <div id="sec-config" class="section">
     <div class="page-header">
@@ -695,6 +714,7 @@ function showSection(id){
   if(id==='calendario')loadCalImg();
   if(id==='inventario')loadInventario();
   if(id==='telefonos')loadTelefonos();
+  if(id==='backup'){}
   if(id==='config')loadConfig();
 }
 
@@ -1285,6 +1305,58 @@ async function init(){
   });
   const{data:{session}}=await sb.auth.getSession();
   if(!session)showLanding();
+}
+
+// BACKUP
+const BACKUP_TABLES = ['diario_trabajo','horas_extras','formacion_prl','vacaciones','horas_dormida','calendario_imagen','inventario','telefonos','opciones_configuracion'];
+
+async function downloadBackup() {
+  toast('Preparando copia de seguridad...');
+  const backup = { version: 1, fecha: new Date().toISOString(), tablas: {} };
+  for (const tabla of BACKUP_TABLES) {
+    const { data, error } = await sb.from(tabla).select('*');
+    if (error) { toast('Error al leer ' + tabla, 'error'); return; }
+    backup.tablas[tabla] = data || [];
+  }
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `moeve_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Copia de seguridad descargada');
+}
+
+async function uploadBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!confirm('⚠️ Esto reemplazará TODOS los datos actuales. ¿Estás seguro?')) {
+    event.target.value = ''; return;
+  }
+  toast('Restaurando datos...');
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.tablas) { toast('Archivo inválido', 'error'); return; }
+      for (const tabla of BACKUP_TABLES) {
+        if (!backup.tablas[tabla]) continue;
+        await sb.from(tabla).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (backup.tablas[tabla].length > 0) {
+          const { error } = await sb.from(tabla).insert(backup.tablas[tabla]);
+          if (error) { toast('Error al restaurar ' + tabla, 'error'); return; }
+        }
+      }
+      toast('Datos restaurados correctamente');
+      await loadOpciones();
+      populateFilters();
+    } catch(err) {
+      toast('Error al leer el archivo', 'error');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 init();
