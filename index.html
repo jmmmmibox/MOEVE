@@ -1281,11 +1281,11 @@ async function init(){
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(session&&session.user){
       currentUser=session.user;
-      // Check if blocked
-      const{data,error}=await sb.from('usuarios').select('bloqueado').eq('id',currentUser.id).maybeSingle();
-      if(data&&data.bloqueado){await sb.auth.signOut();toast('Tu cuenta está bloqueada.','error');showLanding();return;}
-      // Save user to table if not exists
-      if(!data){await sb.from('usuarios').insert({id:currentUser.id,email:currentUser.email,bloqueado:false});}
+      try{
+        const{data}=await sb.from('usuarios').select('bloqueado').eq('id',currentUser.id).maybeSingle();
+        if(data&&data.bloqueado){await sb.auth.signOut();toast('Tu cuenta está bloqueada.','error');showLanding();return;}
+        if(!data){await sb.from('usuarios').insert({id:currentUser.id,email:currentUser.email,bloqueado:false});}
+      }catch(e){}
       document.getElementById('landingScreen').style.display='none';
       document.getElementById('authScreen').style.display='none';
       document.getElementById('userEmailLabel').textContent=currentUser.email;
