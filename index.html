@@ -1285,15 +1285,6 @@ async function doAddUser(){
 
 // ── INIT ──
 async function init(){
-  // Clear any stale session from a different Supabase project
-  const{data:{session:existingSession}}=await sb.auth.getSession();
-  if(existingSession){
-    try{
-      const{data}=await sb.from('usuarios').select('id').eq('id',existingSession.user.id).maybeSingle();
-      if(!data){await sb.auth.signOut();}
-    }catch(e){await sb.auth.signOut();}
-  }
-
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(session&&session.user){
       currentUser=session.user;
@@ -1319,7 +1310,8 @@ async function init(){
       showLanding();
     }
   });
-  if(!existingSession)showLanding();
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session)showLanding();
 }
 
 // BACKUP
