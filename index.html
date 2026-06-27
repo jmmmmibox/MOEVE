@@ -670,7 +670,7 @@
 <script>
 const SUPABASE_URL='https://dvqusjapfsuwyozwdcgw.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2cXVzamFwZnN1d3lvendkY2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzAwMDAsImV4cCI6MjA5ODE0NjAwMH0.d2sFmXGmpjH1xbpwedYx7gSXvmIstZbsio0mNeWV45w';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 
 let opciones={},editingId=null,diarioView='lista',calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),diarioData=[],horasTab='todas',prlTab='todas',vacTab='todas';
 
