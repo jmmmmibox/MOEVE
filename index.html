@@ -299,6 +299,7 @@
       <div class="tab active" onclick="setVacTab('todas',this)">Todas</div>
       <div class="tab" onclick="setVacTab('planificadas',this)">Planificadas</div>
       <div class="tab" onclick="setVacTab('no-planificadas',this)">No Planificadas</div>
+      <div class="tab" onclick="setVacTab('ya-disfrutadas',this)">Ya disfrutadas</div>
     </div>
     <div class="table-wrap">
       <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
@@ -867,10 +868,18 @@ async function crearAnioVac(){
 async function loadVacaciones(){
   const anio=document.getElementById('vacAnioSel').value||new Date().getFullYear();
   document.getElementById('vacAnioSubtitle').textContent=anio;
-  const{data}=await sb.from('vacaciones').select('*').eq('anio',anio).order('created_at');
+  const{data}=await sb.from('vacaciones').select('*').eq('anio',anio);
   let all=data||[];
-  if(vacTab==='planificadas')all=all.filter(r=>r.fecha_planeada);
-  if(vacTab==='no-planificadas')all=all.filter(r=>!r.fecha_planeada);
+  // Sort by fecha_planeada (nulls last)
+  all.sort((a,b)=>{
+    if(!a.fecha_planeada && !b.fecha_planeada) return 0;
+    if(!a.fecha_planeada) return 1;
+    if(!b.fecha_planeada) return -1;
+    return a.fecha_planeada.localeCompare(b.fecha_planeada);
+  });
+  if(vacTab==='planificadas') all=all.filter(r=>r.fecha_planeada);
+  if(vacTab==='no-planificadas') all=all.filter(r=>!r.fecha_planeada);
+  if(vacTab==='ya-disfrutadas') all=all.filter(r=>r.estado==='Ya disfrutada');
   document.getElementById('vacTotal').textContent=all.length;
   document.getElementById('vacDisfrutadas').textContent=all.filter(r=>r.estado==='Ya disfrutada').length;
   document.getElementById('vacPendientes').textContent=all.filter(r=>r.estado==='Pendiente').length;
