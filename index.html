@@ -877,7 +877,7 @@ async function loadVacaciones(){
     if(!b.fecha_planeada) return -1;
     return a.fecha_planeada.localeCompare(b.fecha_planeada);
   });
-  if(vacTab==='planificadas') all=all.filter(r=>r.fecha_planeada);
+  if(vacTab==='planificadas') all=all.filter(r=>r.fecha_planeada && r.estado!=='Ya disfrutada');
   if(vacTab==='no-planificadas') all=all.filter(r=>!r.fecha_planeada);
   if(vacTab==='ya-disfrutadas') all=all.filter(r=>r.estado==='Ya disfrutada');
   document.getElementById('vacTotal').textContent=all.length;
