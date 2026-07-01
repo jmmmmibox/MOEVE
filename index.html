@@ -162,6 +162,7 @@
     <div class="nav-item" onclick="showSection('horas-extras')"><span class="nav-icon">⏱️</span> Horas Extras / Form.</div>
     <div class="nav-item" onclick="showSection('formacion-prl')"><span class="nav-icon">🎓</span> Formación PRL</div>
     <div class="nav-item" onclick="showSection('vacaciones')"><span class="nav-icon">🏖️</span> Vacaciones</div>
+    <div class="nav-item" onclick="showSection('dias-companeros')"><span class="nav-icon">👥</span> Días Compañeros</div>
     <div class="nav-item" onclick="showSection('horas-dormida')"><span class="nav-icon">😴</span> Horas de Dormida</div>
     <div class="nav-item" onclick="showSection('calendario')"><span class="nav-icon">📅</span> Calendario Turnos</div>
     <div class="nav-item" onclick="showSection('inventario')"><span class="nav-icon">📦</span> Inventario</div>
@@ -308,6 +309,35 @@
   </div>
 
   <!-- HORAS DORMIDA -->
+  <!-- DIAS COMPANEROS -->
+  <div id="sec-dias-companeros" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle" id="dcAnioSubtitle">2026</div></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="exportDCPDF()">⬇ PDF</button>
+        <select id="dcAnioSel" class="btn btn-secondary btn-sm" onchange="loadDC()" style="cursor:pointer;"></select>
+        <button class="btn btn-secondary btn-sm" onclick="crearAnioDC()">+ Año</button>
+        <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value" id="dcTotal">—</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="setDCTab('todas',this)">Todas</div>
+      <div class="tab" onclick="setDCTab('planificadas',this)">Planificadas</div>
+      <div class="tab" onclick="setDCTab('no-planificadas',this)">No Planificadas</div>
+      <div class="tab" onclick="setDCTab('ya-disfrutadas',this)">Ya disfrutadas</div>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
+      <tbody id="dcBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
+    </div>
+  </div>
+
   <div id="sec-horas-dormida" class="section">
     <div class="page-header">
       <div><div class="page-title">Horas de Dormida</div><div class="page-subtitle">10 horas anuales sin justificar</div></div>
@@ -540,6 +570,26 @@
   </div>
 </div>
 
+<!-- Modal Días Compañeros -->
+<div id="modalDC" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalDCTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalDC')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Nombre</label><input type="text" id="dcNombre"></div>
+        <div class="form-group"><label>Descripción</label><select id="dcDescripcion"></select></div>
+        <div class="form-group"><label>Horas</label><input type="number" id="dcHoras" step="0.5"></div>
+        <div class="form-group"><label>Días</label><input type="number" id="dcDias" step="0.5"></div>
+        <div class="form-group"><label>Estado</label><select id="dcEstado"></select></div>
+        <div class="form-group"><label>Fecha Planeada</label><input type="date" id="dcPlaneada"></div>
+        <div class="form-group"><label>Fecha Realizada</label><input type="date" id="dcRealizada"></div>
+        <div class="form-group full"><label>Observaciones</label><textarea id="dcObs"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalDC')">Cancelar</button><button class="btn btn-primary" onclick="saveDC()">Guardar</button></div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
@@ -592,6 +642,7 @@ function showSection(id){
   if(id==='horas-extras')loadHorasExtras();
   if(id==='formacion-prl')loadPRL();
   if(id==='vacaciones'){loadVacAnios();loadVacaciones();}
+  if(id==='dias-companeros'){loadDCAnios();loadDC();}
   if(id==='horas-dormida')loadDormida();
   if(id==='calendario')loadCalImg();
   if(id==='inventario')loadInventario();
@@ -1124,6 +1175,83 @@ async function uploadBackup(event) {
     event.target.value = '';
   };
   reader.readAsText(file);
+}
+
+// DÍAS COMPAÑEROS
+let dcTab='todas';
+
+async function loadDCAnios(){
+  const{data}=await sb.from('dias_companeros').select('anio').order('anio');
+  const anios=[...new Set((data||[]).map(r=>r.anio))];
+  const sel=document.getElementById('dcAnioSel');const cur=sel.value||String(new Date().getFullYear());
+  sel.innerHTML=anios.map(a=>`<option value="${a}" ${a==cur?'selected':''}>${a}</option>`).join('');
+  if(!anios.length)sel.innerHTML=`<option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>`;
+}
+
+async function crearAnioDC(){
+  const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
+  await sb.from('dias_companeros').insert({anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
+  toast(`Año ${anio} creado`);loadDCAnios();loadDC();
+}
+
+async function loadDC(){
+  const anio=document.getElementById('dcAnioSel').value||new Date().getFullYear();
+  document.getElementById('dcAnioSubtitle').textContent=anio;
+  const{data}=await sb.from('dias_companeros').select('*').eq('anio',anio);
+  let all=data||[];
+  all.sort((a,b)=>{
+    if(!a.fecha_planeada&&!b.fecha_planeada)return 0;
+    if(!a.fecha_planeada)return 1;if(!b.fecha_planeada)return -1;
+    return a.fecha_planeada.localeCompare(b.fecha_planeada);
+  });
+  if(dcTab==='planificadas')all=all.filter(r=>r.fecha_planeada&&r.estado!=='Ya disfrutada');
+  if(dcTab==='no-planificadas')all=all.filter(r=>!r.fecha_planeada);
+  if(dcTab==='ya-disfrutadas')all=all.filter(r=>r.estado==='Ya disfrutada');
+  document.getElementById('dcTotal').textContent=all.length;
+  document.getElementById('dcDisfrutadas').textContent=all.filter(r=>r.estado==='Ya disfrutada').length;
+  document.getElementById('dcPendientes').textContent=all.filter(r=>r.estado==='Pendiente').length;
+  document.getElementById('dcDiasTotales').textContent=all.reduce((s,r)=>s+(r.dias||0),0);
+  const tbody=document.getElementById('dcBody');
+  if(!all.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No hay entradas</div></div></td></tr>`;return;}
+  tbody.innerHTML=all.map(r=>`<tr><td>${r.nombre||'—'}</td><td>${r.descripcion||'—'}</td><td>${r.horas||'—'}</td><td>${r.dias||'—'}</td><td>${estadoBadge(r.estado)}</td><td>${fmtDate(r.fecha_planeada)}</td><td>${fmtDate(r.fecha_realizada)}</td><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.observaciones||'—'}</td>${actionBtns(`editDC('${r.id}')`,`delDC('${r.id}')`)}</tr>`).join('');
+}
+
+function setDCTab(tab,el){dcTab=tab;document.querySelectorAll('#sec-dias-companeros .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');loadDC();}
+
+async function openDCModal(id=null){
+  editingId=id;document.getElementById('modalDCTitle').textContent=id?'Editar entrada':'Nueva entrada';
+  fillSelect('dcDescripcion','dias_companeros','descripcion');
+  fillSelect('dcEstado','dias_companeros','estado');
+  if(id){
+    const{data}=await sb.from('dias_companeros').select('*').eq('id',id).single();
+    if(data){document.getElementById('dcNombre').value=data.nombre||'';document.getElementById('dcDescripcion').value=data.descripcion||'';document.getElementById('dcHoras').value=data.horas||'';document.getElementById('dcDias').value=data.dias||'';document.getElementById('dcEstado').value=data.estado||'';document.getElementById('dcPlaneada').value=data.fecha_planeada||'';document.getElementById('dcRealizada').value=data.fecha_realizada||'';document.getElementById('dcObs').value=data.observaciones||'';}
+  }else{
+    ['dcNombre','dcHoras','dcDias','dcPlaneada','dcRealizada','dcObs'].forEach(i=>document.getElementById(i).value='');
+    ['dcDescripcion','dcEstado'].forEach(i=>document.getElementById(i).value='');
+  }
+  openModal('modalDC');
+}
+
+async function editDC(id){openDCModal(id);}
+
+async function saveDC(){
+  const anio=parseInt(document.getElementById('dcAnioSel').value||new Date().getFullYear());
+  const payload={anio,nombre:document.getElementById('dcNombre').value||null,descripcion:document.getElementById('dcDescripcion').value||null,horas:parseFloat(document.getElementById('dcHoras').value)||null,dias:parseFloat(document.getElementById('dcDias').value)||null,estado:document.getElementById('dcEstado').value||null,fecha_planeada:document.getElementById('dcPlaneada').value||null,fecha_realizada:document.getElementById('dcRealizada').value||null,observaciones:document.getElementById('dcObs').value||null};
+  let err;
+  if(editingId){({error:err}=await sb.from('dias_companeros').update(payload).eq('id',editingId));}
+  else{({error:err}=await sb.from('dias_companeros').insert(payload));}
+  if(err){toast('Error al guardar','error');return;}
+  toast(editingId?'Actualizado':'Añadido');closeModal('modalDC');loadDC();
+}
+
+async function delDC(id){if(!confirm('¿Eliminar?'))return;await sb.from('dias_companeros').delete().eq('id',id);toast('Eliminado');loadDC();}
+
+function exportDCPDF(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
+  doc.setFontSize(16);doc.text(`Días Compañeros ${document.getElementById('dcAnioSel').value} - MOEVE`,14,18);
+  const rows=[];document.querySelectorAll('#dcBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});
+  doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});
+  doc.save('dias_companeros_moeve.pdf');
 }
 
 init();
