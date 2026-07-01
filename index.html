@@ -921,12 +921,12 @@ async function loadVacaciones(){
   document.getElementById('vacAnioSubtitle').textContent=anio;
   const{data}=await sb.from('vacaciones').select('*').eq('anio',anio);
   let all=data||[];
-  // Sort by fecha_planeada (nulls last)
+  // Sort by fecha_realizada ascending (nulls last)
   all.sort((a,b)=>{
-    if(!a.fecha_planeada && !b.fecha_planeada) return 0;
-    if(!a.fecha_planeada) return 1;
-    if(!b.fecha_planeada) return -1;
-    return a.fecha_planeada.localeCompare(b.fecha_planeada);
+    if(!a.fecha_realizada && !b.fecha_realizada) return 0;
+    if(!a.fecha_realizada) return 1;
+    if(!b.fecha_realizada) return -1;
+    return a.fecha_realizada.localeCompare(b.fecha_realizada);
   });
   if(vacTab==='planificadas') all=all.filter(r=>r.fecha_planeada && r.estado!=='Ya disfrutada');
   if(vacTab==='no-planificadas') all=all.filter(r=>!r.fecha_planeada);
