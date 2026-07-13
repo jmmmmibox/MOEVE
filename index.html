@@ -26,6 +26,15 @@
     --shadow-sm:0 1px 2px rgba(0,0,0,.05);--shadow:0 1px 3px rgba(0,0,0,.1);
     --shadow-md:0 4px 6px rgba(0,0,0,.07);--shadow-lg:0 10px 15px rgba(0,0,0,.1);
     --radius:8px;--radius-lg:12px;
+    --turno-M:#DBEAFE;--turno-M-text:#1D4ED8;
+    --turno-T:#FEF3C7;--turno-T-text:#92400E;
+    --turno-N:#1E1B4B;--turno-N-text:#C7D2FE;
+    --turno-D:#F1F5F9;--turno-D-text:#64748B;
+    --turno-R:#DCFCE7;--turno-R-text:#166534;
+    --turno-V:#FCE7F3;--turno-V-text:#9D174D;
+    --turno-B:#FEE2E2;--turno-B-text:#991B1B;
+    --border:#E2E8F0;--mc-text:#1E293B;--mc-text2:#64748B;--mc-text3:#94A3B8;
+    --primary-light:#3B82F6;--surface2:#F8FAFC;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-900);min-height:100vh;font-size:14px}
@@ -147,32 +156,20 @@
   .upload-area-text{font-size:14px;color:var(--gray-500)}
 
   /* ── MI CALENDARIO (estilos TurnoX) ── */
-  --turno-M: #DBEAFE; --turno-M-text: #1D4ED8;
-  --turno-T: #FEF3C7; --turno-T-text: #92400E;
-  --turno-N: #1E1B4B; --turno-N-text: #C7D2FE;
-  --turno-D: #F1F5F9; --turno-D-text: #64748B;
-  --turno-R: #DCFCE7; --turno-R-text: #166534;
-  --turno-V: #FCE7F3; --turno-V-text: #9D174D;
-  --turno-B: #FEE2E2; --turno-B-text: #991B1B;
-  --border: #E2E8F0; --text: #1E293B; --text2: #64748B; --text3: #94A3B8;
-  --primary-light: #3B82F6; --surface2: #F8FAFC;
-  .turno-badge {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 28px; height: 28px; border-radius: 6px; font-size: 12px; font-weight: 700;
-  }
-  .turno-badge.M { background: var(--turno-M); color: var(--turno-M-text); }
-  .turno-badge.T { background: var(--turno-T); color: var(--turno-T-text); }
-  .turno-badge.N { background: var(--turno-N); color: var(--turno-N-text); }
-  .turno-badge.D { background: var(--turno-D); color: var(--turno-D-text); }
-  .turno-badge.R { background: var(--turno-R); color: var(--turno-R-text); }
-  .turno-badge.V { background: var(--turno-V); color: var(--turno-V-text); }
-  .turno-badge.B { background: var(--turno-B); color: var(--turno-B-text); }
-  .mc-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
-  .mc-cal-btn { width: 32px; height: 32px; border-radius: 6px; background: white; border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; color: var(--text2); cursor: pointer; transition: all .15s; }
-  .mc-cal-btn:hover { border-color: var(--primary-light); color: var(--primary-light); }
-  .mc-month-label { font-size: 15px; font-weight: 600; min-width: 130px; text-align: center; }
-  .mc-legend-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding: 12px; background: var(--surface2); border-radius: 8px; }
-  .mc-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .turno-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;font-size:12px;font-weight:700;}
+  .turno-badge.M{background:var(--turno-M);color:var(--turno-M-text);}
+  .turno-badge.T{background:var(--turno-T);color:var(--turno-T-text);}
+  .turno-badge.N{background:var(--turno-N);color:var(--turno-N-text);}
+  .turno-badge.D{background:var(--turno-D);color:var(--turno-D-text);}
+  .turno-badge.R{background:var(--turno-R);color:var(--turno-R-text);}
+  .turno-badge.V{background:var(--turno-V);color:var(--turno-V-text);}
+  .turno-badge.B{background:var(--turno-B);color:var(--turno-B-text);}
+  .mc-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .mc-cal-btn{width:32px;height:32px;border-radius:6px;background:white;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--mc-text2);cursor:pointer;transition:all .15s;}
+  .mc-cal-btn:hover{border-color:var(--primary-light);color:var(--primary-light);}
+  .mc-month-label{font-size:15px;font-weight:600;min-width:130px;text-align:center;}
+  .mc-legend-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;padding:12px;background:var(--surface2);border-radius:8px;}
+  .mc-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mc-text2);}
   .ciclo-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--gray-100);}
   .ciclo-row:last-child{border-bottom:none;}
 </style>
