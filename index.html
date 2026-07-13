@@ -1413,9 +1413,18 @@ let turnoOverrides = {};
 async function loadTurnoOverrides() {
   const firstDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-01`;
   const lastDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${new Date(miCalYear,miCalMonth+1,0).getDate()}`;
-  const{data}=await sb.from('mi_calendario_overrides').select('*').gte('fecha',firstDay).lte('fecha',lastDay);
+  // Load manual overrides
+  const{data:ovData}=await sb.from('mi_calendario_overrides').select('*').gte('fecha',firstDay).lte('fecha',lastDay);
   turnoOverrides={};
-  (data||[]).forEach(r=>{turnoOverrides[r.fecha]={turno:r.turno,comentario:r.comentario||''};});
+  (ovData||[]).forEach(r=>{turnoOverrides[r.fecha]={turno:r.turno,comentario:r.comentario||''};});
+  // Load diario records to show red dot if has observaciones (without changing badge color)
+  const{data:diData}=await sb.from('diario_trabajo').select('fecha,observaciones').gte('fecha',firstDay).lte('fecha',lastDay);
+  (diData||[]).forEach(r=>{
+    if(r.observaciones){
+      if(!turnoOverrides[r.fecha]) turnoOverrides[r.fecha]={turno:null,comentario:r.observaciones};
+      else turnoOverrides[r.fecha].comentario = turnoOverrides[r.fecha].comentario || r.observaciones;
+    }
+  });
 }
 
 async function renderMiCalendario() {
@@ -1447,8 +1456,8 @@ async function renderMiCalendario() {
     const ds = year + '-' + String(mes+1).padStart(2,'0') + '-' + String(i).padStart(2,'0');
     const turnoAuto = getTurnoDelDia(ds) || 'D';
     const ovr = turnoOverrides[ds];
-    const turno = ovr ? (typeof ovr === 'object' ? ovr.turno : ovr) : turnoAuto;
-    const hasComment = ovr && typeof ovr === 'object' && ovr.comentario;
+    const turno = (ovr && ovr.turno) ? ovr.turno : turnoAuto;
+    const hasComment = ovr && ovr.comentario;
     const isToday = ds === hoy;
     const isWeekend = d.getDay() === 0 || d.getDay() === 6;
 
@@ -1533,13 +1542,6 @@ async function guardarDiaCalendario(fecha, existingId) {
     ({error:err} = await sb.from('diario_trabajo').insert(payload));
   }
   if (err) { toast('Error al guardar', 'error'); return; }
-
-  // Also update override for calendar display
-  const turno = payload.turno;
-  const comentario = payload.observaciones || '';
-  if (turno) {
-    await sb.from('mi_calendario_overrides').upsert({fecha, turno, comentario}, {onConflict:'fecha'});
-  }
 
   toast(existingId ? 'Registro actualizado' : 'Registro creado');
   document.getElementById('modalEditTurno').style.display = 'none';
