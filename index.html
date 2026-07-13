@@ -163,7 +163,8 @@
   .turno-badge.D{background:var(--turno-D);color:var(--turno-D-text);}
   .turno-badge.R{background:var(--turno-R);color:var(--turno-R-text);}
   .turno-badge.V{background:var(--turno-V);color:var(--turno-V-text);}
-  .turno-badge.B{background:var(--turno-B);color:var(--turno-B-text);}
+  .turno-badge.S{background:#FFF7ED;color:#C2410C;}
+  .turno-badge.L{background:#1E1B4B;color:#A5B4FC;}
   .mc-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
   .mc-cal-btn{width:32px;height:32px;border-radius:6px;background:white;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--mc-text2);cursor:pointer;transition:all .15s;}
   .mc-cal-btn:hover{border-color:var(--primary-light);color:var(--primary-light);}
@@ -1451,7 +1452,7 @@ async function renderMiCalendario() {
   html += '</div>';
 
   html += '<div class="mc-legend-row">';
-  [['M','Mañana'],['T','Tarde'],['N','Noche'],['D','Descanso'],['R','Refuerzo']].forEach(([k,v]) => {
+  [['M','Mañana'],['T','Tarde'],['N','Noche'],['D','Descanso'],['R','Refuerzo'],['S','Sol 12h'],['L','Luna 12h'],['V','Vacaciones'],['B','Baja']].forEach(([k,v]) => {
     html += '<div class="mc-legend-item"><span class="turno-badge ' + k + '">' + k + '</span> ' + v + '</div>';
   });
   html += '</div>';
@@ -1460,8 +1461,8 @@ async function renderMiCalendario() {
 }
 
 async function editTurnoDia(fecha, turnoActual) {
-  const turnos = ['M','T','N','D','R'];
-  const labels = {'M':'Mañana','T':'Tarde','N':'Noche','D':'Descanso','R':'Refuerzo'};
+  const turnos = ['M','T','N','D','R','S','L','V','B'];
+  const labels = {'M':'Mañana','T':'Tarde','N':'Noche','D':'Descanso','R':'Refuerzo','S':'Sol 12h','L':'Luna 12h','V':'Vacaciones','B':'Baja'};
   const override = turnoOverrides[fecha];
   const comentarioActual = override ? (override.comentario||'') : '';
   let body = `<div style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">📅 <strong>${fmtDate(fecha)}</strong></div>`;
@@ -1486,7 +1487,7 @@ async function editTurnoDia(fecha, turnoActual) {
 
 function selTurnoDia(t) {
   window._editDiaTurnoSel = t;
-  ['M','T','N','D','R'].forEach(x => {
+  ['M','T','N','D','R','S','L','V','B'].forEach(x => {
     const btn = document.getElementById('btn-turno-'+x);
     if (btn) {
       btn.style.border = x===t ? '2px solid var(--blue)' : '2px solid var(--gray-200)';
