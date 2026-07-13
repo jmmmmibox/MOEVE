@@ -1413,17 +1413,17 @@ let turnoOverrides = {};
 async function loadTurnoOverrides() {
   const firstDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-01`;
   const lastDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${new Date(miCalYear,miCalMonth+1,0).getDate()}`;
+  turnoOverrides={};
   // Load manual overrides
   const{data:ovData}=await sb.from('mi_calendario_overrides').select('*').gte('fecha',firstDay).lte('fecha',lastDay);
-  turnoOverrides={};
   (ovData||[]).forEach(r=>{turnoOverrides[r.fecha]={turno:r.turno,comentario:r.comentario||''};});
-  // Load diario records to show red dot if has observaciones (without changing badge color)
-  const{data:diData}=await sb.from('diario_trabajo').select('fecha,observaciones').gte('fecha',firstDay).lte('fecha',lastDay);
+  // Load diario records - these take priority over auto calculation
+  const{data:diData}=await sb.from('diario_trabajo').select('fecha,turno,observaciones').gte('fecha',firstDay).lte('fecha',lastDay);
   (diData||[]).forEach(r=>{
-    if(r.observaciones){
-      if(!turnoOverrides[r.fecha]) turnoOverrides[r.fecha]={turno:null,comentario:r.observaciones};
-      else turnoOverrides[r.fecha].comentario = turnoOverrides[r.fecha].comentario || r.observaciones;
-    }
+    turnoOverrides[r.fecha] = {
+      turno: r.turno || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].turno : null),
+      comentario: r.observaciones || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].comentario : '')
+    };
   });
 }
 
