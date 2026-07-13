@@ -670,14 +670,24 @@
   </div>
 </div>
 
-<!-- Modal Editar Turno Día -->
+<!-- Modal Editar Día Mi Calendario -->
 <div id="modalEditTurno" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:320px">
+  <div class="modal" style="max-width:600px">
     <div class="modal-header">
-      <div class="modal-title">Cambiar turno</div>
+      <div class="modal-title" id="modalEditTurnoTitle">Registro del día</div>
       <button class="close-btn" onclick="document.getElementById('modalEditTurno').style.display='none'">✕</button>
     </div>
-    <div class="modal-body" id="editTurnoDiaBody"></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Turno</label><select id="editDiaTurno"></select></div>
+        <div class="form-group"><label>Área</label><select id="editDiaArea"></select></div>
+        <div class="form-group"><label>Letra</label><select id="editDiaLetra"></select></div>
+        <div class="form-group"><label>Jefe de Turno</label><select id="editDiaJefe"></select></div>
+        <div class="form-group"><label>Estado Planta</label><select id="editDiaEstadoPlanta"></select></div>
+        <div class="form-group full"><label>Observaciones</label><textarea id="editDiaComentario" style="min-height:70px;"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer" id="editTurnoFooter"></div>
   </div>
 </div>
 
@@ -1461,45 +1471,88 @@ async function renderMiCalendario() {
 }
 
 async function editTurnoDia(fecha, turnoActual) {
-  const turnos = ['M','T','N','D','R','S','L','V','B'];
-  const labels = {'M':'Mañana','T':'Tarde','N':'Noche','D':'Descanso','R':'Refuerzo','S':'Sol 12h','L':'Luna 12h','V':'Vacaciones','B':'Baja'};
-  const override = turnoOverrides[fecha];
-  const comentarioActual = override ? (override.comentario||'') : '';
-  let body = `<div style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">📅 <strong>${fmtDate(fecha)}</strong></div>`;
-  body += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">`;
-  body += turnos.map(t=>`<button onclick="selTurnoDia('${t}')" id="btn-turno-${t}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:8px;border:2px solid ${t===turnoActual?'var(--blue)':'var(--gray-200)'};background:${t===turnoActual?'var(--blue-light)':'white'};cursor:pointer;font-family:inherit;">
-    <span class="turno-badge ${t}">${t}</span>
-    <span style="font-size:11px;font-weight:600;color:var(--gray-700);">${labels[t]}</span>
-  </button>`).join('');
-  body += '</div>';
-  body += `<div style="margin-bottom:12px;">
-    <label style="font-size:12px;font-weight:500;color:var(--gray-600);display:block;margin-bottom:4px;">Comentario <span style="color:var(--red);font-size:11px;">(aparecerá punto rojo)</span></label>
-    <textarea id="editDiaComentario" style="width:100%;padding:8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;min-height:60px;">${comentarioActual}</textarea>
-  </div>`;
-  body += `<div style="display:flex;gap:8px;">`;
-  if (override) body += `<button class="btn btn-secondary" style="flex:1;" onclick="setTurnoDia('${fecha}','','')">↩ Restaurar automático</button>`;
-  body += `<button class="btn btn-primary" style="flex:1;" onclick="guardarTurnoDia('${fecha}','${turnoActual}')">Guardar</button>`;
-  body += '</div>';
-  document.getElementById('editTurnoDiaBody').innerHTML = body;
-  document.getElementById('modalEditTurno').style.display = 'flex';
-  window._editDiaTurnoSel = turnoActual;
-}
-
-function selTurnoDia(t) {
-  window._editDiaTurnoSel = t;
-  ['M','T','N','D','R','S','L','V','B'].forEach(x => {
-    const btn = document.getElementById('btn-turno-'+x);
-    if (btn) {
-      btn.style.border = x===t ? '2px solid var(--blue)' : '2px solid var(--gray-200)';
-      btn.style.background = x===t ? 'var(--blue-light)' : 'white';
+  // Fill selects with options
+  fillSelect('editDiaTurno','diario_trabajo','turno');
+  // Add extra turn options not in config
+  const extraTurnos = ['S','L','V','B'];
+  const extraLabels = {'S':'Sol 12h','L':'Luna 12h','V':'Vacaciones','B':'Baja'};
+  const turnoSel = document.getElementById('editDiaTurno');
+  extraTurnos.forEach(t => {
+    if (![...turnoSel.options].some(o => o.value === t)) {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = extraLabels[t];
+      turnoSel.appendChild(opt);
     }
   });
+  fillSelect('editDiaArea','diario_trabajo','area');
+  fillSelect('editDiaLetra','diario_trabajo','letra');
+  fillSelect('editDiaJefe','diario_trabajo','jefe_turno');
+  fillSelect('editDiaEstadoPlanta','diario_trabajo','estado_planta');
+
+  document.getElementById('modalEditTurnoTitle').textContent = '📅 ' + fmtDate(fecha);
+
+  // Check if diario record exists for this date
+  const { data: existing } = await sb.from('diario_trabajo').select('*').eq('fecha', fecha).maybeSingle();
+  const override = turnoOverrides[fecha];
+
+  // Set values
+  const turno = existing ? existing.turno : (override ? (typeof override === 'object' ? override.turno : override) : turnoActual);
+  document.getElementById('editDiaTurno').value = turno || '';
+  document.getElementById('editDiaArea').value = existing ? (existing.area||'') : '';
+  document.getElementById('editDiaLetra').value = existing ? (existing.letra||'') : '';
+  document.getElementById('editDiaJefe').value = existing ? (existing.jefe_turno||'') : '';
+  document.getElementById('editDiaEstadoPlanta').value = existing ? (existing.estado_planta||'') : '';
+  const comentario = existing ? (existing.observaciones||'') : (override && typeof override === 'object' ? override.comentario||'' : '');
+  document.getElementById('editDiaComentario').value = comentario;
+
+  // Footer buttons
+  let footer = '';
+  if (existing) footer += `<button class="btn btn-danger btn-sm" onclick="delDiarioDesdeCalendario('${existing.id}','${fecha}')">🗑 Eliminar</button>`;
+  footer += `<button class="btn btn-secondary" onclick="document.getElementById('modalEditTurno').style.display='none'">Cancelar</button>`;
+  footer += `<button class="btn btn-primary" onclick="guardarDiaCalendario('${fecha}','${existing ? existing.id : ''}')">Guardar</button>`;
+  document.getElementById('editTurnoFooter').innerHTML = footer;
+
+  window._editDiaFecha = fecha;
+  document.getElementById('modalEditTurno').style.display = 'flex';
 }
 
-async function guardarTurnoDia(fecha, turnoOriginal) {
-  const turno = window._editDiaTurnoSel || turnoOriginal;
-  const comentario = document.getElementById('editDiaComentario').value.trim();
-  await setTurnoDia(fecha, turno, comentario);
+async function guardarDiaCalendario(fecha, existingId) {
+  const payload = {
+    fecha,
+    turno: document.getElementById('editDiaTurno').value || null,
+    area: document.getElementById('editDiaArea').value || null,
+    letra: document.getElementById('editDiaLetra').value || null,
+    jefe_turno: document.getElementById('editDiaJefe').value || null,
+    estado_planta: document.getElementById('editDiaEstadoPlanta').value || null,
+    observaciones: document.getElementById('editDiaComentario').value || null,
+  };
+  let err;
+  if (existingId) {
+    ({error:err} = await sb.from('diario_trabajo').update(payload).eq('id', existingId));
+  } else {
+    ({error:err} = await sb.from('diario_trabajo').insert(payload));
+  }
+  if (err) { toast('Error al guardar', 'error'); return; }
+
+  // Also update override for calendar display
+  const turno = payload.turno;
+  const comentario = payload.observaciones || '';
+  if (turno) {
+    await sb.from('mi_calendario_overrides').upsert({fecha, turno, comentario}, {onConflict:'fecha'});
+  }
+
+  toast(existingId ? 'Registro actualizado' : 'Registro creado');
+  document.getElementById('modalEditTurno').style.display = 'none';
+  renderMiCalendario();
+}
+
+async function delDiarioDesdeCalendario(id, fecha) {
+  if (!confirm('¿Eliminar el registro de este día?')) return;
+  await sb.from('diario_trabajo').delete().eq('id', id);
+  await sb.from('mi_calendario_overrides').delete().eq('fecha', fecha);
+  toast('Registro eliminado');
+  document.getElementById('modalEditTurno').style.display = 'none';
+  renderMiCalendario();
 }
 
 async function setTurnoDia(fecha, turno, comentario='') {
