@@ -145,6 +145,27 @@
   .upload-area:hover{border-color:var(--blue)}
   .upload-area-icon{font-size:36px;margin-bottom:12px}
   .upload-area-text{font-size:14px;color:var(--gray-500)}
+
+  /* ── MI CALENDARIO ── */
+  .mi-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px;}
+  .mi-cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--gray-400);padding:6px 0;text-transform:uppercase;}
+  .mi-cal-day{min-height:48px;padding:4px;border:1px solid var(--gray-100);border-radius:4px;text-align:center;}
+  .mi-cal-day.other-month{opacity:.3;}
+  .mi-cal-day.today{border-color:var(--blue);}
+  .mi-cal-day-num{font-size:11px;font-weight:600;color:var(--gray-600);}
+  .mi-cal-turno{font-size:11px;font-weight:700;padding:2px 4px;border-radius:3px;margin-top:2px;display:inline-block;}
+  .t-M{background:#fef3c7;color:#92400e;}
+  .t-T{background:#dbeafe;color:#1e40af;}
+  .t-N{background:#ede9fe;color:#6b21a8;}
+  .t-D{background:#dcfce7;color:#166534;}
+  .t-R{background:#fce7f3;color:#9d174d;}
+  .ciclo-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--gray-100);}
+  .ciclo-row:last-child{border-bottom:none;}
+  @media(max-width:768px){
+    .mi-cal-day{min-height:36px;padding:2px;}
+    .mi-cal-day-num{font-size:10px;}
+    .mi-cal-turno{font-size:10px;padding:1px 3px;}
+  }
 </style>
 </head>
 <body>
@@ -165,6 +186,7 @@
     <div class="nav-item" onclick="showSection('dias-companeros')"><span class="nav-icon">👥</span> Días Compañeros</div>
     <div class="nav-item" onclick="showSection('horas-dormida')"><span class="nav-icon">😴</span> Horas de Dormida</div>
     <div class="nav-item" onclick="showSection('calendario')"><span class="nav-icon">📅</span> Calendario Turnos</div>
+    <div class="nav-item" onclick="showSection('mi-calendario')"><span class="nav-icon">🗓️</span> Mi Calendario</div>
     <div class="nav-item" onclick="showSection('inventario')"><span class="nav-icon">📦</span> Inventario</div>
     <div class="nav-item" onclick="showSection('telefonos')"><span class="nav-icon">📞</span> Teléfonos</div>
     <div class="nav-item" onclick="showSection('backup')"><span class="nav-icon">💾</span> Copia de Seguridad</div>
@@ -368,6 +390,33 @@
         <div style="font-size:12px;color:var(--gray-400);margin-top:8px;">JPG, PNG, WEBP</div>
       </div>
     </div></div>
+  </div>
+
+  <!-- MI CALENDARIO -->
+  <div id="sec-mi-calendario" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Mi Calendario</div><div class="page-subtitle">Turnos generados automáticamente</div></div>
+      <button class="btn btn-primary" onclick="openCicloModal()">+ Añadir período</button>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:12px;">📋 Períodos configurados</div>
+      <div id="ciclosList"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <span class="mi-cal-turno t-M">M Mañana</span>
+      <span class="mi-cal-turno t-T">T Tarde</span>
+      <span class="mi-cal-turno t-N">N Noche</span>
+      <span class="mi-cal-turno t-D">D Descanso</span>
+      <span class="mi-cal-turno t-R">R Refuerzo</span>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <button class="btn btn-secondary btn-sm" onclick="changeMiCalMes(-1)">◀</button>
+        <div style="font-size:16px;font-weight:700;" id="miCalMesTitulo"></div>
+        <button class="btn btn-secondary btn-sm" onclick="changeMiCalMes(1)">▶</button>
+      </div>
+      <div class="mi-cal-grid" id="miCalGrid"></div>
+    </div>
   </div>
 
   <!-- INVENTARIO -->
@@ -590,6 +639,41 @@
   </div>
 </div>
 
+<!-- Modal Período Mi Calendario -->
+<div id="modalCiclo" class="modal-overlay" style="display:none">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title" id="modalCicloTitle">Añadir período</div>
+      <button class="close-btn" onclick="closeModal('modalCiclo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Tipo de turno</label>
+          <select id="cicloTipo" onchange="toggleCicloTurnoInicial()">
+            <option value="turno">6-4 (Rotativo)</option>
+            <option value="refuerzo">Equipo de Refuerzo</option>
+          </select>
+        </div>
+        <div class="form-group" id="cicloTurnoInicialGroup">
+          <label>Empieza en</label>
+          <select id="cicloTurnoInicial">
+            <option value="M">Mañana</option>
+            <option value="T">Tarde</option>
+            <option value="N">Noche</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Fecha inicio</label><input type="date" id="cicloFechaInicio"></div>
+        <div class="form-group"><label>Fecha fin</label><input type="date" id="cicloFechaFin"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalCiclo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCiclo()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
@@ -645,6 +729,7 @@ function showSection(id){
   if(id==='dias-companeros'){loadDCAnios();loadDC();}
   if(id==='horas-dormida')loadDormida();
   if(id==='calendario')loadCalImg();
+  if(id==='mi-calendario'){loadMiCalendarioCiclos();renderMiCalendario();}
   if(id==='inventario')loadInventario();
   if(id==='telefonos')loadTelefonos();
   if(id==='config')loadConfig();
@@ -1252,6 +1337,135 @@ function exportDCPDF(){
   const rows=[];document.querySelectorAll('#dcBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});
   doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});
   doc.save('dias_companeros_moeve.pdf');
+}
+
+// ── MI CALENDARIO ──
+const PATRON_64 = ['M','M','T','T','N','N','D','D','D','D'];
+let miCiclos = [];
+let miCalYear = new Date().getFullYear();
+let miCalMonth = new Date().getMonth();
+
+function getTurnoDelDia(fecha) {
+  const d = new Date(fecha + 'T12:00:00');
+  const fechaStr = fecha;
+  for (const ciclo of miCiclos) {
+    const inicio = new Date(ciclo.fecha_inicio + 'T12:00:00');
+    const fin = new Date(ciclo.fecha_fin + 'T12:00:00');
+    if (d >= inicio && d <= fin) {
+      if (ciclo.tipo === 'refuerzo') {
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) return 'D';
+        return 'R';
+      } else {
+        const offsets = { 'M': 0, 'T': 2, 'N': 4, 'D': 6 };
+        const offset = offsets[ciclo.turno_inicial] || 0;
+        const base = new Date(ciclo.fecha_inicio + 'T12:00:00');
+        base.setDate(base.getDate() - offset);
+        const diffMs = d.getTime() - base.getTime();
+        const diffDays = Math.round(diffMs / 86400000);
+        const pos = ((diffDays % 10) + 10) % 10;
+        return PATRON_64[pos];
+      }
+    }
+  }
+  return '';
+}
+
+async function loadMiCalendarioCiclos() {
+  const { data } = await sb.from('mi_calendario_ciclos').select('*').order('fecha_inicio');
+  miCiclos = data || [];
+  const cont = document.getElementById('ciclosList');
+  if (!miCiclos.length) {
+    cont.innerHTML = '<div style="color:var(--gray-400);font-size:13px;">No hay períodos configurados. Añade uno con el botón de arriba.</div>';
+    return;
+  }
+  const tipoLabel = { 'turno': '6-4 Rotativo', 'refuerzo': 'Equipo de Refuerzo' };
+  const turnoLabel = { 'M': 'Mañana', 'T': 'Tarde', 'N': 'Noche' };
+  cont.innerHTML = miCiclos.map(c => `
+    <div class="ciclo-row">
+      <span class="badge badge-blue">${tipoLabel[c.tipo]||c.tipo}</span>
+      ${c.turno_inicial ? `<span class="badge badge-orange">Empieza: ${turnoLabel[c.turno_inicial]||c.turno_inicial}</span>` : ''}
+      <span style="font-size:13px;color:var(--gray-700);">${fmtDate(c.fecha_inicio)} → ${fmtDate(c.fecha_fin)}</span>
+      <button class="btn btn-danger btn-sm btn-icon" style="margin-left:auto;" onclick="delCiclo('${c.id}')">🗑</button>
+    </div>`).join('');
+}
+
+function renderMiCalendario() {
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('miCalMesTitulo').textContent = `${months[miCalMonth]} ${miCalYear}`;
+  const rawFirstDay = new Date(miCalYear, miCalMonth, 1).getDay();
+  const firstDay = rawFirstDay === 0 ? 6 : rawFirstDay - 1;
+  const daysInMonth = new Date(miCalYear, miCalMonth + 1, 0).getDate();
+  const today = new Date();
+  const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  let html = days.map(d => `<div class="mi-cal-day-name">${d}</div>`).join('');
+  const prevDays = new Date(miCalYear, miCalMonth, 0).getDate();
+  for (let i = firstDay - 1; i >= 0; i--) html += `<div class="mi-cal-day other-month"><div class="mi-cal-day-num">${prevDays - i}</div></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getDate()===d && today.getMonth()===miCalMonth && today.getFullYear()===miCalYear;
+    const turno = getTurnoDelDia(dateStr);
+    const turnoHtml = turno ? `<div class="mi-cal-turno t-${turno}">${turno}</div>` : '';
+    html += `<div class="mi-cal-day ${isToday?'today':''}">
+      <div class="mi-cal-day-num" style="${isToday?'color:var(--blue);':''}">${d}</div>
+      ${turnoHtml}
+    </div>`;
+  }
+  const remaining = 7 - ((firstDay + daysInMonth) % 7);
+  if (remaining < 7) for (let d = 1; d <= remaining; d++) html += `<div class="mi-cal-day other-month"><div class="mi-cal-day-num">${d}</div></div>`;
+  document.getElementById('miCalGrid').innerHTML = html;
+}
+
+function changeMiCalMes(dir) {
+  miCalMonth += dir;
+  if (miCalMonth > 11) { miCalMonth = 0; miCalYear++; }
+  if (miCalMonth < 0) { miCalMonth = 11; miCalYear--; }
+  renderMiCalendario();
+}
+
+function toggleCicloTurnoInicial() {
+  const tipo = document.getElementById('cicloTipo').value;
+  document.getElementById('cicloTurnoInicialGroup').style.display = tipo === 'turno' ? 'flex' : 'none';
+}
+
+function openCicloModal() {
+  editingId = null;
+  document.getElementById('modalCicloTitle').textContent = 'Añadir período';
+  document.getElementById('cicloTipo').value = 'turno';
+  document.getElementById('cicloTurnoInicial').value = 'M';
+  document.getElementById('cicloFechaInicio').value = '';
+  document.getElementById('cicloFechaFin').value = '';
+  document.getElementById('cicloTurnoInicialGroup').style.display = 'flex';
+  openModal('modalCiclo');
+}
+
+async function saveCiclo() {
+  const tipo = document.getElementById('cicloTipo').value;
+  const fechaInicio = document.getElementById('cicloFechaInicio').value;
+  const fechaFin = document.getElementById('cicloFechaFin').value;
+  if (!fechaInicio || !fechaFin) { toast('Las fechas son obligatorias', 'error'); return; }
+  if (fechaFin < fechaInicio) { toast('La fecha fin debe ser posterior a la fecha inicio', 'error'); return; }
+  const payload = {
+    tipo,
+    turno_inicial: tipo === 'turno' ? document.getElementById('cicloTurnoInicial').value : null,
+    fecha_inicio: fechaInicio,
+    fecha_fin: fechaFin,
+    orden: miCiclos.length + 1
+  };
+  const { error } = await sb.from('mi_calendario_ciclos').insert(payload);
+  if (error) { toast('Error al guardar', 'error'); return; }
+  toast('Período añadido');
+  closeModal('modalCiclo');
+  await loadMiCalendarioCiclos();
+  renderMiCalendario();
+}
+
+async function delCiclo(id) {
+  if (!confirm('¿Eliminar este período?')) return;
+  await sb.from('mi_calendario_ciclos').delete().eq('id', id);
+  toast('Período eliminado');
+  await loadMiCalendarioCiclos();
+  renderMiCalendario();
 }
 
 init();
