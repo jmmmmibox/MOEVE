@@ -1410,6 +1410,9 @@ async function loadMiCalendarioCiclos() {
 // Store manual overrides in memory and Supabase
 let turnoOverrides = {};
 
+const TURNO_A_LETRA = {'Mañana':'M','Tarde':'T','Noche':'N','Descanso':'D','Vacaciones':'V','Refuerzo':'R','Baja':'B','Sol 12h':'S','Luna 12h':'L','Sol':'S','Luna':'L'};
+function normalizaTurno(t){ return t ? (TURNO_A_LETRA[t] || t) : t; }
+
 async function loadTurnoOverrides() {
   const firstDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-01`;
   const lastDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${new Date(miCalYear,miCalMonth+1,0).getDate()}`;
@@ -1421,7 +1424,7 @@ async function loadTurnoOverrides() {
   const{data:diData}=await sb.from('diario_trabajo').select('fecha,turno,observaciones').gte('fecha',firstDay).lte('fecha',lastDay);
   (diData||[]).forEach(r=>{
     turnoOverrides[r.fecha] = {
-      turno: r.turno || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].turno : null),
+      turno: normalizaTurno(r.turno) || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].turno : null),
       comentario: r.observaciones || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].comentario : '')
     };
   });
