@@ -1404,7 +1404,7 @@ async function loadTurnoOverrides() {
   const lastDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${new Date(miCalYear,miCalMonth+1,0).getDate()}`;
   const{data}=await sb.from('mi_calendario_overrides').select('*').gte('fecha',firstDay).lte('fecha',lastDay);
   turnoOverrides={};
-  (data||[]).forEach(r=>{turnoOverrides[r.fecha]=r.turno;});
+  (data||[]).forEach(r=>{turnoOverrides[r.fecha]={turno:r.turno,comentario:r.comentario||''};});
 }
 
 async function renderMiCalendario() {
@@ -1435,15 +1435,17 @@ async function renderMiCalendario() {
     const d = new Date(year, mes, i);
     const ds = year + '-' + String(mes+1).padStart(2,'0') + '-' + String(i).padStart(2,'0');
     const turnoAuto = getTurnoDelDia(ds) || 'D';
-    const turno = turnoOverrides[ds] || turnoAuto;
-    const isOverride = !!turnoOverrides[ds];
+    const ovr = turnoOverrides[ds];
+    const turno = ovr ? (typeof ovr === 'object' ? ovr.turno : ovr) : turnoAuto;
+    const hasComment = ovr && typeof ovr === 'object' && ovr.comentario;
     const isToday = ds === hoy;
     const isWeekend = d.getDay() === 0 || d.getDay() === 6;
 
-    html += '<div style="border-radius:8px;border:1px solid ' + (isToday ? 'var(--primary-light)' : 'var(--border)') + ';background:' + (isToday ? '#EFF6FF' : 'white') + ';padding:6px;text-align:center;min-height:52px;cursor:pointer;" onclick="editTurnoDia(\'' + ds + '\',\'' + turno + '\')">';
+    html += '<div style="border-radius:8px;border:1px solid ' + (isToday ? 'var(--primary-light)' : 'var(--border)') + ';background:' + (isToday ? '#EFF6FF' : 'white') + ';padding:6px;text-align:center;min-height:52px;cursor:pointer;position:relative;" onclick="editTurnoDia(\'' + ds + '\',\'' + turno + '\')">';
+    if (hasComment) html += '<div style="position:absolute;top:3px;right:3px;width:7px;height:7px;background:#EF4444;border-radius:50%;"></div>';
     html += '<div style="font-size:10px;color:' + (isWeekend ? '#EF4444' : 'var(--text3)') + ';font-weight:600">' + dayNames[d.getDay()] + '</div>';
     html += '<div style="font-size:14px;font-weight:700;color:' + (isToday ? 'var(--primary-light)' : 'var(--text)') + '">' + i + '</div>';
-    html += '<span class="turno-badge ' + turno + '" style="margin-top:2px">' + turno + (isOverride ? '·' : '') + '</span>';
+    html += '<span class="turno-badge ' + turno + '" style="margin-top:2px">' + turno + '</span>';
     html += '</div>';
   }
   html += '</div>';
@@ -1460,25 +1462,51 @@ async function renderMiCalendario() {
 async function editTurnoDia(fecha, turnoActual) {
   const turnos = ['M','T','N','D','R'];
   const labels = {'M':'Mañana','T':'Tarde','N':'Noche','D':'Descanso','R':'Refuerzo'};
-  const isOverride = !!turnoOverrides[fecha];
+  const override = turnoOverrides[fecha];
+  const comentarioActual = override ? (override.comentario||'') : '';
   let body = `<div style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">📅 <strong>${fmtDate(fecha)}</strong></div>`;
   body += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">`;
-  body += turnos.map(t=>`<button onclick="setTurnoDia('${fecha}','${t}')" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:8px;border:2px solid ${t===turnoActual?'var(--blue)':'var(--gray-200)'};background:${t===turnoActual?'var(--blue-light)':'white'};cursor:pointer;font-family:inherit;">
+  body += turnos.map(t=>`<button onclick="selTurnoDia('${t}')" id="btn-turno-${t}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:8px;border:2px solid ${t===turnoActual?'var(--blue)':'var(--gray-200)'};background:${t===turnoActual?'var(--blue-light)':'white'};cursor:pointer;font-family:inherit;">
     <span class="turno-badge ${t}">${t}</span>
     <span style="font-size:11px;font-weight:600;color:var(--gray-700);">${labels[t]}</span>
   </button>`).join('');
   body += '</div>';
-  if (isOverride) body += `<button class="btn btn-secondary" style="width:100%;" onclick="setTurnoDia('${fecha}','')">↩ Restaurar turno automático</button>`;
+  body += `<div style="margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:500;color:var(--gray-600);display:block;margin-bottom:4px;">Comentario <span style="color:var(--red);font-size:11px;">(aparecerá punto rojo)</span></label>
+    <textarea id="editDiaComentario" style="width:100%;padding:8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;min-height:60px;">${comentarioActual}</textarea>
+  </div>`;
+  body += `<div style="display:flex;gap:8px;">`;
+  if (override) body += `<button class="btn btn-secondary" style="flex:1;" onclick="setTurnoDia('${fecha}','','')">↩ Restaurar automático</button>`;
+  body += `<button class="btn btn-primary" style="flex:1;" onclick="guardarTurnoDia('${fecha}','${turnoActual}')">Guardar</button>`;
+  body += '</div>';
   document.getElementById('editTurnoDiaBody').innerHTML = body;
   document.getElementById('modalEditTurno').style.display = 'flex';
+  window._editDiaTurnoSel = turnoActual;
 }
 
-async function setTurnoDia(fecha, turno) {
+function selTurnoDia(t) {
+  window._editDiaTurnoSel = t;
+  ['M','T','N','D','R'].forEach(x => {
+    const btn = document.getElementById('btn-turno-'+x);
+    if (btn) {
+      btn.style.border = x===t ? '2px solid var(--blue)' : '2px solid var(--gray-200)';
+      btn.style.background = x===t ? 'var(--blue-light)' : 'white';
+    }
+  });
+}
+
+async function guardarTurnoDia(fecha, turnoOriginal) {
+  const turno = window._editDiaTurnoSel || turnoOriginal;
+  const comentario = document.getElementById('editDiaComentario').value.trim();
+  await setTurnoDia(fecha, turno, comentario);
+}
+
+async function setTurnoDia(fecha, turno, comentario='') {
   document.getElementById('modalEditTurno').style.display = 'none';
   if (turno === '') {
     await sb.from('mi_calendario_overrides').delete().eq('fecha', fecha);
   } else {
-    await sb.from('mi_calendario_overrides').upsert({fecha, turno}, {onConflict:'fecha'});
+    await sb.from('mi_calendario_overrides').upsert({fecha, turno, comentario}, {onConflict:'fecha'});
   }
   renderMiCalendario();
 }
