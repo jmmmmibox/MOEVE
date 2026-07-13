@@ -162,7 +162,7 @@
   --turno-N:#1E1B4B;--turno-N-text:#C7D2FE;
   --turno-D:#F1F5F9;--turno-D-text:#64748B;
   --turno-R:#DCFCE7;--turno-R-text:#166534;
-  .mi-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;}
+  .mi-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;}
   .mi-cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--gray-400);padding:6px 0;text-transform:uppercase;}
   .mi-cal-day{padding:6px 4px;border:1px solid var(--gray-100);border-radius:6px;text-align:center;min-height:56px;display:flex;flex-direction:column;align-items:center;gap:4px;}
   .mi-cal-day.other-month{opacity:.25;}
@@ -1439,12 +1439,11 @@ async function renderMiCalendario() {
   const diasMes = new Date(miCalYear, miCalMonth+1, 0).getDate();
   const rawFirstDay = new Date(miCalYear, miCalMonth, 1).getDay();
   const offset = rawFirstDay === 0 ? 6 : rawFirstDay - 1;
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = new Date().toISOString().split('T')[0];
   const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
   let html = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d =>
-    `<div style="text-align:center;font-size:10px;font-weight:700;color:var(--gray-400);padding:4px">${d}</div>`
+    `<div style="text-align:center;font-size:11px;font-weight:700;color:var(--gray-400);padding:6px 0;letter-spacing:.3px;">${d}</div>`
   ).join('');
 
   for (let i = 0; i < offset; i++) html += '<div></div>';
@@ -1452,14 +1451,27 @@ async function renderMiCalendario() {
   for (let i = 1; i <= diasMes; i++) {
     const d = new Date(miCalYear, miCalMonth, i);
     const ds = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-    const turno = turnoOverrides[ds] || getTurnoDelDia(ds) || 'D';
+    const turnoBase = getTurnoDelDia(ds) || 'D';
+    const turno = turnoOverrides[ds] || turnoBase;
     const isOverride = !!turnoOverrides[ds];
     const isToday = ds === todayStr;
     const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-    html += `<div style="border-radius:8px;border:2px solid ${isToday?'var(--blue)':'var(--gray-200)'};background:${isToday?'var(--blue-light)':'white'};padding:6px;text-align:center;min-height:60px;cursor:pointer;" onclick="editTurnoDia('${ds}','${turno}')">
-      <div style="font-size:10px;color:${isWeekend?'var(--red)':'var(--gray-400)'};font-weight:600;">${dayNames[d.getDay()]}</div>
-      <div style="font-size:14px;font-weight:700;color:${isToday?'var(--blue)':'var(--gray-800)'};">${i}</div>
-      <span class="turno-badge ${turno}" style="margin-top:3px;display:inline-block;">${turno}${isOverride?'·':''}</span>
+    const dayName = dayNames[d.getDay()];
+    html += `
+    <div onclick="editTurnoDia('${ds}','${turno}')" style="
+      border-radius:10px;
+      border:${isToday?'2px solid var(--blue)':'1px solid var(--gray-200)'};
+      background:${isToday?'var(--blue-light)':'white'};
+      padding:8px 4px;
+      text-align:center;
+      min-height:72px;
+      cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:2px;
+      transition:box-shadow .1s;
+    " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='none'">
+      <div style="font-size:10px;font-weight:700;color:${isWeekend?'#ef4444':'var(--gray-400)'};">${dayName}</div>
+      <div style="font-size:16px;font-weight:700;color:${isToday?'var(--blue)':'var(--gray-800)'};">${i}</div>
+      <span class="turno-badge ${turno}" style="margin-top:2px;">${turno}${isOverride?'·':''}</span>
     </div>`;
   }
 
