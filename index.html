@@ -1440,7 +1440,7 @@ async function renderMiCalendario() {
     const isToday = ds === hoy;
     const isWeekend = d.getDay() === 0 || d.getDay() === 6;
 
-    html += '<div style="border-radius:8px;border:1px solid ' + (isToday ? 'var(--primary-light)' : 'var(--border)') + ';background:' + (isToday ? '#EFF6FF' : 'white') + ';padding:6px;text-align:center;min-height:52px;cursor:pointer;" onclick="editTurnoDia('' + ds + '','' + turno + '')">';
+    html += '<div style="border-radius:8px;border:1px solid ' + (isToday ? 'var(--primary-light)' : 'var(--border)') + ';background:' + (isToday ? '#EFF6FF' : 'white') + ';padding:6px;text-align:center;min-height:52px;cursor:pointer;" onclick="editTurnoDia(\'' + ds + '\',\'' + turno + '\')">';
     html += '<div style="font-size:10px;color:' + (isWeekend ? '#EF4444' : 'var(--text3)') + ';font-weight:600">' + dayNames[d.getDay()] + '</div>';
     html += '<div style="font-size:14px;font-weight:700;color:' + (isToday ? 'var(--primary-light)' : 'var(--text)') + '">' + i + '</div>';
     html += '<span class="turno-badge ' + turno + '" style="margin-top:2px">' + turno + (isOverride ? '·' : '') + '</span>';
