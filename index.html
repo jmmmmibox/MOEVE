@@ -186,8 +186,8 @@
     <div class="sidebar-subtitle">Panel de Gestión</div>
   </div>
   <div class="sidebar-nav">
-    <div class="nav-item active" onclick="showSection('diario')"><span class="nav-icon">📋</span> Diario de Trabajo</div>
-    <div class="nav-item" onclick="showSection('mi-calendario')"><span class="nav-icon">🗓️</span> Mi Calendario</div>
+    <div class="nav-item active" onclick="showSection('mi-calendario')"><span class="nav-icon">🗓️</span> Mi Calendario</div>
+    <div class="nav-item" onclick="showSection('diario')"><span class="nav-icon">📋</span> Diario de Trabajo</div>
     <div class="nav-item" onclick="showSection('horas-extras')"><span class="nav-icon">⏱️</span> Horas Extras / Form.</div>
     <div class="nav-item" onclick="showSection('formacion-prl')"><span class="nav-icon">🎓</span> Formación PRL</div>
     <div class="nav-item" onclick="showSection('vacaciones')"><span class="nav-icon">🏖️</span> Vacaciones</div>
@@ -204,7 +204,7 @@
 <main id="main">
 
   <!-- DIARIO -->
-  <div id="sec-diario" class="section active">
+  <div id="sec-diario" class="section">
     <div class="page-header">
       <div><div class="page-title">Diario de Trabajo</div><div class="page-subtitle">Registro diario de turnos y actividad</div></div>
       <div style="display:flex;gap:8px;">
@@ -400,7 +400,7 @@
   </div>
 
   <!-- MI CALENDARIO -->
-  <div id="sec-mi-calendario" class="section">
+  <div id="sec-mi-calendario" class="section active">
     <div class="page-header">
       <div><div class="page-title">Mi Calendario</div><div class="page-subtitle">Turnos generados automáticamente</div></div>
     </div>
@@ -700,7 +700,7 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let opciones={},editingId=null,diarioView='lista',calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),diarioData=[],horasTab='todas',prlTab='todas',vacTab='todas';
 
-async function init(){await loadOpciones();populateFilters();showSection('diario');}
+async function init(){await loadOpciones();populateFilters();showSection('mi-calendario');}
 
 async function loadOpciones(){
   const{data}=await sb.from('opciones_configuracion').select('*').order('orden');
