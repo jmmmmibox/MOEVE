@@ -173,9 +173,148 @@
   .mc-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mc-text2);}
   .ciclo-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--gray-100);}
   .ciclo-row:last-child{border-bottom:none;}
+
+  /* ── LANDING ── */
+  #landingScreen{position:fixed;inset:0;background:white;z-index:9000;display:flex;flex-direction:column;overflow-y:auto;}
+  .landing-hero{background:linear-gradient(135deg,#1a56db 0%,#0f3490 100%);color:white;padding:60px 24px 80px;text-align:center;}
+  .landing-logo{font-size:52px;font-weight:700;letter-spacing:-2px;margin-bottom:8px;}
+  .landing-tagline{font-size:18px;opacity:.85;margin-bottom:40px;font-weight:300;}
+  .landing-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .landing-btn-primary{padding:14px 36px;background:white;color:var(--blue);border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+  .landing-btn-primary:hover{background:var(--gray-100);}
+  .landing-btn-secondary{padding:14px 36px;background:transparent;color:white;border:2px solid rgba(255,255,255,.6);border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+  .landing-btn-secondary:hover{border-color:white;background:rgba(255,255,255,.1);}
+  .landing-features{padding:48px 24px;max-width:900px;margin:0 auto;width:100%;}
+  .landing-features-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:32px;}
+  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;}
+  .feature-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;text-align:center;}
+  .feature-icon{font-size:32px;margin-bottom:10px;}
+  .feature-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .feature-desc{font-size:12px;color:var(--gray-500);}
+  .landing-footer{text-align:center;padding:24px;color:var(--gray-400);font-size:12px;border-top:1px solid var(--gray-200);margin-top:auto;}
+
+  /* ── AUTH ── */
+  #authScreen{position:fixed;inset:0;background:var(--gray-50);display:none;align-items:center;justify-content:center;z-index:9100;padding:16px;}
+  .auth-box{background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:380px;padding:36px 32px;}
+  .auth-logo{font-size:26px;font-weight:700;color:var(--blue);text-align:center;margin-bottom:4px;}
+  .auth-subtitle{text-align:center;color:var(--gray-400);font-size:13px;margin-bottom:28px;}
+  .auth-title{font-size:18px;font-weight:700;margin-bottom:20px;}
+  .auth-form .form-group{margin-bottom:14px;}
+  .auth-btn{width:100%;padding:11px;background:var(--blue);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;font-family:inherit;transition:background .15s;}
+  .auth-btn:hover{background:var(--blue-dark);}
+  .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500);}
+  .auth-switch a{color:var(--blue);cursor:pointer;font-weight:500;}
+  .auth-back{text-align:center;margin-top:10px;font-size:13px;}
+  .auth-back a{color:var(--gray-400);cursor:pointer;}
+  .auth-error{background:var(--red-light);color:var(--red);border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none;}
+  .auth-success{background:var(--green-light);color:var(--green);border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none;}
+
+  /* ── USER BAR ── */
+  #userBar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--gray-200);}
+  .user-email{font-size:11px;color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+  .logout-btn{background:none;border:none;cursor:pointer;font-size:11px;color:var(--gray-400);padding:4px 6px;border-radius:4px;}
+  .logout-btn:hover{background:var(--gray-100);color:var(--red);}
+
+  /* ── ADMIN ── */
+  #adminScreen{position:fixed;inset:0;background:var(--gray-50);z-index:8000;display:none;flex-direction:column;}
+  .admin-header{background:white;border-bottom:1px solid var(--gray-200);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .admin-title{font-size:18px;font-weight:700;}
+  .admin-body{flex:1;overflow-y:auto;padding:24px;}
+
 </style>
 </head>
 <body>
+
+<!-- LANDING -->
+<div id="landingScreen" style="display:none;">
+  <div class="landing-hero">
+    <div class="landing-logo">MOEVE</div>
+    <div class="landing-tagline">Tu panel de gestión personal</div>
+    <div class="landing-btns">
+      <button class="landing-btn-primary" onclick="showAuth('login')">Iniciar sesión</button>
+      <button class="landing-btn-secondary" onclick="showAuth('register')">Registrarse</button>
+    </div>
+  </div>
+  <div class="landing-features">
+    <div class="landing-features-title">Todo lo que necesitas en un solo lugar</div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🗓️</div><div class="feature-title">Mi Calendario</div><div class="feature-desc">Turnos generados automáticamente según tus ciclos</div></div>
+      <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Diario de Trabajo</div><div class="feature-desc">Registro diario de turnos, área y estado de planta</div></div>
+      <div class="feature-card"><div class="feature-icon">⏱️</div><div class="feature-title">Horas Extras</div><div class="feature-desc">Controla y gestiona todas tus horas extras</div></div>
+      <div class="feature-card"><div class="feature-icon">🏖️</div><div class="feature-title">Vacaciones</div><div class="feature-desc">Planifica y controla tus días libres</div></div>
+      <div class="feature-card"><div class="feature-icon">📦</div><div class="feature-title">Inventario</div><div class="feature-desc">Gestiona el stock de material con alertas</div></div>
+      <div class="feature-card"><div class="feature-icon">💾</div><div class="feature-title">Copia de Seguridad</div><div class="feature-desc">Exporta e importa todos tus datos</div></div>
+    </div>
+  </div>
+  <div class="landing-footer">MOEVE — Panel de Gestión Personal · 15€/año</div>
+</div>
+
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">MOEVE</div>
+    <div class="auth-subtitle">Panel de Gestión Personal</div>
+    <div id="authLogin">
+      <div class="auth-title">Iniciar sesión</div>
+      <div class="auth-error" id="loginError"></div>
+      <div class="auth-form">
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="form-group"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="auth-btn" onclick="doLogin()">Entrar</button>
+      </div>
+      <div class="auth-switch">¿No tienes cuenta? <a onclick="showAuth('register')">Regístrate</a></div>
+      <div class="auth-back"><a onclick="showLanding()">← Volver</a></div>
+    </div>
+    <div id="authRegister" style="display:none;">
+      <div class="auth-title">Crear cuenta</div>
+      <div class="auth-error" id="registerError"></div>
+      <div class="auth-success" id="registerSuccess"></div>
+      <div class="auth-form">
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="tu@email.com"></div>
+        <div class="form-group"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="form-group"><label>Repetir contraseña</label><input type="password" id="regPass2" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="auth-btn" onclick="doRegister()">Crear cuenta</button>
+      </div>
+      <div class="auth-switch">¿Ya tienes cuenta? <a onclick="showAuth('login')">Inicia sesión</a></div>
+      <div class="auth-back"><a onclick="showLanding()">← Volver</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminScreen">
+  <div class="admin-header">
+    <div class="admin-title">🔐 Panel de Administración</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">+ Añadir usuario</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeAdmin()">← Volver a la app</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Email</th><th>Registrado</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="adminUsersBody"><tr><td colspan="4"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal añadir usuario -->
+<div id="modalAddUser" class="modal-overlay" style="display:none">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><div class="modal-title">Añadir usuario</div><button class="close-btn" onclick="closeModal('modalAddUser')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Email</label><input type="email" id="addUserEmail"></div>
+      <div class="form-group" style="margin-top:12px;"><label>Contraseña temporal</label><input type="password" id="addUserPass"></div>
+      <div class="auth-error" id="addUserError" style="margin-top:10px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalAddUser')">Cancelar</button>
+      <button class="btn btn-primary" onclick="doAddUser()">Crear</button>
+    </div>
+  </div>
+</div>
 
 <button class="hamburger" onclick="toggleSidebar()">☰</button>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -198,6 +337,11 @@
     <div class="nav-item" onclick="showSection('telefonos')"><span class="nav-icon">📞</span> Teléfonos</div>
     <div class="nav-item" onclick="showSection('backup')"><span class="nav-icon">💾</span> Copia de Seguridad</div>
     <div class="nav-item" onclick="showSection('config')"><span class="nav-icon">⚙️</span> Configuración</div>
+    <div class="nav-item" id="adminNavItem" style="display:none;" onclick="openAdmin()"><span class="nav-icon">🔐</span> Panel Admin</div>
+  </div>
+  <div id="userBar" style="display:none;">
+    <span class="user-email" id="userEmailLabel">—</span>
+    <button class="logout-btn" onclick="doLogout()">Salir</button>
   </div>
 </nav>
 
@@ -700,7 +844,148 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let opciones={},editingId=null,diarioView='lista',calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),diarioData=[],horasTab='todas',prlTab='todas',vacTab='todas';
 
-async function init(){await loadOpciones();populateFilters();showSection('mi-calendario');}
+// ── AUTH ──
+const ADMIN_EMAIL = 'nadius76@hotmail.com';
+let currentUser = null;
+
+function showLanding(){
+  document.getElementById('landingScreen').style.display='flex';
+  document.getElementById('authScreen').style.display='none';
+}
+
+function showAuth(mode){
+  document.getElementById('landingScreen').style.display='none';
+  const as = document.getElementById('authScreen');
+  as.style.display='flex'; as.style.alignItems='center'; as.style.justifyContent='center';
+  document.getElementById('authLogin').style.display = mode==='login' ? 'block' : 'none';
+  document.getElementById('authRegister').style.display = mode==='register' ? 'block' : 'none';
+  ['loginError','registerError','registerSuccess'].forEach(id => document.getElementById(id).style.display='none');
+}
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Completa todos los campos.';errEl.style.display='block';return;}
+  const{error} = await sb.auth.signInWithPassword({email,password:pass});
+  if(error){errEl.textContent='Email o contraseña incorrectos.';errEl.style.display='block';}
+}
+
+async function doRegister(){
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  const errEl = document.getElementById('registerError');
+  const okEl = document.getElementById('registerSuccess');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Completa todos los campos.';errEl.style.display='block';return;}
+  if(pass.length<6){errEl.textContent='La contraseña debe tener al menos 6 caracteres.';errEl.style.display='block';return;}
+  if(pass!==pass2){errEl.textContent='Las contraseñas no coinciden.';errEl.style.display='block';return;}
+  const{data,error} = await sb.auth.signUp({email,password:pass});
+  if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
+  if(data.user){
+    await sb.from('usuarios').upsert({id:data.user.id,email,bloqueado:false});
+    // Copy default inventario for new user
+    const{data:inv} = await sb.from('inventario').select('*').eq('user_id',currentUser.id).is('user_id',null);
+    if(inv&&inv.length){
+      const newInv = inv.map(({id,...r})=>({...r,user_id:data.user.id}));
+      await sb.from('inventario').insert(newInv);
+    }
+  }
+  okEl.textContent='Cuenta creada. Ya puedes iniciar sesión.';okEl.style.display='block';
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  currentUser=null;
+  document.getElementById('userBar').style.display='none';
+  document.getElementById('adminNavItem').style.display='none';
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  showLanding();
+}
+
+function openAdmin(){loadAdminUsers();document.getElementById('adminScreen').style.display='flex';}
+function closeAdmin(){document.getElementById('adminScreen').style.display='none';}
+
+async function loadAdminUsers(){
+  const{data} = await sb.from('usuarios').select('*').order('created_at');
+  const tbody = document.getElementById('adminUsersBody');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No hay usuarios</div></div></td></tr>';return;}
+  tbody.innerHTML=data.map(u=>`<tr>
+    <td><strong>${u.email}</strong></td>
+    <td>${u.created_at?new Date(u.created_at).toLocaleDateString('es-ES'):'—'}</td>
+    <td>${u.bloqueado?'<span class="badge badge-red">Bloqueado</span>':'<span class="badge badge-green">Activo</span>'}</td>
+    <td style="white-space:nowrap;">
+      <button class="btn btn-secondary btn-sm btn-icon" onclick="toggleBloqueo('${u.id}',${u.bloqueado})">${u.bloqueado?'🔓':'🔒'}</button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="delUser('${u.id}','${u.email}')">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function toggleBloqueo(id,bloqueado){
+  await sb.from('usuarios').update({bloqueado:!bloqueado}).eq('id',id);
+  toast(bloqueado?'Usuario desbloqueado':'Usuario bloqueado');
+  loadAdminUsers();
+}
+
+async function delUser(id,email){
+  if(!confirm(`¿Eliminar el usuario ${email}?`))return;
+  await sb.from('usuarios').delete().eq('id',id);
+  toast('Usuario eliminado');loadAdminUsers();
+}
+
+function openAddUserModal(){
+  document.getElementById('addUserEmail').value='';
+  document.getElementById('addUserPass').value='';
+  document.getElementById('addUserError').style.display='none';
+  openModal('modalAddUser');
+}
+
+async function doAddUser(){
+  const email=document.getElementById('addUserEmail').value.trim();
+  const pass=document.getElementById('addUserPass').value;
+  const errEl=document.getElementById('addUserError');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Completa todos los campos.';errEl.style.display='block';return;}
+  if(pass.length<6){errEl.textContent='Mínimo 6 caracteres.';errEl.style.display='block';return;}
+  const{data,error}=await sb.auth.signUp({email,password:pass});
+  if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
+  if(data.user)await sb.from('usuarios').upsert({id:data.user.id,email,bloqueado:false});
+  toast('Usuario creado');closeModal('modalAddUser');loadAdminUsers();
+}
+
+// ── INIT ──
+async function init(){
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(session&&session.user){
+      currentUser=session.user;
+      try{
+        const{data}=await sb.from('usuarios').select('bloqueado').eq('id',currentUser.id).maybeSingle();
+        if(data&&data.bloqueado){await sb.auth.signOut();toast('Tu cuenta está bloqueada.','error');showLanding();return;}
+        if(!data)await sb.from('usuarios').upsert({id:currentUser.id,email:currentUser.email,bloqueado:false});
+      }catch(e){}
+      document.getElementById('landingScreen').style.display='none';
+      document.getElementById('authScreen').style.display='none';
+      document.getElementById('userEmailLabel').textContent=currentUser.email;
+      document.getElementById('userBar').style.display='flex';
+      if(currentUser.email===ADMIN_EMAIL)document.getElementById('adminNavItem').style.display='flex';
+      await loadOpciones();
+      populateFilters();
+      showSection('mi-calendario');
+    } else {
+      currentUser=null;
+      document.getElementById('userBar').style.display='none';
+      document.getElementById('adminNavItem').style.display='none';
+      showLanding();
+    }
+  });
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session)showLanding();
+}
+
+init();
 
 async function loadOpciones(){
   const{data}=await sb.from('opciones_configuracion').select('*').order('orden');
@@ -774,7 +1059,7 @@ function actionBtns(ef,df){return`<td style="white-space:nowrap;"><button class=
 
 // DIARIO
 async function loadDiario(){
-  let q=sb.from('diario_trabajo').select('*').order('fecha',{ascending:false});
+  let q=sb.from('diario_trabajo').select('*').eq('user_id',currentUser.id).order('fecha',{ascending:false});
   const desde=document.getElementById('fDiarioDesde').value,hasta=document.getElementById('fDiarioHasta').value;
   const area=document.getElementById('fDiarioArea').value,turno=document.getElementById('fDiarioTurno').value;
   const letra=document.getElementById('fDiarioLetra').value,jefe=document.getElementById('fDiarioJefe').value;
@@ -913,14 +1198,14 @@ function exportDiarioPDF(){
 
 // HORAS EXTRAS
 async function loadHorasExtras(){
-  let q=sb.from('horas_extras').select('*').order('fecha',{ascending:false});
+  let q=sb.from('horas_extras').select('*').eq('user_id',currentUser.id).order('fecha',{ascending:false});
   if(horasTab!=='todas')q=q.eq('estado',horasTab);
   const desde=document.getElementById('fHorasDesde').value,hasta=document.getElementById('fHorasHasta').value;
   const tipo=document.getElementById('fHorasTipo').value,pagado=document.getElementById('fHorasPagado').value;
   if(desde)q=q.gte('fecha',desde);if(hasta)q=q.lte('fecha',hasta);
   if(tipo)q=q.eq('tipo',tipo);if(pagado)q=q.eq('pagado_en',pagado);
   const{data}=await q;const all=data||[];
-  const{data:allData}=await sb.from('horas_extras').select('*');const total=allData||[];
+  const{data:allData}=await sb.from('horas_extras').select('*').eq('user_id',currentUser.id);const total=allData||[];
   document.getElementById('hSumPlanificadas').textContent=total.filter(r=>r.estado==='Planificado').reduce((s,r)=>s+(r.horas||0),0)+'h';
   document.getElementById('hSumRealizadas').textContent=total.filter(r=>r.estado==='Realizado').reduce((s,r)=>s+(r.horas||0),0)+'h';
   document.getElementById('hSumPagadas').textContent=total.filter(r=>r.estado==='Pagado').reduce((s,r)=>s+(r.horas||0),0)+'h';
@@ -938,7 +1223,7 @@ async function openHorasModal(id=null){
   fillSelect('hEstado','horas_extras','estado');fillSelect('hPagadoEn','horas_extras','pagado_en');
   fillSelect('hTipo','horas_extras','tipo');fillSelect('hComo','horas_extras','como');fillSelect('hModalidad','horas_extras','modalidad');
   if(id){
-    const{data}=await sb.from('horas_extras').select('*').eq('id',id).single();
+    const{data}=await sb.from('horas_extras').select('*').eq('user_id',currentUser.id).eq('id',id).single();
     if(data){document.getElementById('hNombre').value=data.nombre||'';document.getElementById('hEstado').value=data.estado||'';document.getElementById('hFecha').value=data.fecha||'';document.getElementById('hHoras').value=data.horas||'';document.getElementById('hPagadoEn').value=data.pagado_en||'';document.getElementById('hTipo').value=data.tipo||'';document.getElementById('hComo').value=data.como||'';document.getElementById('hModalidad').value=data.modalidad||'';document.getElementById('hObs').value=data.observaciones||'';}
   }else{['hNombre','hFecha','hHoras','hObs'].forEach(i=>document.getElementById(i).value='');['hEstado','hPagadoEn','hTipo','hComo','hModalidad'].forEach(i=>document.getElementById(i).value='');}
   openModal('modalHoras');
@@ -967,12 +1252,12 @@ function exportHorasPDF(){
 
 // PRL
 async function loadPRL(){
-  let q=sb.from('formacion_prl').select('*').order('created_at',{ascending:false});
+  let q=sb.from('formacion_prl').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(prlTab!=='todas')q=q.eq('estado',prlTab);
   const desde=document.getElementById('fPRLDesde').value,hasta=document.getElementById('fPRLHasta').value,tipo=document.getElementById('fPRLTipo').value;
   if(desde)q=q.gte('fecha_realizacion',desde);if(hasta)q=q.lte('fecha_realizacion',hasta);if(tipo)q=q.eq('tipo',tipo);
   const{data}=await q;const all=data||[];
-  const{data:allData}=await sb.from('formacion_prl').select('*');const total=allData||[];
+  const{data:allData}=await sb.from('formacion_prl').select('*').eq('user_id',currentUser.id);const total=allData||[];
   document.getElementById('prlSinEmpezar').textContent=total.filter(r=>r.estado==='Sin empezar').reduce((s,r)=>s+(r.horas||0),0)+'h';
   document.getElementById('prlPlanificadas').textContent=total.filter(r=>r.estado==='Planificado').reduce((s,r)=>s+(r.horas||0),0)+'h';
   document.getElementById('prlRealizadas').textContent=total.filter(r=>r.estado==='Realizada').reduce((s,r)=>s+(r.horas||0),0)+'h';
@@ -987,7 +1272,7 @@ function clearPRLFilters(){['fPRLDesde','fPRLHasta','fPRLTipo'].forEach(id=>docu
 async function openPRLModal(id=null){
   editingId=id;document.getElementById('modalPRLTitle').textContent=id?'Editar formación':'Nueva formación PRL';
   fillSelect('pEstado','formacion_prl','estado');fillSelect('pTipo','formacion_prl','tipo');
-  if(id){const{data}=await sb.from('formacion_prl').select('*').eq('id',id).single();if(data){document.getElementById('pNombre').value=data.nombre||'';document.getElementById('pEstado').value=data.estado||'';document.getElementById('pFecha').value=data.fecha_realizacion||'';document.getElementById('pHoras').value=data.horas||'';document.getElementById('pTipo').value=data.tipo||'';document.getElementById('pObs').value=data.observaciones||'';}}
+  if(id){const{data}=await sb.from('formacion_prl').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('pNombre').value=data.nombre||'';document.getElementById('pEstado').value=data.estado||'';document.getElementById('pFecha').value=data.fecha_realizacion||'';document.getElementById('pHoras').value=data.horas||'';document.getElementById('pTipo').value=data.tipo||'';document.getElementById('pObs').value=data.observaciones||'';}}
   else{['pNombre','pFecha','pHoras','pObs'].forEach(i=>document.getElementById(i).value='');['pEstado','pTipo'].forEach(i=>document.getElementById(i).value='');}
   openModal('modalPRL');
 }
@@ -1014,14 +1299,14 @@ async function loadVacAnios(){
 
 async function crearAnioVac(){
   const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
-  await sb.from('vacaciones').insert({anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
+  await sb.from('vacaciones').insert({user_id:currentUser.id,user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
   toast(`Año ${anio} creado`);loadVacAnios();loadVacaciones();
 }
 
 async function loadVacaciones(){
   const anio=document.getElementById('vacAnioSel').value||new Date().getFullYear();
   document.getElementById('vacAnioSubtitle').textContent=anio;
-  const{data}=await sb.from('vacaciones').select('*').eq('anio',anio);
+  const{data}=await sb.from('vacaciones').select('*').eq('user_id',currentUser.id).eq('anio',anio);
   let all=data||[];
   // Sort by fecha_realizada ascending (nulls last)
   all.sort((a,b)=>{
@@ -1047,7 +1332,7 @@ function setVacTab(tab,el){vacTab=tab;document.querySelectorAll('#sec-vacaciones
 async function openVacModal(id=null){
   editingId=id;document.getElementById('modalVacTitle').textContent=id?'Editar entrada':'Nueva entrada';
   fillSelect('vDescripcion','vacaciones','descripcion');fillSelect('vEstado','vacaciones','estado');
-  if(id){const{data}=await sb.from('vacaciones').select('*').eq('id',id).single();if(data){document.getElementById('vNombre').value=data.nombre||'';document.getElementById('vDescripcion').value=data.descripcion||'';document.getElementById('vHoras').value=data.horas||'';document.getElementById('vDias').value=data.dias||'';document.getElementById('vEstado').value=data.estado||'';document.getElementById('vPlaneada').value=data.fecha_planeada||'';document.getElementById('vRealizada').value=data.fecha_realizada||'';document.getElementById('vObs').value=data.observaciones||'';}}
+  if(id){const{data}=await sb.from('vacaciones').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('vNombre').value=data.nombre||'';document.getElementById('vDescripcion').value=data.descripcion||'';document.getElementById('vHoras').value=data.horas||'';document.getElementById('vDias').value=data.dias||'';document.getElementById('vEstado').value=data.estado||'';document.getElementById('vPlaneada').value=data.fecha_planeada||'';document.getElementById('vRealizada').value=data.fecha_realizada||'';document.getElementById('vObs').value=data.observaciones||'';}}
   else{['vNombre','vHoras','vDias','vPlaneada','vRealizada','vObs'].forEach(i=>document.getElementById(i).value='');['vDescripcion','vEstado'].forEach(i=>document.getElementById(i).value='');}
   openModal('modalVac');
 }
@@ -1067,7 +1352,7 @@ function exportVacPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l');doc.s
 
 // HORAS DORMIDA
 async function loadDormida(){
-  const{data}=await sb.from('horas_dormida').select('*').order('fecha',{ascending:false});
+  const{data}=await sb.from('horas_dormida').select('*').eq('user_id',currentUser.id).order('fecha',{ascending:false});
   const all=data||[];const gastadas=all.reduce((s,r)=>s+(r.horas||0),0);
   document.getElementById('dormidaGastadas').textContent=gastadas+'h';
   document.getElementById('dormidaRestantes').textContent=Math.max(0,10-gastadas)+'h';
@@ -1078,7 +1363,7 @@ async function loadDormida(){
 
 async function openDormidaModal(id=null){
   editingId=id;fillSelect('dorTurno','horas_dormida','turno');
-  if(id){const{data}=await sb.from('horas_dormida').select('*').eq('id',id).single();if(data){document.getElementById('dorFecha').value=data.fecha||'';document.getElementById('dorTurno').value=data.turno||'';document.getElementById('dorHoras').value=data.horas||'';}}
+  if(id){const{data}=await sb.from('horas_dormida').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('dorFecha').value=data.fecha||'';document.getElementById('dorTurno').value=data.turno||'';document.getElementById('dorHoras').value=data.horas||'';}}
   else{document.getElementById('dorFecha').value=new Date().toISOString().split('T')[0];document.getElementById('dorTurno').value='';document.getElementById('dorHoras').value='';}
   openModal('modalDormida');
 }
@@ -1098,7 +1383,7 @@ async function delDormida(id){if(!confirm('¿Eliminar?'))return;await sb.from('h
 
 // CALENDARIO IMAGEN
 async function loadCalImg(){
-  const{data}=await sb.from('calendario_imagen').select('*').order('anio',{ascending:false}).limit(1);
+  const{data}=await sb.from('calendario_imagen').select('*').eq('user_id',currentUser.id).order('anio',{ascending:false}).limit(1);
   const wrap=document.getElementById('calImgWrap');
   if(data&&data.length&&data[0].url_imagen){
     wrap.innerHTML=`<div style="text-align:center;"><img src="${data[0].url_imagen}" style="max-width:100%;border-radius:8px;box-shadow:var(--shadow-md);" alt="Calendario"><div style="margin-top:12px;"><button class="btn btn-danger btn-sm" onclick="delCalImg('${data[0].id}')">🗑 Eliminar imagen</button></div></div>`;
@@ -1123,7 +1408,7 @@ async function delCalImg(id){if(!confirm('¿Eliminar la imagen?'))return;await s
 
 // INVENTARIO
 async function loadInventario(){
-  const{data}=await sb.from('inventario').select('*').order('nombre');const all=data||[];
+  const{data}=await sb.from('inventario').select('*').eq('user_id',currentUser.id).order('nombre');const all=data||[];
   const tbody=document.getElementById('invBody');
   if(!all.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-text">No hay artículos</div></div></td></tr>`;return;}
   tbody.innerHTML=all.map(r=>{
@@ -1135,7 +1420,7 @@ async function loadInventario(){
 
 async function openInvModal(id=null){
   editingId=id;document.getElementById('modalInvTitle').textContent=id?'Editar artículo':'Nuevo artículo';
-  if(id){const{data}=await sb.from('inventario').select('*').eq('id',id).single();if(data){document.getElementById('iNombre').value=data.nombre||'';document.getElementById('iCantidad').value=data.cantidad??'';document.getElementById('iStockMin').value=data.stock_minimo??'';}}
+  if(id){const{data}=await sb.from('inventario').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('iNombre').value=data.nombre||'';document.getElementById('iCantidad').value=data.cantidad??'';document.getElementById('iStockMin').value=data.stock_minimo??'';}}
   else{['iNombre','iCantidad','iStockMin'].forEach(i=>document.getElementById(i).value='');}
   openModal('modalInv');
 }
@@ -1156,7 +1441,7 @@ function exportInvPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setF
 // TELEFONOS
 async function loadTelefonos(){
   const search=document.getElementById('telSearch').value.toLowerCase();
-  const{data}=await sb.from('telefonos').select('*').order('nombre');
+  const{data}=await sb.from('telefonos').select('*').eq('user_id',currentUser.id).order('nombre');
   const all=(data||[]).filter(r=>!search||r.nombre?.toLowerCase().includes(search)||r.numero?.includes(search));
   const tbody=document.getElementById('telBody');
   if(!all.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📞</div><div class="empty-state-text">No hay contactos</div></div></td></tr>`;return;}
@@ -1165,7 +1450,7 @@ async function loadTelefonos(){
 
 async function openTelModal(id=null){
   editingId=id;document.getElementById('modalTelTitle').textContent=id?'Editar contacto':'Nuevo contacto';
-  if(id){const{data}=await sb.from('telefonos').select('*').eq('id',id).single();if(data){document.getElementById('tNombre').value=data.nombre||'';document.getElementById('tNumero').value=data.numero||'';document.getElementById('tObs').value=data.observaciones||'';}}
+  if(id){const{data}=await sb.from('telefonos').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('tNombre').value=data.nombre||'';document.getElementById('tNumero').value=data.numero||'';document.getElementById('tObs').value=data.observaciones||'';}}
   else{['tNombre','tNumero','tObs'].forEach(i=>document.getElementById(i).value='');}
   openModal('modalTel');
 }
@@ -1292,14 +1577,14 @@ async function loadDCAnios(){
 
 async function crearAnioDC(){
   const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
-  await sb.from('dias_companeros').insert({anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
+  await sb.from('dias_companeros').insert({user_id:currentUser.id,user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
   toast(`Año ${anio} creado`);loadDCAnios();loadDC();
 }
 
 async function loadDC(){
   const anio=document.getElementById('dcAnioSel').value||new Date().getFullYear();
   document.getElementById('dcAnioSubtitle').textContent=anio;
-  const{data}=await sb.from('dias_companeros').select('*').eq('anio',anio);
+  const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).eq('anio',anio);
   let all=data||[];
   all.sort((a,b)=>{
     if(!a.fecha_planeada&&!b.fecha_planeada)return 0;
@@ -1325,7 +1610,7 @@ async function openDCModal(id=null){
   fillSelect('dcDescripcion','dias_companeros','descripcion');
   fillSelect('dcEstado','dias_companeros','estado');
   if(id){
-    const{data}=await sb.from('dias_companeros').select('*').eq('id',id).single();
+    const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).eq('id',id).single();
     if(data){document.getElementById('dcNombre').value=data.nombre||'';document.getElementById('dcDescripcion').value=data.descripcion||'';document.getElementById('dcHoras').value=data.horas||'';document.getElementById('dcDias').value=data.dias||'';document.getElementById('dcEstado').value=data.estado||'';document.getElementById('dcPlaneada').value=data.fecha_planeada||'';document.getElementById('dcRealizada').value=data.fecha_realizada||'';document.getElementById('dcObs').value=data.observaciones||'';}
   }else{
     ['dcNombre','dcHoras','dcDias','dcPlaneada','dcRealizada','dcObs'].forEach(i=>document.getElementById(i).value='');
@@ -1389,7 +1674,7 @@ function getTurnoDelDia(fecha) {
 }
 
 async function loadMiCalendarioCiclos() {
-  const { data } = await sb.from('mi_calendario_ciclos').select('*').order('fecha_inicio');
+  const { data } = await sb.from('mi_calendario_ciclos').select('*').eq('user_id',currentUser.id).order('fecha_inicio');
   miCiclos = data || [];
   const cont = document.getElementById('ciclosList');
   if (!miCiclos.length) {
@@ -1418,7 +1703,7 @@ async function loadTurnoOverrides() {
   const lastDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${new Date(miCalYear,miCalMonth+1,0).getDate()}`;
   turnoOverrides={};
   // Load manual overrides
-  const{data:ovData}=await sb.from('mi_calendario_overrides').select('*').gte('fecha',firstDay).lte('fecha',lastDay);
+  const{data:ovData}=await sb.from('mi_calendario_overrides').select('*').eq('user_id',currentUser.id).gte('fecha',firstDay).lte('fecha',lastDay);
   (ovData||[]).forEach(r=>{turnoOverrides[r.fecha]={turno:r.turno,comentario:r.comentario||''};});
   // Load diario records - these take priority over auto calculation
   const{data:diData}=await sb.from('diario_trabajo').select('fecha,turno,observaciones').gte('fecha',firstDay).lte('fecha',lastDay);
@@ -1504,7 +1789,7 @@ async function editTurnoDia(fecha, turnoActual) {
   document.getElementById('modalEditTurnoTitle').textContent = '📅 ' + fmtDate(fecha);
 
   // Check if diario record exists for this date
-  const { data: existing } = await sb.from('diario_trabajo').select('*').eq('fecha', fecha).maybeSingle();
+  const { data: existing } = await sb.from('diario_trabajo').select('*').eq('user_id',currentUser.id).eq('fecha', fecha).maybeSingle();
   const override = turnoOverrides[fecha];
 
   // Set values
@@ -1530,6 +1815,7 @@ async function editTurnoDia(fecha, turnoActual) {
 
 async function guardarDiaCalendario(fecha, existingId) {
   const payload = {
+    user_id:currentUser.id,
     fecha,
     turno: document.getElementById('editDiaTurno').value || null,
     area: document.getElementById('editDiaArea').value || null,
@@ -1554,7 +1840,7 @@ async function guardarDiaCalendario(fecha, existingId) {
 async function delDiarioDesdeCalendario(id, fecha) {
   if (!confirm('¿Eliminar el registro de este día?')) return;
   await sb.from('diario_trabajo').delete().eq('id', id);
-  await sb.from('mi_calendario_overrides').delete().eq('fecha', fecha);
+  await sb.from('mi_calendario_overrides').delete().eq('user_id',currentUser.id).eq('fecha', fecha);
   toast('Registro eliminado');
   document.getElementById('modalEditTurno').style.display = 'none';
   renderMiCalendario();
@@ -1563,9 +1849,9 @@ async function delDiarioDesdeCalendario(id, fecha) {
 async function setTurnoDia(fecha, turno, comentario='') {
   document.getElementById('modalEditTurno').style.display = 'none';
   if (turno === '') {
-    await sb.from('mi_calendario_overrides').delete().eq('fecha', fecha);
+    await sb.from('mi_calendario_overrides').delete().eq('user_id',currentUser.id).eq('fecha', fecha);
   } else {
-    await sb.from('mi_calendario_overrides').upsert({fecha, turno, comentario}, {onConflict:'fecha'});
+    await sb.from('mi_calendario_overrides').upsert({user_id:currentUser.id, fecha, turno, comentario}, {onConflict:'fecha'});
   }
   renderMiCalendario();
 }
@@ -1600,6 +1886,7 @@ async function saveCiclo() {
   if (!fechaInicio || !fechaFin) { toast('Las fechas son obligatorias', 'error'); return; }
   if (fechaFin < fechaInicio) { toast('La fecha fin debe ser posterior a la fecha inicio', 'error'); return; }
   const payload = {
+    user_id:currentUser.id,
     tipo,
     turno_inicial: tipo === 'turno' ? document.getElementById('cicloTurnoInicial').value : null,
     fecha_inicio: fechaInicio,
