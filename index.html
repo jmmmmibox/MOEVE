@@ -221,6 +221,16 @@
   .admin-title{font-size:18px;font-weight:700;}
   .admin-body{flex:1;overflow-y:auto;padding:24px;}
 
+
+  /* ── STICKY TABLE DIARIO ── */
+  #diarioTableWrap{overflow:auto;max-height:65vh;border-radius:var(--radius);border:1px solid var(--gray-200);}
+  #diarioTableWrap table{border-collapse:separate;border-spacing:0;}
+  #diarioTableWrap thead th{position:sticky;top:0;background:var(--gray-50);z-index:2;border-bottom:1px solid var(--gray-200);}
+  #diarioTableWrap thead th:first-child{position:sticky;top:0;left:0;z-index:3;background:var(--gray-50);}
+  #diarioTableWrap tbody td:first-child{position:sticky;left:0;background:white;z-index:1;border-right:1px solid var(--gray-200);}
+  #diarioTableWrap tbody tr:hover td:first-child{background:var(--gray-50);}
+  #diarioTableWrap th:first-child,#diarioTableWrap td:first-child{min-width:100px;}
+
 </style>
 </head>
 <body>
