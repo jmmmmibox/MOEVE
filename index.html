@@ -979,6 +979,40 @@
   </div>
 </div>
 
+<!-- Modal Rutina -->
+<div id="modalRutina" class="modal-overlay" style="display:none">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="rutinaModalTitulo">Iniciar Rutina</div>
+      </div>
+      <button class="close-btn" onclick="document.getElementById('modalRutina').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end;">
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="rutinaFecha">
+        </div>
+        <div class="form-group" style="min-width:130px;">
+          <label>Letra</label>
+          <select id="rutinaLetra"></select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Producto</th><th>Dato Anterior</th><th>Dato Actualizado</th><th>Observaciones</th></tr></thead>
+          <tbody id="rutinaTablaBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('modalRutina').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="registrarRutina()">✅ Registrar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
@@ -1143,6 +1177,7 @@ async function showSection_invQuimico(){
 }
 
 let areaCollapsed = {};
+let rutinaAreaActiva = null;
 
 async function loadInvQuimico(){
   const cont = document.getElementById('invQuimicoContent');
@@ -1154,21 +1189,7 @@ async function loadInvQuimico(){
     return;
   }
 
-  // Header: fecha, letra y botón registrar
-  let html = `<div class="card" style="margin-bottom:16px;">
-    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-      <div class="form-group">
-        <label>Fecha de la rutina</label>
-        <input type="date" id="rutFecha" value="${new Date().toISOString().split('T')[0]}">
-      </div>
-      <div class="form-group" style="min-width:120px;">
-        <label>Letra</label>
-        <select id="rutLetra"></select>
-      </div>
-      <button class="btn btn-primary" onclick="registrarRutina()" style="margin-bottom:1px;">✅ Registrar Rutina</button>
-    </div>
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+  let html = `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
     <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos datos</button>
     <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
     <button class="btn btn-primary btn-sm" onclick="openAreaModal()">+ Área</button>
@@ -1176,61 +1197,87 @@ async function loadInvQuimico(){
 
   for(const area of areas){
     const{data:productos} = await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
-    const collapsed = areaCollapsed[area.id] || false;
-    const arrow = collapsed ? '▶' : '▼';
+    const nProd = productos ? productos.length : 0;
+    const collapsed = areaCollapsed[area.id] !== false; // default collapsed
 
-    html += `<div class="area-body">
-      <div class="area-header" onclick="toggleArea('${area.id}')">
-        <div class="area-header-title">${arrow} 📍 ${area.nombre}</div>
+    html += `<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden;">
+      <!-- Área header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--blue-light);cursor:pointer;" onclick="toggleArea('${area.id}')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;">${collapsed?'▶':'▼'}</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue);">📍 ${area.nombre}</span>
+          <span style="font-size:12px;color:var(--gray-500);">${nProd} producto${nProd!==1?'s':''}</span>
+        </div>
         <div style="display:flex;gap:6px;" onclick="event.stopPropagation()">
+          <button class="btn btn-primary btn-sm" onclick="iniciarRutina('${area.id}','${area.nombre.replace(/'/g,"\'")}')">▶ Iniciar Rutina</button>
           <button class="btn btn-secondary btn-sm btn-icon" onclick="openProductoModal('${area.id}')">+ Prod.</button>
           <button class="btn btn-secondary btn-sm btn-icon" onclick="openAreaModal('${area.id}','${area.nombre.replace(/'/g,"\'")}')">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="delArea('${area.id}','${area.nombre}')">🗑</button>
         </div>
       </div>
-      <div id="area-body-${area.id}" style="display:${collapsed?'none':'block'}">`;
+      <!-- Productos list (collapsed by default) -->
+      <div id="area-body-${area.id}" style="display:${collapsed?'none':'block'};padding:12px 16px;">`;
 
     if(!productos||!productos.length){
-      html += '<div style="color:var(--gray-400);font-size:13px;padding:8px 0 16px;">No hay productos en esta área.</div>';
+      html += '<div style="color:var(--gray-400);font-size:13px;">No hay productos en esta área.</div>';
     } else {
-      // Table header
-      html += `<div class="table-wrap" style="margin-bottom:12px;"><table>
-        <thead><tr><th>Producto</th><th>Dato Anterior</th><th>Dato Actualizado</th><th>Obs.</th><th></th></tr></thead>
-        <tbody>`;
-
+      html += '<div style="display:flex;flex-direction:column;gap:6px;">';
       for(const prod of productos){
-        // Get last record to pre-fill dato_anterior
-        html += `<tr>
-          <td><strong>${prod.nombre}</strong>
-            <div style="margin-top:4px;display:flex;gap:4px;">
-              <button class="btn btn-secondary btn-sm btn-icon" onclick="openProductoModal('${area.id}','${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">✏️</button>
-              <button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorial('${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">📋</button>
-              <button class="btn btn-danger btn-sm btn-icon" onclick="delProducto('${prod.id}','${prod.nombre}')">🗑</button>
-            </div>
-          </td>
-          <td><input type="number" step="any" id="ant_${prod.id}" placeholder="Dato anterior..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
-          <td><input type="number" step="any" id="act_${prod.id}" placeholder="Dato actualizado..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
-          <td><input type="text" id="obs_${prod.id}" placeholder="Observaciones..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
-          <td style="white-space:nowrap;"></td>
-        </tr>`;
+        const{data:regs}=await sb.from('rutina_inv_quimico').select('fecha,dato_actualizado').eq('producto_id',prod.id).eq('user_id',currentUser.id).order('fecha',{ascending:false}).limit(1);
+        const ult=regs&&regs.length?regs[0]:null;
+        html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--gray-50);border-radius:6px;border:1px solid var(--gray-200);">
+          <div>
+            <span style="font-size:13px;font-weight:600;">🧪 ${prod.nombre}</span>
+            ${ult?'<span style="font-size:11px;color:var(--gray-400);margin-left:8px;">Último: '+ult.dato_actualizado+' ('+fmtDate(ult.fecha)+')</span>':''}
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorial('${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">📋</button>
+            <button class="btn btn-secondary btn-sm btn-icon" onclick="openProductoModal('${area.id}','${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">✏️</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="delProducto('${prod.id}','${prod.nombre}')">🗑</button>
+          </div>
+        </div>`;
       }
-      html += '</tbody></table></div>';
+      html += '</div>';
     }
     html += '</div></div>';
   }
-
   cont.innerHTML = html;
-
-  // Fill letra select
-  fillSelect('rutLetra','diario_trabajo','letra');
-  
-  // Store all product IDs for registration
-  window._allProductIds = [];
-  for(const area of areas){
-    const{data:productos} = await sb.from('rutina_productos').select('id').eq('area_id',area.id).eq('user_id',currentUser.id);
-    (productos||[]).forEach(p => window._allProductIds.push(p.id));
-  }
 }
+
+function toggleArea(areaId){
+  areaCollapsed[areaId] = areaCollapsed[areaId] === false ? true : false;
+  loadInvQuimico();
+}
+
+async function iniciarRutina(areaId, areaNombre){
+  rutinaAreaActiva = areaId;
+  const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',areaId).eq('user_id',currentUser.id).order('orden');
+  
+  if(!productos||!productos.length){
+    toast('No hay productos en esta área','error');
+    return;
+  }
+
+  // Build rutina table
+  let rows = productos.map(p=>`<tr>
+    <td style="font-weight:600;font-size:13px;">🧪 ${p.nombre}</td>
+    <td><input type="number" step="any" id="ant_${p.id}" placeholder="Anterior..." style="width:100%;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><input type="number" step="any" id="act_${p.id}" placeholder="Actualizado..." style="width:100%;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><input type="text" id="obs_${p.id}" placeholder="Obs..." style="width:100%;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+  </tr>`).join('');
+
+  // Store product ids
+  window._rutinaProductos = productos.map(p=>p.id);
+
+  // Fill modal
+  document.getElementById('rutinaModalTitulo').textContent = '📍 ' + areaNombre;
+  document.getElementById('rutinaFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('rutinaTablaBody').innerHTML = rows;
+  fillSelect('rutinaLetra','diario_trabajo','letra');
+  document.getElementById('modalRutina').style.display = 'flex';
+}
+
+
 
 async function registrarRutina(){
   const fecha = document.getElementById('rutFecha').value;
