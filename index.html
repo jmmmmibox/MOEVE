@@ -1183,7 +1183,7 @@ async function loadInvQuimico(){
             <span>📅 <strong>${fmtDate(ult.fecha)}</strong></span>
             <span>Anterior: <strong>${ult.dato_anterior??'—'}</strong></span>
             <span>Actualizado: <strong style="color:var(--blue);">${ult.dato_actualizado??'—'}</strong></span>
-            <span>Letra: <span class="badge badge-blue">${ult.letra||'—'}</span></span>
+            <span>Letra: <strong>${ult.letra||'—'}</strong></span>
           </div>`;
         } else {
           html += '<div style="color:var(--gray-400);font-size:13px;">Sin registros aún.</div>';
@@ -1294,7 +1294,7 @@ async function verHistorial(productoId, productoNombre){
     <td>${fmtDate(r.fecha)}</td>
     <td>${r.dato_anterior??'—'}</td>
     <td><strong style="color:var(--blue);">${r.dato_actualizado??'—'}</strong></td>
-    <td>${r.letra?`<span class="badge badge-blue">${r.letra}</span>`:'—'}</td>
+    <td>${r.letra?'<span class="badge badge-blue">'+r.letra+'</span>':'—'}</td>
     <td>${r.observaciones||'—'}</td>
     <td><button class="btn btn-danger btn-sm btn-icon" onclick="delRegistroIQ('${r.id}','${productoId}','${productoNombre}')">🗑</button></td>
   </tr>`).join('');
@@ -2319,7 +2319,7 @@ async function loadInvQuimico(){
             <span>📅 <strong>${fmtDate(ult.fecha)}</strong></span>
             <span>Anterior: <strong>${ult.dato_anterior??'—'}</strong></span>
             <span>Actualizado: <strong style="color:var(--blue);">${ult.dato_actualizado??'—'}</strong></span>
-            <span>Letra: <span class="badge badge-blue">${ult.letra||'—'}</span></span>
+            <span>Letra: <strong>${ult.letra||'—'}</strong></span>
           </div>`;
         } else {
           html += '<div style="color:var(--gray-400);font-size:13px;">Sin registros aún.</div>';
@@ -2430,7 +2430,7 @@ async function verHistorial(productoId, productoNombre){
     <td>${fmtDate(r.fecha)}</td>
     <td>${r.dato_anterior??'—'}</td>
     <td><strong style="color:var(--blue);">${r.dato_actualizado??'—'}</strong></td>
-    <td>${r.letra?`<span class="badge badge-blue">${r.letra}</span>`:'—'}</td>
+    <td>${r.letra?'<span class="badge badge-blue">'+r.letra+'</span>':'—'}</td>
     <td>${r.observaciones||'—'}</td>
     <td><button class="btn btn-danger btn-sm btn-icon" onclick="delRegistroIQ('${r.id}','${productoId}','${productoNombre}')">🗑</button></td>
   </tr>`).join('');
