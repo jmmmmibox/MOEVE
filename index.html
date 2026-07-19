@@ -1543,7 +1543,7 @@ async function exportIQHistorialCompleto(){
 init();
 
 async function loadOpciones(){
-  const{data}=await sb.from('opciones_configuracion').select('*').order('orden');
+  const{data}=await sb.from('opciones_configuracion').select('*').eq('user_id',currentUser.id).order('orden');
   opciones={};
   (data||[]).forEach(o=>{
     if(!opciones[o.modulo])opciones[o.modulo]={};
@@ -2081,7 +2081,7 @@ async function loadConfig(){
 async function addOpcion(modulo,campo){
   const input=document.getElementById(`new-${modulo}-${campo}`);const valor=input.value.trim();if(!valor)return;
   const maxOrden=getOpts(modulo,campo).length+1;
-  const{error}=await sb.from('opciones_configuracion').insert({modulo,campo,valor,orden:maxOrden});
+  const{error}=await sb.from('opciones_configuracion').insert({user_id:currentUser.id,modulo,campo,valor,orden:maxOrden});
   if(error){toast('Error al añadir','error');return;}
   input.value='';toast('Opción añadida');await loadOpciones();loadConfig();
 }
