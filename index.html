@@ -1393,7 +1393,8 @@ async function guardarBorradorRutina(){
       observaciones:obsEl.value||null,
       updated_at:new Date().toISOString(),
     });
-    if(!error)guardados++;
+    if(error){toast('Error: '+error.message,'error');return;}
+    else guardados++;
   }
   toast(guardados>0?'💾 Borrador guardado':'No hay datos que guardar', guardados>0?'success':'error');
 }
