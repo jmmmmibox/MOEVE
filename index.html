@@ -1384,14 +1384,15 @@ async function guardarBorradorRutina(){
     const antEl=document.getElementById('ant_'+id);
     const actEl=document.getElementById('act_'+id);
     const obsEl=document.getElementById('obs_'+id);
-    const{error}=await sb.from('rutina_borrador').upsert({
+    await sb.from('rutina_borrador').delete().eq('user_id',currentUser.id).eq('producto_id',id);
+    const{error}=await sb.from('rutina_borrador').insert({
       user_id:currentUser.id,
       producto_id:id,
       dato_anterior:parseFloat(antEl.value)||null,
       dato_actualizado:parseFloat(actEl.value)||null,
       observaciones:obsEl.value||null,
       updated_at:new Date().toISOString(),
-    },{onConflict:'user_id,producto_id'});
+    });
     if(!error)guardados++;
   }
   toast(guardados>0?'💾 Borrador guardado':'No hay datos que guardar', guardados>0?'success':'error');
