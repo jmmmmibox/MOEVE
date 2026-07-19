@@ -615,16 +615,76 @@
   <!-- INVENTARIO PRODUCTOS QUIMICOS -->
   <div id="sec-inv-quimico" class="section">
     <div class="page-header">
-      <div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="btn btn-secondary btn-sm" onclick="showSection('rutinas')">← Rutinas</button>
-          <div class="page-title">Inventario de Productos Químicos</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="showSection('rutinas')">← Rutinas</button>
+        <div class="page-title">Inventario Productos Químicos</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="showSection('inv-quimico-config')">⚙️ Gestionar áreas y productos</button>
+    </div>
+
+    <!-- Selector de área -->
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="form-group" style="min-width:200px;">
+          <label>Selecciona un área</label>
+          <select id="iqAreaSel" onchange="loadTablaRutina()">
+            <option value="">— Selecciona área —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="iqFechaRutina" value="">
+        </div>
+        <div class="form-group" style="min-width:120px;">
+          <label>Letra</label>
+          <select id="iqLetraRutina"></select>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:1px;">
+          <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos</button>
+          <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="openAreaModal()">+ Área</button>
     </div>
-    <div id="invQuimicoContent"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
+
+    <!-- Tabla de rutina -->
+    <div id="iqTablaWrap" style="display:none;">
+      <div class="table-wrap" style="margin-bottom:12px;">
+        <table>
+          <thead>
+            <tr>
+              <th style="min-width:160px;">Producto</th>
+              <th style="min-width:130px;">Dato Anterior</th>
+              <th style="min-width:130px;">Dato Actualizado</th>
+              <th>Observaciones</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="iqTablaBody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="resetTablaRutina()">🔄 Limpiar campos</button>
+        <button class="btn btn-primary" onclick="guardarRutina()">✅ Guardar en historial</button>
+      </div>
+    </div>
+
+    <div id="iqEmpty" style="display:none;">
+      <div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-text">No hay productos en esta área. Añádelos desde ⚙️ Gestionar.</div></div>
+    </div>
   </div>
+
+  <!-- CONFIGURACION RUTINA -->
+  <div id="sec-inv-quimico-config" class="section">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="showSection('inv-quimico')">← Volver</button>
+        <div class="page-title">Gestionar Áreas y Productos</div>
+      </div>
+      <button class="btn btn-primary" onclick="openAreaModal()">+ Nueva área</button>
+    </div>
+    <div id="iqConfigContent"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
+  </div>
+
 
   <!-- BACKUP -->
 
@@ -979,40 +1039,6 @@
   </div>
 </div>
 
-<!-- Modal Rutina -->
-<div id="modalRutina" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:700px">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="rutinaModalTitulo">Iniciar Rutina</div>
-      </div>
-      <button class="close-btn" onclick="document.getElementById('modalRutina').style.display='none'">✕</button>
-    </div>
-    <div class="modal-body">
-      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end;">
-        <div class="form-group">
-          <label>Fecha</label>
-          <input type="date" id="rutinaFecha">
-        </div>
-        <div class="form-group" style="min-width:130px;">
-          <label>Letra</label>
-          <select id="rutinaLetra"></select>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Producto</th><th>Dato Anterior</th><th>Dato Actualizado</th><th>Observaciones</th></tr></thead>
-          <tbody id="rutinaTablaBody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="document.getElementById('modalRutina').style.display='none'">Cancelar</button>
-      <button class="btn btn-primary" onclick="registrarRutina()">✅ Registrar</button>
-    </div>
-  </div>
-</div>
-
 <div id="toast-container"></div>
 
 <script>
@@ -1176,263 +1202,205 @@ async function showSection_invQuimico(){
   loadInvQuimico();
 }
 
-let areaCollapsed = {};
-let rutinaAreaActiva = null;
+// ════════════════════════════════════════
+// INVENTARIO PRODUCTOS QUÍMICOS
+// ════════════════════════════════════════
+let iqProductosActivos = [];
 
-async function loadInvQuimico(){
-  const cont = document.getElementById('invQuimicoContent');
-  cont.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
-  const{data:areas} = await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+async function initInvQuimico(){
+  // Fill area selector
+  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const sel=document.getElementById('iqAreaSel');
+  const curVal=sel.value;
+  sel.innerHTML='<option value="">— Selecciona área —</option>';
+  (areas||[]).forEach(a=>{
+    sel.innerHTML+=`<option value="${a.id}">${a.nombre}</option>`;
+  });
+  sel.value=curVal;
+  // Set today's date
+  if(!document.getElementById('iqFechaRutina').value)
+    document.getElementById('iqFechaRutina').value=new Date().toISOString().split('T')[0];
+  fillSelect('iqLetraRutina','diario_trabajo','letra');
+  loadTablaRutina();
+}
+
+async function loadTablaRutina(){
+  const areaId=document.getElementById('iqAreaSel').value;
+  const tablaWrap=document.getElementById('iqTablaWrap');
+  const empty=document.getElementById('iqEmpty');
+  const tbody=document.getElementById('iqTablaBody');
+
+  if(!areaId){tablaWrap.style.display='none';empty.style.display='none';return;}
+
+  const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',areaId).eq('user_id',currentUser.id).order('orden');
+
+  if(!productos||!productos.length){
+    tablaWrap.style.display='none';empty.style.display='block';return;
+  }
+
+  tablaWrap.style.display='block';empty.style.display='none';
+  iqProductosActivos=productos.map(p=>p.id);
+
+  tbody.innerHTML=productos.map(p=>`<tr>
+    <td style="font-weight:600;">${p.nombre}</td>
+    <td><input type="number" step="any" id="ant_${p.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><input type="number" step="any" id="act_${p.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><input type="text" id="obs_${p.id}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorial('${p.id}','${p.nombre.replace(/'/g,"\'")}')">📋</button></td>
+  </tr>`).join('');
+}
+
+function resetTablaRutina(){
+  iqProductosActivos.forEach(id=>{
+    ['ant_','act_','obs_'].forEach(pre=>{
+      const el=document.getElementById(pre+id);
+      if(el)el.value='';
+    });
+  });
+}
+
+async function guardarRutina(){
+  const fecha=document.getElementById('iqFechaRutina').value;
+  const letra=document.getElementById('iqLetraRutina').value;
+  if(!fecha){toast('Introduce la fecha','error');return;}
+
+  let guardados=0;
+  for(const id of iqProductosActivos){
+    const actEl=document.getElementById('act_'+id);
+    if(!actEl||actEl.value==='') continue;
+    const{error}=await sb.from('rutina_inv_quimico').insert({
+      user_id:currentUser.id,
+      producto_id:id,
+      fecha,
+      dato_anterior:parseFloat(document.getElementById('ant_'+id).value)||null,
+      dato_actualizado:parseFloat(actEl.value),
+      letra:letra||null,
+      observaciones:document.getElementById('obs_'+id).value||null,
+    });
+    if(!error)guardados++;
+  }
+
+  if(!guardados){toast('No hay datos que guardar','error');return;}
+  toast('✅ '+guardados+' productos guardados en historial');
+  resetTablaRutina();
+}
+
+// ── CONFIGURACIÓN: ÁREAS Y PRODUCTOS ──
+async function loadIQConfig(){
+  const cont=document.getElementById('iqConfigContent');
+  cont.innerHTML='<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
 
   if(!areas||!areas.length){
-    cont.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-text">No hay áreas. Añade una con el botón + Área</div></div>';
+    cont.innerHTML='<div class="empty-state"><div class="empty-state-icon">📍</div><div class="empty-state-text">No hay áreas. Añade una con + Nueva área</div></div>';
     return;
   }
 
-  let html = `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos datos</button>
-    <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
-    <button class="btn btn-primary btn-sm" onclick="openAreaModal()">+ Área</button>
-  </div>`;
-
+  let html='';
   for(const area of areas){
-    const{data:productos} = await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
-    const nProd = productos ? productos.length : 0;
-    const collapsed = areaCollapsed[area.id] !== false; // default collapsed
-
-    html += `<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden;">
-      <!-- Área header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--blue-light);cursor:pointer;" onclick="toggleArea('${area.id}')">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:16px;">${collapsed?'▶':'▼'}</span>
-          <span style="font-size:15px;font-weight:700;color:var(--blue);">📍 ${area.nombre}</span>
-          <span style="font-size:12px;color:var(--gray-500);">${nProd} producto${nProd!==1?'s':''}</span>
-        </div>
-        <div style="display:flex;gap:6px;" onclick="event.stopPropagation()">
-          <button class="btn btn-primary btn-sm" onclick="iniciarRutina('${area.id}','${area.nombre.replace(/'/g,"\'")}')">▶ Iniciar Rutina</button>
-          <button class="btn btn-secondary btn-sm btn-icon" onclick="openProductoModal('${area.id}')">+ Prod.</button>
+    const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    html+=`<div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:15px;font-weight:700;color:var(--blue);">📍 ${area.nombre}</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-primary btn-sm" onclick="openProductoModal('${area.id}')">+ Producto</button>
           <button class="btn btn-secondary btn-sm btn-icon" onclick="openAreaModal('${area.id}','${area.nombre.replace(/'/g,"\'")}')">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="delArea('${area.id}','${area.nombre}')">🗑</button>
         </div>
-      </div>
-      <!-- Productos list (collapsed by default) -->
-      <div id="area-body-${area.id}" style="display:${collapsed?'none':'block'};padding:12px 16px;">`;
+      </div>`;
 
     if(!productos||!productos.length){
-      html += '<div style="color:var(--gray-400);font-size:13px;">No hay productos en esta área.</div>';
+      html+='<div style="color:var(--gray-400);font-size:13px;">Sin productos. Añade uno con + Producto.</div>';
     } else {
-      html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-      for(const prod of productos){
-        const{data:regs}=await sb.from('rutina_inv_quimico').select('fecha,dato_actualizado').eq('producto_id',prod.id).eq('user_id',currentUser.id).order('fecha',{ascending:false}).limit(1);
-        const ult=regs&&regs.length?regs[0]:null;
-        html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--gray-50);border-radius:6px;border:1px solid var(--gray-200);">
-          <div>
-            <span style="font-size:13px;font-weight:600;">🧪 ${prod.nombre}</span>
-            ${ult?'<span style="font-size:11px;color:var(--gray-400);margin-left:8px;">Último: '+ult.dato_actualizado+' ('+fmtDate(ult.fecha)+')</span>':''}
-          </div>
+      html+='<div style="display:flex;flex-direction:column;gap:4px;">';
+      for(const p of productos){
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--gray-50);border-radius:6px;border:1px solid var(--gray-200);">
+          <span style="font-size:13px;font-weight:500;">🧪 ${p.nombre}</span>
           <div style="display:flex;gap:4px;">
-            <button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorial('${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">📋</button>
-            <button class="btn btn-secondary btn-sm btn-icon" onclick="openProductoModal('${area.id}','${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">✏️</button>
-            <button class="btn btn-danger btn-sm btn-icon" onclick="delProducto('${prod.id}','${prod.nombre}')">🗑</button>
+            <button class="btn btn-secondary btn-sm btn-icon" onclick="openProductoModal('${area.id}','${p.id}','${p.nombre.replace(/'/g,"\'")}')">✏️</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="delProducto('${p.id}','${p.nombre}')">🗑</button>
           </div>
         </div>`;
       }
-      html += '</div>';
+      html+='</div>';
     }
-    html += '</div></div>';
+    html+='</div>';
   }
-  cont.innerHTML = html;
+  cont.innerHTML=html;
 }
 
-function toggleArea(areaId){
-  areaCollapsed[areaId] = areaCollapsed[areaId] === false ? true : false;
-  loadInvQuimico();
-}
-
-async function iniciarRutina(areaId, areaNombre){
-  rutinaAreaActiva = areaId;
-  const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',areaId).eq('user_id',currentUser.id).order('orden');
-  
-  if(!productos||!productos.length){
-    toast('No hay productos en esta área','error');
-    return;
-  }
-
-  // Build rutina table
-  let rows = productos.map(p=>`<tr>
-    <td style="font-weight:600;font-size:13px;">🧪 ${p.nombre}</td>
-    <td><input type="number" step="any" id="ant_${p.id}" placeholder="Anterior..." style="width:100%;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="number" step="any" id="act_${p.id}" placeholder="Actualizado..." style="width:100%;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="text" id="obs_${p.id}" placeholder="Obs..." style="width:100%;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-  </tr>`).join('');
-
-  // Store product ids
-  window._rutinaProductos = productos.map(p=>p.id);
-
-  // Fill modal
-  document.getElementById('rutinaModalTitulo').textContent = '📍 ' + areaNombre;
-  document.getElementById('rutinaFecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('rutinaTablaBody').innerHTML = rows;
-  fillSelect('rutinaLetra','diario_trabajo','letra');
-  document.getElementById('modalRutina').style.display = 'flex';
-}
-
-
-
-async function registrarRutina(){
-  const fecha = document.getElementById('rutFecha').value;
-  const letra = document.getElementById('rutLetra').value;
-  if(!fecha){toast('Introduce la fecha de la rutina','error');return;}
-  
-  const ids = window._allProductIds || [];
-  let guardados = 0;
-  let errores = 0;
-
-  for(const id of ids){
-    const actEl = document.getElementById('act_'+id);
-    if(!actEl) continue;
-    const datoActualizado = actEl.value;
-    if(datoActualizado==='') continue; // skip empty
-    
-    const payload = {
-      user_id: currentUser.id,
-      producto_id: id,
-      fecha,
-      dato_anterior: parseFloat(document.getElementById('ant_'+id).value)||null,
-      dato_actualizado: parseFloat(datoActualizado),
-      letra: letra||null,
-      observaciones: document.getElementById('obs_'+id).value||null,
-    };
-    const{error} = await sb.from('rutina_inv_quimico').insert(payload);
-    if(error) errores++;
-    else guardados++;
-  }
-
-  if(errores>0) toast(`${guardados} registros guardados, ${errores} errores`,'error');
-  else if(guardados===0) toast('No hay datos que registrar','error');
-  else toast(`✅ ${guardados} productos registrados correctamente`);
-  
-  // Reload to reset fields (dato actualizado becomes new dato anterior)
-  if(guardados>0) loadInvQuimico();
-}
-
-
-function toggleArea(areaId){
-  areaCollapsed[areaId] = !areaCollapsed[areaId];
-  const body = document.getElementById('area-body-'+areaId);
-  if(body) body.style.display = areaCollapsed[areaId] ? 'none' : 'block';
-  // Update arrow
-  loadInvQuimico();
-}
-
-// Área
-let areaEditId = null;
-function openAreaModal(id=null, nombre=''){
-  areaEditId=id;
-  document.getElementById('modalAreaTitle').textContent = id ? 'Editar área' : 'Nueva área';
-  document.getElementById('areaNombre').value = nombre;
+// ── ÁREA CRUD ──
+let areaEditId=null;
+function openAreaModal(id=null,nombre=''){
+  areaEditId=id||null;
+  document.getElementById('modalAreaTitle').textContent=id?'Editar área':'Nueva área';
+  document.getElementById('areaNombre').value=nombre||'';
   openModal('modalArea');
 }
 async function saveArea(){
-  const nombre = document.getElementById('areaNombre').value.trim();
+  const nombre=document.getElementById('areaNombre').value.trim();
   if(!nombre){toast('El nombre es obligatorio','error');return;}
   let err;
   if(areaEditId){
     ({error:err}=await sb.from('rutina_areas').update({nombre}).eq('id',areaEditId));
   } else {
-    const{data:areas}=await sb.from('rutina_areas').select('orden').eq('user_id',currentUser.id).order('orden',{ascending:false}).limit(1);
-    const orden=(areas&&areas.length)?areas[0].orden+1:0;
+    const{data:existing}=await sb.from('rutina_areas').select('orden').eq('user_id',currentUser.id).order('orden',{ascending:false}).limit(1);
+    const orden=(existing&&existing.length)?existing[0].orden+1:0;
     ({error:err}=await sb.from('rutina_areas').insert({user_id:currentUser.id,nombre,orden}));
   }
   if(err){toast('Error al guardar','error');return;}
   toast(areaEditId?'Área actualizada':'Área añadida');
   closeModal('modalArea');
-  loadInvQuimico();
+  loadIQConfig();
+  initInvQuimico();
 }
 async function delArea(id,nombre){
-  if(!confirm(`¿Eliminar el área "${nombre}" y todos sus productos?`))return;
+  if(!confirm('¿Eliminar el área "'+nombre+'" y todos sus productos?'))return;
   await sb.from('rutina_areas').delete().eq('id',id);
-  toast('Área eliminada');loadInvQuimico();
+  toast('Área eliminada');loadIQConfig();initInvQuimico();
 }
 
-// Producto
-let prodAreaId = null;
-let prodEditId = null;
-function openProductoModal(areaId, prodId=null, nombre=''){
-  prodAreaId=areaId; prodEditId=prodId||null;
-  document.getElementById('modalProductoTitle').textContent = prodId ? 'Editar producto' : 'Nuevo producto';
-  document.getElementById('productoNombre').value = nombre||'';
+// ── PRODUCTO CRUD ──
+let prodAreaId=null;
+let prodEditId=null;
+function openProductoModal(areaId,prodId=null,nombre=''){
+  prodAreaId=areaId;prodEditId=prodId||null;
+  document.getElementById('modalProductoTitle').textContent=prodId?'Editar producto':'Nuevo producto';
+  document.getElementById('productoNombre').value=nombre||'';
   openModal('modalProducto');
 }
 async function saveProducto(){
-  const nombre = document.getElementById('productoNombre').value.trim();
+  const nombre=document.getElementById('productoNombre').value.trim();
   if(!nombre){toast('El nombre es obligatorio','error');return;}
   let err;
   if(prodEditId){
     ({error:err}=await sb.from('rutina_productos').update({nombre}).eq('id',prodEditId));
   } else {
-    const{data:prods}=await sb.from('rutina_productos').select('orden').eq('area_id',prodAreaId).order('orden',{ascending:false}).limit(1);
-    const orden=(prods&&prods.length)?prods[0].orden+1:0;
+    const{data:existing}=await sb.from('rutina_productos').select('orden').eq('area_id',prodAreaId).order('orden',{ascending:false}).limit(1);
+    const orden=(existing&&existing.length)?existing[0].orden+1:0;
     ({error:err}=await sb.from('rutina_productos').insert({user_id:currentUser.id,area_id:prodAreaId,nombre,orden}));
   }
   if(err){toast('Error al guardar','error');return;}
   toast(prodEditId?'Producto actualizado':'Producto añadido');
   closeModal('modalProducto');
-  loadInvQuimico();
+  loadIQConfig();
+  loadTablaRutina();
 }
 async function delProducto(id,nombre){
-  if(!confirm(`¿Eliminar el producto "${nombre}" y todos sus registros?`))return;
+  if(!confirm('¿Eliminar el producto "'+nombre+'"?'))return;
   await sb.from('rutina_productos').delete().eq('id',id);
-  toast('Producto eliminado');loadInvQuimico();
+  toast('Producto eliminado');loadIQConfig();loadTablaRutina();
 }
 
-// Registro Inv Químico
-function openInvQuimicoModal(productoId, productoNombre, id=null){
-  currentProductoId=productoId; iqEditingId=id;
-  document.getElementById('modalInvQuimicoTitle').textContent = `🧪 ${productoNombre}`;
-  fillSelect('iqLetra','diario_trabajo','letra');
-  document.getElementById('iqFecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('iqDatoAnterior').value='';
-  document.getElementById('iqDatoActualizado').value='';
-  document.getElementById('iqObs').value='';
-  document.getElementById('iqLetra').value='';
-  openModal('modalInvQuimico');
-}
-async function saveInvQuimico(){
-  const fecha=document.getElementById('iqFecha').value;
-  const datoActualizado=document.getElementById('iqDatoActualizado').value;
-  if(!fecha||datoActualizado===''){toast('Fecha y dato actualizado son obligatorios','error');return;}
-  const payload={
-    user_id:currentUser.id,
-    producto_id:currentProductoId,
-    fecha,
-    dato_anterior:parseFloat(document.getElementById('iqDatoAnterior').value)||null,
-    dato_actualizado:parseFloat(datoActualizado),
-    letra:document.getElementById('iqLetra').value||null,
-    observaciones:document.getElementById('iqObs').value||null,
-  };
-  let err;
-  if(iqEditingId){
-    ({error:err}=await sb.from('rutina_inv_quimico').update(payload).eq('id',iqEditingId));
-  } else {
-    ({error:err}=await sb.from('rutina_inv_quimico').insert(payload));
-  }
-  if(err){toast('Error al guardar','error');return;}
-  toast(iqEditingId?'Registro actualizado':'Registro añadido');
-  iqEditingId=null;
-  closeModal('modalInvQuimico');
-  loadInvQuimico();
-}
+// ── HISTORIAL ──
+let historialProductoId=null;
+let historialProductoNombre=null;
 
-// Historial
-let historialProductoId = null;
-let historialProductoNombre = null;
-
-async function verHistorial(productoId, productoNombre, desde='', hasta=''){
-  historialProductoId=productoId; historialProductoNombre=productoNombre;
-  let q = sb.from('rutina_inv_quimico').select('*').eq('producto_id',productoId).eq('user_id',currentUser.id).order('fecha',{ascending:false});
-  if(desde) q=q.gte('fecha',desde);
-  if(hasta) q=q.lte('fecha',hasta);
+async function verHistorial(productoId,productoNombre,desde='',hasta=''){
+  historialProductoId=productoId;historialProductoNombre=productoNombre;
+  let q=sb.from('rutina_inv_quimico').select('*').eq('producto_id',productoId).eq('user_id',currentUser.id).order('fecha',{ascending:false});
+  if(desde)q=q.gte('fecha',desde);
+  if(hasta)q=q.lte('fecha',hasta);
   const{data}=await q;
   const rows=(data||[]).map(r=>`<tr>
     <td>${fmtDate(r.fecha)}</td>
@@ -1441,31 +1409,32 @@ async function verHistorial(productoId, productoNombre, desde='', hasta=''){
     <td>${r.letra||'—'}</td>
     <td>${r.observaciones||'—'}</td>
     <td style="white-space:nowrap;">
-      <button class="btn btn-secondary btn-sm btn-icon" onclick="editRegistroIQ('${r.id}','${productoId}','${productoNombre}')">✏️</button>
-      <button class="btn btn-danger btn-sm btn-icon" onclick="delRegistroIQ('${r.id}','${productoId}','${productoNombre}')">🗑</button>
+      <button class="btn btn-secondary btn-sm btn-icon" onclick="editRegistroIQ('${r.id}','${productoId}','${productoNombre.replace(/'/g,"\'")}')">✏️</button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="delRegistroIQ('${r.id}','${productoId}','${productoNombre.replace(/'/g,"\'")}')">🗑</button>
     </td>
   </tr>`).join('');
 
-  const body=`<div style="font-size:14px;font-weight:700;margin-bottom:12px;">🧪 ${productoNombre}</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap;">
-      <div class="form-group"><label>Desde</label><input type="date" id="histDesde" value="${desde}" onchange="verHistorial('${productoId}','${productoNombre}',this.value,document.getElementById('histHasta').value)"></div>
-      <div class="form-group"><label>Hasta</label><input type="date" id="histHasta" value="${hasta}" onchange="verHistorial('${productoId}','${productoNombre}',document.getElementById('histDesde').value,this.value)"></div>
-      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('histDesde').value='';document.getElementById('histHasta').value='';verHistorial('${productoId}','${productoNombre}')">✕ Limpiar</button>
-      <button class="btn btn-secondary btn-sm" onclick="exportHistorialPDF('${productoId}','${productoNombre}')">⬇ PDF</button>
-    </div>
-    <div class="table-wrap"><table>
-      <thead><tr><th>Fecha</th><th>Anterior</th><th>Actualizado</th><th>Letra</th><th>Obs.</th><th></th></tr></thead>
-      <tbody>${rows||'<tr><td colspan="6"><div class="empty-state"><div class="empty-state-text">Sin registros</div></div></td></tr>'}</tbody>
-    </table></div>`;
-  document.getElementById('historialBody').innerHTML=body;
+  document.getElementById('historialBody').innerHTML=
+    '<div style="font-size:14px;font-weight:700;margin-bottom:12px;">🧪 '+productoNombre+'</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end;">'+
+    '<div class="form-group"><label>Desde</label><input type="date" id="histDesde" value="'+desde+'"></div>'+
+    '<div class="form-group"><label>Hasta</label><input type="date" id="histHasta" value="'+hasta+'"></div>'+
+    '<button class="btn btn-secondary btn-sm" onclick="filtrarHistorial()">Filtrar</button>'+
+    '<button class="btn btn-secondary btn-sm" onclick="exportHistorialPDF()">⬇ PDF</button>'+
+    '</div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Anterior</th><th>Actualizado</th><th>Letra</th><th>Obs.</th><th></th></tr></thead>'+
+    '<tbody>'+(rows||'<tr><td colspan="6"><div class="empty-state"><div class="empty-state-text">Sin registros</div></div></td></tr>')+'</tbody></table></div>';
+
   document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='📋 Historial';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML='<button class="btn btn-secondary" onclick="closeMH()">Cerrar</button>';
 }
 
-async function editRegistroIQ(id, productoId, productoNombre){
+async function editRegistroIQ(id,productoId,productoNombre){
   const{data}=await sb.from('rutina_inv_quimico').select('*').eq('id',id).single();
   if(!data)return;
-  currentProductoId=productoId; iqEditingId=id;
-  document.getElementById('modalInvQuimicoTitle').textContent='✏️ Editar registro — '+productoNombre;
+  currentProductoId=productoId;iqEditingId=id;
+  document.getElementById('modalInvQuimicoTitle').textContent='✏️ Editar — '+productoNombre;
   fillSelect('iqLetra','diario_trabajo','letra');
   document.getElementById('iqFecha').value=data.fecha||'';
   document.getElementById('iqDatoAnterior').value=data.dato_anterior??'';
@@ -1481,13 +1450,12 @@ async function delRegistroIQ(id,productoId,productoNombre){
   await sb.from('rutina_inv_quimico').delete().eq('id',id);
   toast('Eliminado');
   verHistorial(productoId,productoNombre);
-  loadInvQuimico();
 }
 
-function exportHistorialPDF(productoId, productoNombre){
+function exportHistorialPDF(){
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF();
-  doc.setFontSize(14);doc.text('Historial: '+productoNombre,14,18);
+  doc.setFontSize(14);doc.text('Historial: '+historialProductoNombre,14,18);
   doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
   const rows=[];
   document.querySelectorAll('#historialBody tbody tr').forEach(tr=>{
@@ -1495,30 +1463,30 @@ function exportHistorialPDF(productoId, productoNombre){
     if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));
   });
   doc.autoTable({head:[['Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
-  doc.save('historial_'+productoNombre.replace(/\s/g,'_')+'.pdf');
+  doc.save('historial_'+historialProductoNombre.replace(/\s/g,'_')+'.pdf');
 }
 
+// ── PDF EXPORTS ──
 async function abrirPDFUltimos(){
   const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
   const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
   document.getElementById('historialBody').innerHTML=
-    '<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Selecciona el área para exportar los últimos datos.</div>'+
+    '<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Selecciona área para exportar.</div>'+
     '<div class="form-group"><label>Área</label><select id="exportAreaUlt">'+areaOpts+'</select></div>';
   document.getElementById('modalHistorial').style.display='flex';
-  document.querySelector('#modalHistorial .modal-title').textContent='PDF Últimos Datos';
+  document.querySelector('#modalHistorial .modal-title').textContent='⬇ PDF Últimos datos';
   document.querySelector('#modalHistorial .modal-footer').innerHTML=
-    '<button class="btn btn-secondary" onclick="closeModal(&apos;modalHistorial&apos;)">Cancelar</button>'+
+    '<button class="btn btn-secondary" onclick="closeMH()">Cancelar</button>'+
     '<button class="btn btn-primary" onclick="exportIQUltimos()">Exportar PDF</button>';
 }
 
 async function exportIQUltimos(){
   const areaFiltro=document.getElementById('exportAreaUlt')?document.getElementById('exportAreaUlt').value:'';
-  const{jsPDF}=window.jspdf;
-  const doc=new jsPDF('l');
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
   doc.setFontSize(14);doc.text('Inventario Productos Químicos — Últimos datos',14,18);
   doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
   let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
-  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  if(areaFiltro)areasQ=areasQ.eq('id',areaFiltro);
   const{data:areas}=await areasQ;
   const rows=[];
   for(const area of (areas||[])){
@@ -1536,37 +1504,33 @@ async function exportIQUltimos(){
   document.getElementById('modalHistorial').style.display='none';
 }
 
-function openExportHistorialModal(){
-  const body=`<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Filtra por fecha para exportar el historial completo de todos los productos.</div>
-    <div class="form-grid">
-      <div class="form-group"><label>Desde</label><input type="date" id="exportDesde"></div>
-      <div class="form-group"><label>Hasta</label><input type="date" id="exportHasta"></div>
-    </div>`;
-  document.getElementById('historialBody').innerHTML=body;
+async function openExportHistorialModal(){
+  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+  document.getElementById('historialBody').innerHTML=
+    '<div class="form-grid">'+
+    '<div class="form-group full"><label>Área</label><select id="exportArea">'+areaOpts+'</select></div>'+
+    '<div class="form-group"><label>Desde</label><input type="date" id="exportDesde"></div>'+
+    '<div class="form-group"><label>Hasta</label><input type="date" id="exportHasta"></div>'+
+    '</div>';
   document.getElementById('modalHistorial').style.display='flex';
-  document.querySelector('#modalHistorial .modal-title').textContent='⬇ Exportar Historial PDF';
-  // Change footer
-  const footer=document.querySelector('#modalHistorial .modal-footer');
-  if(!footer){
-    const f=document.createElement('div');
-    f.className='modal-footer';
-    f.innerHTML='<button class="btn btn-secondary" onclick="closeModal(\'modalHistorial\')">Cancelar</button><button class="btn btn-primary" onclick="exportIQHistorialCompleto()">Exportar PDF</button>';
-    document.querySelector('#modalHistorial .modal').appendChild(f);
-  }
+  document.querySelector('#modalHistorial .modal-title').textContent='⬇ PDF Historial';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML=
+    '<button class="btn btn-secondary" onclick="closeMH()">Cancelar</button>'+
+    '<button class="btn btn-primary" onclick="exportIQHistorialCompleto()">Exportar PDF</button>';
 }
 
 async function exportIQHistorialCompleto(){
   const desde=document.getElementById('exportDesde')?document.getElementById('exportDesde').value:'';
   const hasta=document.getElementById('exportHasta')?document.getElementById('exportHasta').value:'';
   const areaFiltro=document.getElementById('exportArea')?document.getElementById('exportArea').value:'';
-  const{jsPDF}=window.jspdf;
-  const doc=new jsPDF('l');
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
   doc.setFontSize(14);doc.text('Historial Inventario Productos Químicos',14,18);
   doc.setFontSize(10);
   const rango=desde||hasta?(desde?'Desde '+fmtDate(desde):'')+(hasta?' Hasta '+fmtDate(hasta):''):'Completo';
   doc.text('Período: '+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
   let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
-  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  if(areaFiltro)areasQ=areasQ.eq('id',areaFiltro);
   const{data:areas}=await areasQ;
   const rows=[];
   for(const area of (areas||[])){
@@ -1586,6 +1550,14 @@ async function exportIQHistorialCompleto(){
   doc.save('inv_quimico_historial.pdf');
   toast('PDF generado');
   document.getElementById('modalHistorial').style.display='none';
+}
+
+
+function closeMH(){document.getElementById('modalHistorial').style.display='none';}
+function filtrarHistorial(){
+  const desde=document.getElementById('histDesde').value;
+  const hasta=document.getElementById('histHasta').value;
+  verHistorial(historialProductoId,historialProductoNombre,desde,hasta);
 }
 
 init();
@@ -1639,7 +1611,8 @@ function showSection(id){
   if(id==='telefonos')loadTelefonos();
   if(id==='config'){loadMiCalendarioCiclos();loadConfig();}
   if(id==='rutinas')loadRutinas();
-  if(id==='inv-quimico')loadInvQuimico();
+  if(id==='inv-quimico')initInvQuimico();
+  if(id==='inv-quimico-config')loadIQConfig();
   if(id==='backup'){}
 }
 
@@ -2877,6 +2850,13 @@ async function exportIQHistorialCompleto(){
   doc.save('inv_quimico_historial.pdf');
   toast('PDF generado');
   document.getElementById('modalHistorial').style.display='none';
+}
+
+function closeMH(){document.getElementById('modalHistorial').style.display='none';}
+function filtrarHistorial(){
+  const desde=document.getElementById('histDesde').value;
+  const hasta=document.getElementById('histHasta').value;
+  verHistorial(historialProductoId,historialProductoNombre,desde,hasta);
 }
 
 init();
