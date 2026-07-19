@@ -667,8 +667,9 @@
           <tbody id="iqTablaBody"></tbody>
         </table>
       </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn btn-secondary" onclick="resetTablaRutina()">🔄 Limpiar campos</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="resetTablaRutina()">🔄 Limpiar</button>
+        <button class="btn btn-secondary" onclick="guardarBorradorRutina()">💾 Guardar</button>
         <button class="btn btn-primary" onclick="guardarRutina()">✅ Guardar en historial</button>
       </div>
     </div>
@@ -728,8 +729,8 @@
           <thead>
             <tr>
               <th style="min-width:160px;">Nivel / Equipo</th>
-              <th style="min-width:130px;">Dato Control</th>
-              <th style="min-width:130px;">Dato Campo</th>
+              <th style="min-width:130px;">Datos en Control</th>
+              <th style="min-width:130px;">Datos en Campo</th>
               <th>Observaciones</th>
               <th></th>
             </tr>
@@ -737,8 +738,9 @@
           <tbody id="nvTablaBody"></tbody>
         </table>
       </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn btn-secondary" onclick="resetTablaNiveles()">🔄 Limpiar campos</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="resetTablaNiveles()">🔄 Limpiar</button>
+        <button class="btn btn-secondary" onclick="guardarBorradorNiveles()">💾 Guardar</button>
         <button class="btn btn-primary" onclick="guardarNiveles()">✅ Guardar en historial</button>
       </div>
     </div>
@@ -1144,8 +1146,8 @@
       <div class="form-grid">
         <div class="form-group"><label>Fecha</label><input type="date" id="nvRegFecha"></div>
         <div class="form-group"><label>Letra</label><select id="nvRegLetra"></select></div>
-        <div class="form-group"><label>Dato Control</label><input type="number" step="any" id="nvRegControl"></div>
-        <div class="form-group"><label>Dato Campo</label><input type="number" step="any" id="nvRegCampo"></div>
+        <div class="form-group"><label>Datos en Control</label><input type="number" step="any" id="nvRegControl"></div>
+        <div class="form-group"><label>Datos en Campo</label><input type="number" step="any" id="nvRegCampo"></div>
         <div class="form-group full"><label>Observaciones</label><textarea id="nvRegObs"></textarea></div>
       </div>
     </div>
@@ -1374,6 +1376,25 @@ function resetTablaRutina(){
       if(el)el.value='';
     });
   });
+}
+
+async function guardarBorradorRutina(){
+  let guardados=0;
+  for(const id of iqProductosActivos){
+    const antEl=document.getElementById('ant_'+id);
+    const actEl=document.getElementById('act_'+id);
+    const obsEl=document.getElementById('obs_'+id);
+    const{error}=await sb.from('rutina_borrador').upsert({
+      user_id:currentUser.id,
+      producto_id:id,
+      dato_anterior:parseFloat(antEl.value)||null,
+      dato_actualizado:parseFloat(actEl.value)||null,
+      observaciones:obsEl.value||null,
+      updated_at:new Date().toISOString(),
+    },{onConflict:'user_id,producto_id'});
+    if(!error)guardados++;
+  }
+  toast(guardados>0?'💾 Borrador guardado':'No hay datos que guardar', guardados>0?'success':'error');
 }
 
 async function guardarRutina(){
@@ -1706,13 +1727,19 @@ async function loadTablaNiveles(){
   if(!equipos||!equipos.length){wrap.style.display='none';empty.style.display='block';return;}
   wrap.style.display='block';empty.style.display='none';
   nvEquiposActivos=equipos.map(e=>e.id);
-  tbody.innerHTML=equipos.map(e=>`<tr>
-    <td style="font-weight:600;">${e.nombre}</td>
-    <td><input type="number" step="any" id="nvc_${e.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="number" step="any" id="nvf_${e.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="text" id="nvo_${e.id}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorialNiveles('${e.id}','${e.nombre.replace(/'/g,"\'")}')">📋</button></td>
-  </tr>`).join('');
+  // Load borrador
+  const{data:borradores}=await sb.from('niveles_borrador').select('*').eq('user_id',currentUser.id).in('equipo_id',nvEquiposActivos);
+  const bMap={};(borradores||[]).forEach(b=>{bMap[b.equipo_id]=b;});
+  tbody.innerHTML=equipos.map(e=>{
+    const b=bMap[e.id]||{};
+    return `<tr>
+      <td style="font-weight:600;">${e.nombre}</td>
+      <td><input type="number" step="any" id="nvc_${e.id}" value="${b.dato_control??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><input type="number" step="any" id="nvf_${e.id}" value="${b.dato_campo??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><input type="text" id="nvo_${e.id}" value="${b.observaciones||''}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorialNiveles('${e.id}','${e.nombre.replace(/'/g,"\'")}')">📋</button></td>
+    </tr>`;
+  }).join('');
 }
 
 function resetTablaNiveles(){
@@ -1722,6 +1749,25 @@ function resetTablaNiveles(){
       if(el)el.value='';
     });
   });
+}
+
+async function guardarBorradorNiveles(){
+  let guardados=0;
+  for(const id of nvEquiposActivos){
+    const cEl=document.getElementById('nvc_'+id);
+    const fEl=document.getElementById('nvf_'+id);
+    const oEl=document.getElementById('nvo_'+id);
+    const{error}=await sb.from('niveles_borrador').upsert({
+      user_id:currentUser.id,
+      equipo_id:id,
+      dato_control:parseFloat(cEl.value)||null,
+      dato_campo:parseFloat(fEl.value)||null,
+      observaciones:oEl.value||null,
+      updated_at:new Date().toISOString(),
+    },{onConflict:'user_id,equipo_id'});
+    if(!error)guardados++;
+  }
+  toast(guardados>0?'💾 Borrador guardado':'No hay datos que guardar', guardados>0?'success':'error');
 }
 
 async function guardarNiveles(){
@@ -1744,6 +1790,9 @@ async function guardarNiveles(){
   }
   if(!guardados){toast('No hay datos que guardar','error');return;}
   toast('✅ '+guardados+' niveles guardados en historial');
+  for(const id of nvEquiposActivos){
+    sb.from('niveles_borrador').delete().eq('user_id',currentUser.id).eq('equipo_id',id);
+  }
   resetTablaNiveles();
 }
 
@@ -3336,13 +3385,19 @@ async function loadTablaNiveles(){
   if(!equipos||!equipos.length){wrap.style.display='none';empty.style.display='block';return;}
   wrap.style.display='block';empty.style.display='none';
   nvEquiposActivos=equipos.map(e=>e.id);
-  tbody.innerHTML=equipos.map(e=>`<tr>
-    <td style="font-weight:600;">${e.nombre}</td>
-    <td><input type="number" step="any" id="nvc_${e.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="number" step="any" id="nvf_${e.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="text" id="nvo_${e.id}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorialNiveles('${e.id}','${e.nombre.replace(/'/g,"\'")}')">📋</button></td>
-  </tr>`).join('');
+  // Load borrador
+  const{data:borradores}=await sb.from('niveles_borrador').select('*').eq('user_id',currentUser.id).in('equipo_id',nvEquiposActivos);
+  const bMap={};(borradores||[]).forEach(b=>{bMap[b.equipo_id]=b;});
+  tbody.innerHTML=equipos.map(e=>{
+    const b=bMap[e.id]||{};
+    return `<tr>
+      <td style="font-weight:600;">${e.nombre}</td>
+      <td><input type="number" step="any" id="nvc_${e.id}" value="${b.dato_control??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><input type="number" step="any" id="nvf_${e.id}" value="${b.dato_campo??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><input type="text" id="nvo_${e.id}" value="${b.observaciones||''}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorialNiveles('${e.id}','${e.nombre.replace(/'/g,"\'")}')">📋</button></td>
+    </tr>`;
+  }).join('');
 }
 
 function resetTablaNiveles(){
@@ -3352,6 +3407,25 @@ function resetTablaNiveles(){
       if(el)el.value='';
     });
   });
+}
+
+async function guardarBorradorNiveles(){
+  let guardados=0;
+  for(const id of nvEquiposActivos){
+    const cEl=document.getElementById('nvc_'+id);
+    const fEl=document.getElementById('nvf_'+id);
+    const oEl=document.getElementById('nvo_'+id);
+    const{error}=await sb.from('niveles_borrador').upsert({
+      user_id:currentUser.id,
+      equipo_id:id,
+      dato_control:parseFloat(cEl.value)||null,
+      dato_campo:parseFloat(fEl.value)||null,
+      observaciones:oEl.value||null,
+      updated_at:new Date().toISOString(),
+    },{onConflict:'user_id,equipo_id'});
+    if(!error)guardados++;
+  }
+  toast(guardados>0?'💾 Borrador guardado':'No hay datos que guardar', guardados>0?'success':'error');
 }
 
 async function guardarNiveles(){
@@ -3374,6 +3448,9 @@ async function guardarNiveles(){
   }
   if(!guardados){toast('No hay datos que guardar','error');return;}
   toast('✅ '+guardados+' niveles guardados en historial');
+  for(const id of nvEquiposActivos){
+    sb.from('niveles_borrador').delete().eq('user_id',currentUser.id).eq('equipo_id',id);
+  }
   resetTablaNiveles();
 }
 
