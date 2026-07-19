@@ -1360,13 +1360,20 @@ async function loadTablaRutina(){
   tablaWrap.style.display='block';empty.style.display='none';
   iqProductosActivos=productos.map(p=>p.id);
 
-  tbody.innerHTML=productos.map(p=>`<tr>
+  // Load borrador data
+  const{data:borradores}=await sb.from('rutina_borrador').select('*').eq('user_id',currentUser.id).in('producto_id',iqProductosActivos);
+  const bMap={};(borradores||[]).forEach(b=>{bMap[b.producto_id]=b;});
+
+  tbody.innerHTML=productos.map(p=>{
+    const b=bMap[p.id]||{};
+    return `<tr>
     <td style="font-weight:600;">${p.nombre}</td>
-    <td><input type="number" step="any" id="ant_${p.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="number" step="any" id="act_${p.id}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><input type="text" id="obs_${p.id}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
-    <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorial('${p.id}','${p.nombre.replace(/'/g,"\'")}')">📋</button></td>
-  </tr>`).join('');
+    <td><input type="number" step="any" id="ant_${p.id}" value="${b.dato_anterior??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><input type="number" step="any" id="act_${p.id}" value="${b.dato_actualizado??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><input type="text" id="obs_${p.id}" value="${b.observaciones||''}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+    <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorial('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">📋</button></td>
+  </tr>`;
+  }).join('');
 }
 
 function resetTablaRutina(){
