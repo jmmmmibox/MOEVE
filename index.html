@@ -2157,7 +2157,7 @@ async function loadDCAnios(){
 
 async function crearAnioDC(){
   const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
-  await sb.from('dias_companeros').insert({user_id:currentUser.id,user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
+  await sb.from('dias_companeros').insert({user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
   toast(`Año ${anio} creado`);loadDCAnios();loadDC();
 }
 
@@ -2203,7 +2203,7 @@ async function editDC(id){openDCModal(id);}
 
 async function saveDC(){
   const anio=parseInt(document.getElementById('dcAnioSel').value||new Date().getFullYear());
-  const payload={anio,nombre:document.getElementById('dcNombre').value||null,descripcion:document.getElementById('dcDescripcion').value||null,horas:parseFloat(document.getElementById('dcHoras').value)||null,dias:parseFloat(document.getElementById('dcDias').value)||null,estado:document.getElementById('dcEstado').value||null,fecha_planeada:document.getElementById('dcPlaneada').value||null,fecha_realizada:document.getElementById('dcRealizada').value||null,observaciones:document.getElementById('dcObs').value||null};
+  const payload={user_id:currentUser.id,anio,nombre:document.getElementById('dcNombre').value||null,descripcion:document.getElementById('dcDescripcion').value||null,horas:parseFloat(document.getElementById('dcHoras').value)||null,dias:parseFloat(document.getElementById('dcDias').value)||null,estado:document.getElementById('dcEstado').value||null,fecha_planeada:document.getElementById('dcPlaneada').value||null,fecha_realizada:document.getElementById('dcRealizada').value||null,observaciones:document.getElementById('dcObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('dias_companeros').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('dias_companeros').insert(payload));}
