@@ -1199,10 +1199,6 @@ async function loadInvQuimico(){
 
       for(const prod of productos){
         // Get last record to pre-fill dato_anterior
-        const{data:regs} = await sb.from('rutina_inv_quimico').select('*').eq('producto_id',prod.id).eq('user_id',currentUser.id).order('fecha',{ascending:false}).limit(1);
-        const ult = regs&&regs.length ? regs[0] : null;
-        const datoAnterior = ult ? (ult.dato_actualizado??'') : '';
-
         html += `<tr>
           <td><strong>${prod.nombre}</strong>
             <div style="margin-top:4px;display:flex;gap:4px;">
@@ -1211,8 +1207,8 @@ async function loadInvQuimico(){
               <button class="btn btn-danger btn-sm btn-icon" onclick="delProducto('${prod.id}','${prod.nombre}')">🗑</button>
             </div>
           </td>
-          <td><input type="number" step="any" id="ant_${prod.id}" value="${datoAnterior}" style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
-          <td><input type="number" step="any" id="act_${prod.id}" placeholder="Introduce dato..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
+          <td><input type="number" step="any" id="ant_${prod.id}" placeholder="Dato anterior..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
+          <td><input type="number" step="any" id="act_${prod.id}" placeholder="Dato actualizado..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
           <td><input type="text" id="obs_${prod.id}" placeholder="Observaciones..." style="width:100%;padding:6px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;"></td>
           <td style="white-space:nowrap;"></td>
         </tr>`;
