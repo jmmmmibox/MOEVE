@@ -972,9 +972,9 @@
 <!-- Modal Historial -->
 <div id="modalHistorial" class="modal-overlay" style="display:none">
   <div class="modal" style="max-width:700px">
-    <div class="modal-header"><div class="modal-title">📋 Historial</div><button class="close-btn" onclick="closeModal('modalHistorial')">✕</button></div>
+    <div class="modal-header"><div class="modal-title">📋 Historial</div><button class="close-btn" onclick="document.getElementById('modalHistorial').style.display='none'">✕</button></div>
     <div class="modal-body" id="historialBody"></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalHistorial')">Cerrar</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="document.getElementById('modalHistorial').style.display='none'">Cerrar</button></div>
   </div>
 </div>
 
@@ -1168,7 +1168,7 @@ async function loadInvQuimico(){
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <button class="btn btn-secondary btn-sm" onclick="exportIQUltimos()">⬇ PDF Últimos datos</button>
+    <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos datos</button>
     <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
     <button class="btn btn-primary btn-sm" onclick="openAreaModal()">+ Área</button>
   </div>`;
@@ -1428,7 +1428,7 @@ async function editRegistroIQ(id, productoId, productoNombre){
   document.getElementById('iqDatoActualizado').value=data.dato_actualizado??'';
   document.getElementById('iqObs').value=data.observaciones||'';
   document.getElementById('iqLetra').value=data.letra||'';
-  closeModal('modalHistorial');
+  document.getElementById('modalHistorial').style.display='none';
   openModal('modalInvQuimico');
 }
 
@@ -1454,12 +1454,28 @@ function exportHistorialPDF(productoId, productoNombre){
   doc.save('historial_'+productoNombre.replace(/\s/g,'_')+'.pdf');
 }
 
+async function abrirPDFUltimos(){
+  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+  document.getElementById('historialBody').innerHTML=
+    '<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Selecciona el área para exportar los últimos datos.</div>'+
+    '<div class="form-group"><label>Área</label><select id="exportAreaUlt">'+areaOpts+'</select></div>';
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='PDF Últimos Datos';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML=
+    '<button class="btn btn-secondary" onclick="closeModal(&apos;modalHistorial&apos;)">Cancelar</button>'+
+    '<button class="btn btn-primary" onclick="exportIQUltimos()">Exportar PDF</button>';
+}
+
 async function exportIQUltimos(){
+  const areaFiltro=document.getElementById('exportAreaUlt')?document.getElementById('exportAreaUlt').value:'';
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF('l');
   doc.setFontSize(14);doc.text('Inventario Productos Químicos — Últimos datos',14,18);
   doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
-  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
   const rows=[];
   for(const area of (areas||[])){
     const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
@@ -1469,9 +1485,11 @@ async function exportIQUltimos(){
       rows.push([area.nombre,prod.nombre,ult?fmtDate(ult.fecha):'—',ult?ult.dato_anterior??'—':'—',ult?ult.dato_actualizado??'—':'—',ult?ult.letra||'—':'—',ult?ult.observaciones||'—':'—']);
     }
   }
+  if(!rows.length){toast('No hay datos','error');return;}
   doc.autoTable({head:[['Área','Producto','Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
   doc.save('inv_quimico_ultimos.pdf');
   toast('PDF generado');
+  document.getElementById('modalHistorial').style.display='none';
 }
 
 function openExportHistorialModal(){
@@ -1494,15 +1512,18 @@ function openExportHistorialModal(){
 }
 
 async function exportIQHistorialCompleto(){
-  const desde=document.getElementById('exportDesde').value;
-  const hasta=document.getElementById('exportHasta').value;
+  const desde=document.getElementById('exportDesde')?document.getElementById('exportDesde').value:'';
+  const hasta=document.getElementById('exportHasta')?document.getElementById('exportHasta').value:'';
+  const areaFiltro=document.getElementById('exportArea')?document.getElementById('exportArea').value:'';
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF('l');
   doc.setFontSize(14);doc.text('Historial Inventario Productos Químicos',14,18);
   doc.setFontSize(10);
-  const rango=desde||hasta?`${desde?'Desde '+fmtDate(desde):''}${hasta?' Hasta '+fmtDate(hasta):''}`:' Completo';
-  doc.text('Período:'+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
-  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const rango=desde||hasta?(desde?'Desde '+fmtDate(desde):'')+(hasta?' Hasta '+fmtDate(hasta):''):'Completo';
+  doc.text('Período: '+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
   const rows=[];
   for(const area of (areas||[])){
     const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
@@ -1520,7 +1541,7 @@ async function exportIQHistorialCompleto(){
   doc.autoTable({head:[['Área','Producto','Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:8}});
   doc.save('inv_quimico_historial.pdf');
   toast('PDF generado');
-  closeModal('modalHistorial');
+  document.getElementById('modalHistorial').style.display='none';
 }
 
 init();
@@ -2495,7 +2516,7 @@ async function loadInvQuimico(){
 
   // Export buttons at top
   let html = `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <button class="btn btn-secondary btn-sm" onclick="exportIQUltimos()">⬇ PDF Últimos datos</button>
+    <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos datos</button>
     <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
   </div>`;
 
@@ -2698,7 +2719,7 @@ async function editRegistroIQ(id, productoId, productoNombre){
   document.getElementById('iqDatoActualizado').value=data.dato_actualizado??'';
   document.getElementById('iqObs').value=data.observaciones||'';
   document.getElementById('iqLetra').value=data.letra||'';
-  closeModal('modalHistorial');
+  document.getElementById('modalHistorial').style.display='none';
   openModal('modalInvQuimico');
 }
 
@@ -2724,12 +2745,28 @@ function exportHistorialPDF(productoId, productoNombre){
   doc.save('historial_'+productoNombre.replace(/\s/g,'_')+'.pdf');
 }
 
+async function abrirPDFUltimos(){
+  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+  document.getElementById('historialBody').innerHTML=
+    '<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Selecciona el área para exportar los últimos datos.</div>'+
+    '<div class="form-group"><label>Área</label><select id="exportAreaUlt">'+areaOpts+'</select></div>';
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='PDF Últimos Datos';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML=
+    '<button class="btn btn-secondary" onclick="closeModal(&apos;modalHistorial&apos;)">Cancelar</button>'+
+    '<button class="btn btn-primary" onclick="exportIQUltimos()">Exportar PDF</button>';
+}
+
 async function exportIQUltimos(){
+  const areaFiltro=document.getElementById('exportAreaUlt')?document.getElementById('exportAreaUlt').value:'';
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF('l');
   doc.setFontSize(14);doc.text('Inventario Productos Químicos — Últimos datos',14,18);
   doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
-  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
   const rows=[];
   for(const area of (areas||[])){
     const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
@@ -2739,9 +2776,11 @@ async function exportIQUltimos(){
       rows.push([area.nombre,prod.nombre,ult?fmtDate(ult.fecha):'—',ult?ult.dato_anterior??'—':'—',ult?ult.dato_actualizado??'—':'—',ult?ult.letra||'—':'—',ult?ult.observaciones||'—':'—']);
     }
   }
+  if(!rows.length){toast('No hay datos','error');return;}
   doc.autoTable({head:[['Área','Producto','Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
   doc.save('inv_quimico_ultimos.pdf');
   toast('PDF generado');
+  document.getElementById('modalHistorial').style.display='none';
 }
 
 function openExportHistorialModal(){
@@ -2764,15 +2803,18 @@ function openExportHistorialModal(){
 }
 
 async function exportIQHistorialCompleto(){
-  const desde=document.getElementById('exportDesde').value;
-  const hasta=document.getElementById('exportHasta').value;
+  const desde=document.getElementById('exportDesde')?document.getElementById('exportDesde').value:'';
+  const hasta=document.getElementById('exportHasta')?document.getElementById('exportHasta').value:'';
+  const areaFiltro=document.getElementById('exportArea')?document.getElementById('exportArea').value:'';
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF('l');
   doc.setFontSize(14);doc.text('Historial Inventario Productos Químicos',14,18);
   doc.setFontSize(10);
-  const rango=desde||hasta?`${desde?'Desde '+fmtDate(desde):''}${hasta?' Hasta '+fmtDate(hasta):''}`:' Completo';
-  doc.text('Período:'+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
-  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const rango=desde||hasta?(desde?'Desde '+fmtDate(desde):'')+(hasta?' Hasta '+fmtDate(hasta):''):'Completo';
+  doc.text('Período: '+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
   const rows=[];
   for(const area of (areas||[])){
     const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
@@ -2790,7 +2832,7 @@ async function exportIQHistorialCompleto(){
   doc.autoTable({head:[['Área','Producto','Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:8}});
   doc.save('inv_quimico_historial.pdf');
   toast('PDF generado');
-  closeModal('modalHistorial');
+  document.getElementById('modalHistorial').style.display='none';
 }
 
 init();
