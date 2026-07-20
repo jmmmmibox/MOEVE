@@ -2414,7 +2414,7 @@ async function loadVacAnios(){
 
 async function crearAnioVac(){
   const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
-  await sb.from('vacaciones').insert({user_id:currentUser.id,user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
+  await sb.from('vacaciones').insert({user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
   toast(`Año ${anio} creado`);loadVacAnios();loadVacaciones();
 }
 
@@ -2455,7 +2455,7 @@ async function openVacModal(id=null){
 async function editVac(id){openVacModal(id);}
 async function saveVac(){
   const anio=parseInt(document.getElementById('vacAnioSel').value||new Date().getFullYear());
-  const payload={anio,nombre:document.getElementById('vNombre').value||null,descripcion:document.getElementById('vDescripcion').value||null,horas:parseFloat(document.getElementById('vHoras').value)||null,dias:parseFloat(document.getElementById('vDias').value)||null,estado:document.getElementById('vEstado').value||null,fecha_planeada:document.getElementById('vPlaneada').value||null,fecha_realizada:document.getElementById('vRealizada').value||null,observaciones:document.getElementById('vObs').value||null};
+  const payload={user_id:currentUser.id,anio,nombre:document.getElementById('vNombre').value||null,descripcion:document.getElementById('vDescripcion').value||null,horas:parseFloat(document.getElementById('vHoras').value)||null,dias:parseFloat(document.getElementById('vDias').value)||null,estado:document.getElementById('vEstado').value||null,fecha_planeada:document.getElementById('vPlaneada').value||null,fecha_realizada:document.getElementById('vRealizada').value||null,observaciones:document.getElementById('vObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('vacaciones').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('vacaciones').insert(payload));}
