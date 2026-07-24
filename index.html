@@ -1209,11 +1209,11 @@ async function doRegister(){
   if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
   if(data.user){
     await sb.from('usuarios').upsert({id:data.user.id,email,bloqueado:false});
-    // Copy admin opciones_configuracion to new user
-    const{data:adminOpts}=await sb.from('opciones_configuracion').select('*').eq('user_id',(await sb.from('usuarios').select('id').eq('email',ADMIN_EMAIL).maybeSingle()).data?.id||'');
-    if(adminOpts&&adminOpts.length){
-      const newOpts=adminOpts.map(({id,...o})=>({...o,user_id:data.user.id}));
-      await sb.from('opciones_configuracion').insert(newOpts);
+    // Copy default inventario for new user
+    const{data:inv} = await sb.from('inventario').select('*').eq('user_id',currentUser.id).is('user_id',null);
+    if(inv&&inv.length){
+      const newInv = inv.map(({id,...r})=>({...r,user_id:data.user.id}));
+      await sb.from('inventario').insert(newInv);
     }
   }
   okEl.textContent='Cuenta creada. Ya puedes iniciar sesión.';okEl.style.display='block';
@@ -2269,7 +2269,7 @@ async function editDiario(id){openDiarioModal(id);}
 async function saveDiario(){
   const fecha=document.getElementById('dFecha').value;
   if(!fecha){toast('La fecha es obligatoria','error');return;}
-  const payload={user_id:currentUser.id,fecha,area:document.getElementById('dArea').value||null,turno:normalizaTurno(document.getElementById('dTurno').value)||null,letra:document.getElementById('dLetra').value||null,jefe_turno:document.getElementById('dJefe').value||null,estado_planta:document.getElementById('dEstadoPlanta').value||null,observaciones:document.getElementById('dObs').value||null};
+  const payload={fecha,area:document.getElementById('dArea').value||null,turno:document.getElementById('dTurno').value||null,letra:document.getElementById('dLetra').value||null,jefe_turno:document.getElementById('dJefe').value||null,estado_planta:document.getElementById('dEstadoPlanta').value||null,observaciones:document.getElementById('dObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('diario_trabajo').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('diario_trabajo').insert(payload));}
@@ -2932,7 +2932,7 @@ async function guardarDiaCalendario(fecha, existingId) {
   const payload = {
     user_id:currentUser.id,
     fecha,
-    turno: normalizaTurno(document.getElementById('editDiaTurno').value) || null,
+    turno: document.getElementById('editDiaTurno').value || null,
     area: document.getElementById('editDiaArea').value || null,
     letra: document.getElementById('editDiaLetra').value || null,
     jefe_turno: document.getElementById('editDiaJefe').value || null,
