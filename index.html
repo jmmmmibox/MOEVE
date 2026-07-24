@@ -1209,11 +1209,11 @@ async function doRegister(){
   if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
   if(data.user){
     await sb.from('usuarios').upsert({id:data.user.id,email,bloqueado:false});
-    // Copy default inventario for new user
-    const{data:inv} = await sb.from('inventario').select('*').eq('user_id',currentUser.id).is('user_id',null);
-    if(inv&&inv.length){
-      const newInv = inv.map(({id,...r})=>({...r,user_id:data.user.id}));
-      await sb.from('inventario').insert(newInv);
+    // Copy admin opciones_configuracion to new user
+    const{data:adminOpts}=await sb.from('opciones_configuracion').select('*').eq('user_id',(await sb.from('usuarios').select('id').eq('email',ADMIN_EMAIL).maybeSingle()).data?.id||'');
+    if(adminOpts&&adminOpts.length){
+      const newOpts=adminOpts.map(({id,...o})=>({...o,user_id:data.user.id}));
+      await sb.from('opciones_configuracion').insert(newOpts);
     }
   }
   okEl.textContent='Cuenta creada. Ya puedes iniciar sesión.';okEl.style.display='block';
