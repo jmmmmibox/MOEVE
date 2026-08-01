@@ -244,6 +244,13 @@
   .area-header-title{font-size:14px;font-weight:700;color:var(--blue);}
   .area-body{margin-bottom:20px;}
 
+
+  /* ── TOGGLE BUTTONS ── */
+  .toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;border:2px solid var(--gray-300);background:white;cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-500);transition:all .15s;font-family:inherit;}
+  .toggle-btn.active-s{border-color:#ea580c;background:#fff7ed;color:#ea580c;}
+  .toggle-btn.active-a{border-color:#16a34a;background:#dcfce7;color:#16a34a;}
+  .badge-s{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#fff7ed;color:#ea580c;font-size:11px;font-weight:700;border:1px solid #ea580c;}
+  .badge-a{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;border:1px solid #16a34a;}
 </style>
 </head>
 <body>
@@ -491,7 +498,7 @@
       <div class="tab" onclick="setVacTab('ya-disfrutadas',this)">Ya disfrutadas</div>
     </div>
     <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
+      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th></th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
       <tbody id="vacBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
     </div>
   </div>
@@ -521,7 +528,7 @@
       <div class="tab" onclick="setDCTab('ya-disfrutadas',this)">Ya disfrutadas</div>
     </div>
     <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
+      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th></th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
       <tbody id="dcBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
     </div>
   </div>
@@ -862,6 +869,11 @@
         <div class="form-group"><label>Horas</label><input type="number" id="vHoras" step="0.5"></div>
         <div class="form-group"><label>Días</label><input type="number" id="vDias" step="0.5"></div>
         <div class="form-group"><label>Estado</label><select id="vEstado"></select></div>
+        <div class="form-group full" style="flex-direction:row;gap:10px;align-items:center;flex-wrap:wrap;">
+          <label style="width:100%;">Solicitud</label>
+          <button type="button" id="btnSolicitado" class="toggle-btn" onclick="toggleVacBtn('solicitado')">📤 Solicitado</button>
+          <button type="button" id="btnAprobado" class="toggle-btn" onclick="toggleVacBtn('aprobado')">✅ Aprobado</button>
+        </div>
         <div class="form-group"><label>Fecha Planeada</label><input type="date" id="vPlaneada"></div>
         <div class="form-group"><label>Fecha Realizada</label><input type="date" id="vRealizada"></div>
         <div class="form-group full"><label>Observaciones</label><textarea id="vObs"></textarea></div>
@@ -2072,6 +2084,17 @@ function filtrarHistorial(){
   verHistorial(historialProductoId,historialProductoNombre,desde,hasta);
 }
 
+function toggleVacBtn(tipo){
+  const btn=document.getElementById(tipo==='solicitado'?'btnSolicitado':'btnAprobado');
+  const cls=tipo==='solicitado'?'active-s':'active-a';
+  btn.classList.toggle(cls);
+}
+function setVacBtnState(tipo,val){
+  const btn=document.getElementById(tipo==='solicitado'?'btnSolicitado':'btnAprobado');
+  const cls=tipo==='solicitado'?'active-s':'active-a';
+  if(val)btn.classList.add(cls);else btn.classList.remove(cls);
+}
+
 init();
 
 async function loadOpciones(){
@@ -2439,7 +2462,7 @@ async function loadVacaciones(){
   document.getElementById('vacDiasTotales').textContent=all.reduce((s,r)=>s+(r.dias||0),0);
   const tbody=document.getElementById('vacBody');
   if(!all.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">🏖️</div><div class="empty-state-text">No hay entradas</div></div></td></tr>`;return;}
-  tbody.innerHTML=all.map(r=>`<tr><td>${r.nombre||'—'}</td><td>${r.descripcion||'—'}</td><td>${r.horas||'—'}</td><td>${r.dias||'—'}</td><td>${estadoBadge(r.estado)}</td><td>${fmtDate(r.fecha_planeada)}</td><td>${fmtDate(r.fecha_realizada)}</td><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.observaciones||'—'}</td>${actionBtns(`editVac('${r.id}')`,`delVac('${r.id}')`)}</tr>`).join('');
+  tbody.innerHTML=all.map(r=>`<tr><td>${r.nombre||'—'}</td><td>${r.descripcion||'—'}</td><td>${r.horas||'—'}</td><td>${r.dias||'—'}</td><td>${estadoBadge(r.estado)}</td><td style="white-space:nowrap;">${r.solicitado?'<span class="badge-s">S</span>':''} ${r.aprobado?'<span class="badge-a">A</span>':''}</td><td>${fmtDate(r.fecha_planeada)}</td><td>${fmtDate(r.fecha_realizada)}</td><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.observaciones||'—'}</td>${actionBtns(`editVac('${r.id}')`,`delVac('${r.id}')`)}</tr>`).join('');
 }
 
 function setVacTab(tab,el){vacTab=tab;document.querySelectorAll('#sec-vacaciones .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');loadVacaciones();}
@@ -2447,15 +2470,15 @@ function setVacTab(tab,el){vacTab=tab;document.querySelectorAll('#sec-vacaciones
 async function openVacModal(id=null){
   editingId=id;document.getElementById('modalVacTitle').textContent=id?'Editar entrada':'Nueva entrada';
   fillSelect('vDescripcion','vacaciones','descripcion');fillSelect('vEstado','vacaciones','estado');
-  if(id){const{data}=await sb.from('vacaciones').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('vNombre').value=data.nombre||'';document.getElementById('vDescripcion').value=data.descripcion||'';document.getElementById('vHoras').value=data.horas||'';document.getElementById('vDias').value=data.dias||'';document.getElementById('vEstado').value=data.estado||'';document.getElementById('vPlaneada').value=data.fecha_planeada||'';document.getElementById('vRealizada').value=data.fecha_realizada||'';document.getElementById('vObs').value=data.observaciones||'';}}
-  else{['vNombre','vHoras','vDias','vPlaneada','vRealizada','vObs'].forEach(i=>document.getElementById(i).value='');['vDescripcion','vEstado'].forEach(i=>document.getElementById(i).value='');}
+  if(id){const{data}=await sb.from('vacaciones').select('*').eq('user_id',currentUser.id).eq('id',id).single();if(data){document.getElementById('vNombre').value=data.nombre||'';document.getElementById('vDescripcion').value=data.descripcion||'';document.getElementById('vHoras').value=data.horas||'';document.getElementById('vDias').value=data.dias||'';document.getElementById('vEstado').value=data.estado||'';document.getElementById('vPlaneada').value=data.fecha_planeada||'';document.getElementById('vRealizada').value=data.fecha_realizada||'';document.getElementById('vObs').value=data.observaciones||'';setVacBtnState('solicitado',data.solicitado||false);setVacBtnState('aprobado',data.aprobado||false);}}
+  else{['vNombre','vHoras','vDias','vPlaneada','vRealizada','vObs'].forEach(i=>document.getElementById(i).value='');['vDescripcion','vEstado'].forEach(i=>document.getElementById(i).value='');setVacBtnState('solicitado',false);setVacBtnState('aprobado',false);}
   openModal('modalVac');
 }
 
 async function editVac(id){openVacModal(id);}
 async function saveVac(){
   const anio=parseInt(document.getElementById('vacAnioSel').value||new Date().getFullYear());
-  const payload={user_id:currentUser.id,anio,nombre:document.getElementById('vNombre').value||null,descripcion:document.getElementById('vDescripcion').value||null,horas:parseFloat(document.getElementById('vHoras').value)||null,dias:parseFloat(document.getElementById('vDias').value)||null,estado:document.getElementById('vEstado').value||null,fecha_planeada:document.getElementById('vPlaneada').value||null,fecha_realizada:document.getElementById('vRealizada').value||null,observaciones:document.getElementById('vObs').value||null};
+  const payload={user_id:currentUser.id,anio,nombre:document.getElementById('vNombre').value||null,descripcion:document.getElementById('vDescripcion').value||null,horas:parseFloat(document.getElementById('vHoras').value)||null,dias:parseFloat(document.getElementById('vDias').value)||null,estado:document.getElementById('vEstado').value||null,solicitado:document.getElementById('btnSolicitado').classList.contains('active-s'),aprobado:document.getElementById('btnAprobado').classList.contains('active-a'),fecha_planeada:document.getElementById('vPlaneada').value||null,fecha_realizada:document.getElementById('vRealizada').value||null,observaciones:document.getElementById('vObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('vacaciones').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('vacaciones').insert(payload));}
@@ -3728,6 +3751,17 @@ function filtrarHistorial(){
   const desde=document.getElementById('histDesde').value;
   const hasta=document.getElementById('histHasta').value;
   verHistorial(historialProductoId,historialProductoNombre,desde,hasta);
+}
+
+function toggleVacBtn(tipo){
+  const btn=document.getElementById(tipo==='solicitado'?'btnSolicitado':'btnAprobado');
+  const cls=tipo==='solicitado'?'active-s':'active-a';
+  btn.classList.toggle(cls);
+}
+function setVacBtnState(tipo,val){
+  const btn=document.getElementById(tipo==='solicitado'?'btnSolicitado':'btnAprobado');
+  const cls=tipo==='solicitado'?'active-s':'active-a';
+  if(val)btn.classList.add(cls);else btn.classList.remove(cls);
 }
 
 init();
