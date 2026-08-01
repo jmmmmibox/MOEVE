@@ -2292,7 +2292,7 @@ async function editDiario(id){openDiarioModal(id);}
 async function saveDiario(){
   const fecha=document.getElementById('dFecha').value;
   if(!fecha){toast('La fecha es obligatoria','error');return;}
-  const payload={fecha,area:document.getElementById('dArea').value||null,turno:document.getElementById('dTurno').value||null,letra:document.getElementById('dLetra').value||null,jefe_turno:document.getElementById('dJefe').value||null,estado_planta:document.getElementById('dEstadoPlanta').value||null,observaciones:document.getElementById('dObs').value||null};
+  const payload={user_id:currentUser.id,fecha,area:document.getElementById('dArea').value||null,turno:document.getElementById('dTurno').value||null,letra:document.getElementById('dLetra').value||null,jefe_turno:document.getElementById('dJefe').value||null,estado_planta:document.getElementById('dEstadoPlanta').value||null,observaciones:document.getElementById('dObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('diario_trabajo').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('diario_trabajo').insert(payload));}
@@ -2359,7 +2359,7 @@ async function openHorasModal(id=null){
 async function editHoras(id){openHorasModal(id);}
 
 async function saveHoras(){
-  const payload={nombre:document.getElementById('hNombre').value||null,estado:document.getElementById('hEstado').value||null,fecha:document.getElementById('hFecha').value||null,horas:parseFloat(document.getElementById('hHoras').value)||null,pagado_en:document.getElementById('hPagadoEn').value||null,tipo:document.getElementById('hTipo').value||null,como:document.getElementById('hComo').value||null,modalidad:document.getElementById('hModalidad').value||null,observaciones:document.getElementById('hObs').value||null};
+  const payload={user_id:currentUser.id,nombre:document.getElementById('hNombre').value||null,estado:document.getElementById('hEstado').value||null,fecha:document.getElementById('hFecha').value||null,horas:parseFloat(document.getElementById('hHoras').value)||null,pagado_en:document.getElementById('hPagadoEn').value||null,tipo:document.getElementById('hTipo').value||null,como:document.getElementById('hComo').value||null,modalidad:document.getElementById('hModalidad').value||null,observaciones:document.getElementById('hObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('horas_extras').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('horas_extras').insert(payload));}
@@ -2417,7 +2417,7 @@ async function openPRLModal(id=null){
 
 async function editPRL(id){openPRLModal(id);}
 async function savePRL(){
-  const payload={nombre:document.getElementById('pNombre').value||null,estado:document.getElementById('pEstado').value||null,fecha_realizacion:document.getElementById('pFecha').value||null,horas:parseFloat(document.getElementById('pHoras').value)||null,tipo:document.getElementById('pTipo').value||null,observaciones:document.getElementById('pObs').value||null};
+  const payload={user_id:currentUser.id,nombre:document.getElementById('pNombre').value||null,estado:document.getElementById('pEstado').value||null,fecha_realizacion:document.getElementById('pFecha').value||null,horas:parseFloat(document.getElementById('pHoras').value)||null,tipo:document.getElementById('pTipo').value||null,observaciones:document.getElementById('pObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('formacion_prl').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('formacion_prl').insert(payload));}
@@ -2510,7 +2510,7 @@ async function editDormida(id){openDormidaModal(id);}
 async function saveDormida(){
   const fecha=document.getElementById('dorFecha').value,horas=parseFloat(document.getElementById('dorHoras').value);
   if(!fecha||!horas){toast('Fecha y horas son obligatorias','error');return;}
-  const payload={fecha,horas,turno:document.getElementById('dorTurno').value||null};
+  const payload={user_id:currentUser.id,fecha,horas,turno:document.getElementById('dorTurno').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('horas_dormida').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('horas_dormida').insert(payload));}
@@ -2536,7 +2536,7 @@ async function uploadCalImg(event){
   reader.onload=async(e)=>{
     const url=e.target.result,anio=new Date().getFullYear();
     await sb.from('calendario_imagen').delete().neq('id','00000000-0000-0000-0000-000000000000');
-    await sb.from('calendario_imagen').insert({anio,url_imagen:url});
+    await sb.from('calendario_imagen').insert({user_id:currentUser.id,anio,url_imagen:url});
     toast('Imagen subida correctamente');loadCalImg();
   };
   reader.readAsDataURL(file);
@@ -2566,7 +2566,7 @@ async function openInvModal(id=null){
 async function editInv(id){openInvModal(id);}
 async function saveInv(){
   const nombre=document.getElementById('iNombre').value;if(!nombre){toast('El nombre es obligatorio','error');return;}
-  const payload={nombre,cantidad:parseFloat(document.getElementById('iCantidad').value)||0,stock_minimo:parseFloat(document.getElementById('iStockMin').value)||0};
+  const payload={user_id:currentUser.id,nombre,cantidad:parseFloat(document.getElementById('iCantidad').value)||0,stock_minimo:parseFloat(document.getElementById('iStockMin').value)||0};
   let err;
   if(editingId){({error:err}=await sb.from('inventario').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('inventario').insert(payload));}
@@ -2596,7 +2596,7 @@ async function openTelModal(id=null){
 async function editTel(id){openTelModal(id);}
 async function saveTel(){
   const nombre=document.getElementById('tNombre').value;if(!nombre){toast('El nombre es obligatorio','error');return;}
-  const payload={nombre,numero:document.getElementById('tNumero').value||null,observaciones:document.getElementById('tObs').value||null};
+  const payload={user_id:currentUser.id,nombre,numero:document.getElementById('tNumero').value||null,observaciones:document.getElementById('tObs').value||null};
   let err;
   if(editingId){({error:err}=await sb.from('telefonos').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('telefonos').insert(payload));}
