@@ -541,51 +541,7 @@
   </div>
 
   <!-- HORAS DORMIDA -->
-  <!-- DIAS COMPANEROS -->
-  <div id="sec-dias-companeros" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle" id="dcAnioSubtitle">2026</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportDCPDF()">⬇ PDF</button>
-        <select id="dcAnioSel" class="btn btn-secondary btn-sm" onchange="loadDC()" style="cursor:pointer;"></select>
-        <button class="btn btn-secondary btn-sm" onclick="crearAnioDC()">+ Año</button>
-        <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="dcTotal">—</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
-    </div>
-    <div class="tabs">
-      <div class="tab active" onclick="setDCTab('todas',this)">Todas</div>
-      <div class="tab" onclick="setDCTab('planificadas',this)">Planificadas</div>
-      <div class="tab" onclick="setDCTab('no-planificadas',this)">No Planificadas</div>
-      <div class="tab" onclick="setDCTab('ya-disfrutadas',this)">Ya disfrutadas</div>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th></th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
-      <tbody id="dcBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
-  <div id="sec-horas-dormida" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Horas de Dormida</div><div class="page-subtitle">10 horas anuales sin justificar</div></div>
-      <button class="btn btn-primary" onclick="openDormidaModal()">+ Registrar uso</button>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value">10</div><div class="stat-label">Horas Totales</div></div>
-      <div class="stat-card"><div class="stat-value" id="dormidaGastadas" style="color:var(--red)">—</div><div class="stat-label">Horas Gastadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="dormidaRestantes" style="color:var(--green)">—</div><div class="stat-label">Horas Restantes</div></div>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Fecha</th><th>Turno</th><th>Horas</th><th></th></tr></thead>
-      <tbody id="dormidaBody"><tr><td colspan="4"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
+  
   <!-- CALENDARIO -->
   <div id="sec-calendario" class="section">
     <div class="page-header">
@@ -1704,88 +1660,9 @@
   </div>
 
   <!-- HORAS DORMIDA -->
-  <!-- DIAS COMPANEROS -->
-  <div id="sec-dias-companeros" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle">Intercambio de días con compañeros</div></div>
-      <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
-    </div>
-
-    <!-- Saldo -->
-    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-        <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px;">Me deben</div>
-        <div id="dcSaldoMeDeben" style="font-size:28px;font-weight:700;color:#16a34a;">0</div>
-        <div style="font-size:11px;color:var(--gray-400);">días</div>
-      </div>
-      <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-        <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px;">Debo</div>
-        <div id="dcSaldoDebo" style="font-size:28px;font-weight:700;color:#dc2626;">0</div>
-        <div style="font-size:11px;color:var(--gray-400);">días</div>
-      </div>
-    </div>
-
-    <!-- Pestañas -->
-    <div class="tabs" style="margin-bottom:16px;">
-      <button class="tab active" onclick="setDCTab('pendientes',this)">Pendientes</button>
-      <button class="tab" onclick="setDCTab('saldados',this)">Saldados</button>
-      <button class="tab" onclick="setDCTab('todos',this)">Todos</button>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Fecha</th><th>Compañero</th><th>Tipo</th><th>Observaciones</th><th>Plan. saldar</th><th>Estado</th><th></th></tr></thead>
-        <tbody id="dcBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
+  
   <!-- HORAS DORMIDA -->
-  <!-- DIAS COMPANEROS -->
-  <div id="sec-dias-companeros" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle" id="dcAnioSubtitle">2026</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportDCPDF()">⬇ PDF</button>
-        <select id="dcAnioSel" class="btn btn-secondary btn-sm" onchange="loadDC()" style="cursor:pointer;"></select>
-        <button class="btn btn-secondary btn-sm" onclick="crearAnioDC()">+ Año</button>
-        <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="dcTotal">—</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
-    </div>
-    <div class="tabs">
-      <div class="tab active" onclick="setDCTab('todas',this)">Todas</div>
-      <div class="tab" onclick="setDCTab('planificadas',this)">Planificadas</div>
-      <div class="tab" onclick="setDCTab('no-planificadas',this)">No Planificadas</div>
-      <div class="tab" onclick="setDCTab('ya-disfrutadas',this)">Ya disfrutadas</div>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th></th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
-      <tbody id="dcBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
-  <div id="sec-horas-dormida" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Horas de Dormida</div><div class="page-subtitle">10 horas anuales sin justificar</div></div>
-      <button class="btn btn-primary" onclick="openDormidaModal()">+ Registrar uso</button>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value">10</div><div class="stat-label">Horas Totales</div></div>
-      <div class="stat-card"><div class="stat-value" id="dormidaGastadas" style="color:var(--red)">—</div><div class="stat-label">Horas Gastadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="dormidaRestantes" style="color:var(--green)">—</div><div class="stat-label">Horas Restantes</div></div>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Fecha</th><th>Turno</th><th>Horas</th><th></th></tr></thead>
-      <tbody id="dormidaBody"><tr><td colspan="4"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
+  
   <!-- CALENDARIO -->
   <div id="sec-calendario" class="section">
     <div class="page-header">
