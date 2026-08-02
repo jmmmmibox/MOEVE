@@ -507,1162 +507,48 @@
   <!-- DIAS COMPANEROS -->
   <div id="sec-dias-companeros" class="section">
     <div class="page-header">
-      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle">Intercambio de días con compañeros</div></div>
-      <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
-    </div>
-
-    <!-- Saldo -->
-    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-        <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px;">Me deben</div>
-        <div id="dcSaldoMeDeben" style="font-size:28px;font-weight:700;color:#16a34a;">0</div>
-        <div style="font-size:11px;color:var(--gray-400);">días</div>
-      </div>
-      <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-        <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px;">Debo</div>
-        <div id="dcSaldoDebo" style="font-size:28px;font-weight:700;color:#dc2626;">0</div>
-        <div style="font-size:11px;color:var(--gray-400);">días</div>
-      </div>
-    </div>
-
-    <!-- Pestañas -->
-    <div class="tabs" style="margin-bottom:16px;">
-      <button class="tab active" onclick="setDCTab('pendientes',this)">Pendientes</button>
-      <button class="tab" onclick="setDCTab('saldados',this)">Saldados</button>
-      <button class="tab" onclick="setDCTab('todos',this)">Todos</button>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Fecha</th><th>Compañero</th><th>Tipo</th><th>Observaciones</th><th>Plan. saldar</th><th>Estado</th><th></th></tr></thead>
-        <tbody id="dcBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- HORAS DORMIDA -->
-  
-  <!-- CALENDARIO -->
-  <div id="sec-calendario" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Calendario Turnos</div><div class="page-subtitle">Imagen del calendario anual</div></div>
-      <button class="btn btn-primary" onclick="document.getElementById('calImgInput').click()">📷 Subir imagen</button>
-    </div>
-    <input type="file" id="calImgInput" accept="image/*" style="display:none" onchange="uploadCalImg(event)">
-    <div class="card"><div id="calImgWrap">
-      <div class="upload-area" onclick="document.getElementById('calImgInput').click()">
-        <div class="upload-area-icon">📅</div>
-        <div class="upload-area-text">Haz clic para subir la imagen del calendario</div>
-        <div style="font-size:12px;color:var(--gray-400);margin-top:8px;">JPG, PNG, WEBP</div>
-      </div>
-    </div></div>
-  </div>
-
-  <!-- MI CALENDARIO -->
-  <div id="sec-mi-calendario" class="section active">
-    <div class="page-header">
-      <div><div class="page-title">Mi Calendario</div><div class="page-subtitle">Turnos generados automáticamente</div></div>
-    </div>
-    <div class="card">
-      <div id="miCalContainer"></div>
-    </div>
-  </div>
-
-  <!-- INVENTARIO -->
-  <div id="sec-inventario" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Inventario Material Letra ER</div><div class="page-subtitle">Control de stock de materiales</div></div>
+      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle" id="dcAnioSubtitle">2026</div></div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportInvPDF()">⬇ PDF</button>
-        <button class="btn btn-primary" onclick="openInvModal()">+ Artículo</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Artículo</th><th>Cantidad</th><th>Stock Mínimo</th><th>Estado Stock</th><th></th></tr></thead>
-      <tbody id="invBody"><tr><td colspan="5"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
-  <!-- TELEFONOS -->
-  <div id="sec-telefonos" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Teléfonos MOEVE</div><div class="page-subtitle">Directorio de contactos</div></div>
-      <button class="btn btn-primary" onclick="openTelModal()">+ Contacto</button>
-    </div>
-    <div class="card" style="margin-bottom:16px;">
-      <input type="text" id="telSearch" placeholder="🔍 Buscar por nombre o número..." oninput="loadTelefonos()" style="max-width:300px;">
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Número</th><th>Observaciones</th><th></th></tr></thead>
-      <tbody id="telBody"><tr><td colspan="4"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
-  <!-- RUTINAS -->
-  <div id="sec-rutinas" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Rutinas</div><div class="page-subtitle">Selecciona una rutina para empezar</div></div>
-    </div>
-    <div class="rutinas-grid" id="rutinasGrid">
-      <div class="rutina-card" onclick="showSection('inv-quimico')">
-        <div class="rutina-card-icon">🧪</div>
-        <div class="rutina-card-title">Inventario de Productos Químicos FCC</div>
-        <div class="rutina-card-desc">Registro histórico de productos químicos por área</div>
-      </div>
-      <div class="rutina-card" onclick="showSection('niveles-fcc')">
-        <div class="rutina-card-icon">📊</div>
-        <div class="rutina-card-title">Rutina Niveles FCC</div>
-        <div class="rutina-card-desc">Control de niveles de equipos por área</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- INVENTARIO PRODUCTOS QUIMICOS -->
-  <div id="sec-inv-quimico" class="section">
-    <div class="page-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button class="btn btn-secondary btn-sm" onclick="showSection('rutinas')">← Rutinas</button>
-        <div class="page-title">Inventario Productos Químicos</div>
-      </div>
-      <button class="btn btn-secondary btn-sm" onclick="showSection('inv-quimico-config')">⚙️ Gestionar áreas y productos</button>
-    </div>
-
-    <!-- Selector de área -->
-    <div class="card" style="margin-bottom:16px;">
-      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-        <div class="form-group" style="min-width:200px;">
-          <label>Selecciona un área</label>
-          <select id="iqAreaSel" onchange="loadTablaRutina()">
-            <option value="">— Selecciona área —</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Fecha</label>
-          <input type="date" id="iqFechaRutina" value="">
-        </div>
-        <div class="form-group" style="min-width:120px;">
-          <label>Letra</label>
-          <select id="iqLetraRutina"></select>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:1px;">
-          <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos</button>
-          <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabla de rutina -->
-    <div id="iqTablaWrap" style="display:none;">
-      <div class="table-wrap" style="margin-bottom:12px;">
-        <table>
-          <thead>
-            <tr>
-              <th style="min-width:160px;">Producto</th>
-              <th style="min-width:130px;">Dato Anterior</th>
-              <th style="min-width:130px;">Dato Actualizado</th>
-              <th>Observaciones</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="iqTablaBody"></tbody>
-        </table>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-        <button class="btn btn-secondary" onclick="resetTablaRutina()">🔄 Limpiar</button>
-        <button class="btn btn-secondary" onclick="guardarBorradorRutina()">💾 Guardar</button>
-        <button class="btn btn-primary" onclick="guardarRutina()">✅ Guardar en historial</button>
-      </div>
-    </div>
-
-    <div id="iqEmpty" style="display:none;">
-      <div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-text">No hay productos en esta área. Añádelos desde ⚙️ Gestionar.</div></div>
-    </div>
-  </div>
-
-  <!-- CONFIGURACION RUTINA -->
-  <div id="sec-inv-quimico-config" class="section">
-    <div class="page-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button class="btn btn-secondary btn-sm" onclick="showSection('inv-quimico')">← Volver</button>
-        <div class="page-title">Gestionar Áreas y Productos</div>
-      </div>
-      <button class="btn btn-primary" onclick="openAreaModal()">+ Nueva área</button>
-    </div>
-    <div id="iqConfigContent"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
-  </div>
-
-
-  <!-- NIVELES FCC -->
-  <div id="sec-niveles-fcc" class="section">
-    <div class="page-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button class="btn btn-secondary btn-sm" onclick="showSection('rutinas')">← Rutinas</button>
-        <div class="page-title">Rutina Niveles FCC</div>
-      </div>
-      <button class="btn btn-secondary btn-sm" onclick="showSection('niveles-fcc-config')">⚙️ Gestionar áreas y niveles</button>
-    </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-        <div class="form-group" style="min-width:200px;">
-          <label>Selecciona un área</label>
-          <select id="nvAreaSel" onchange="loadTablaNiveles()">
-            <option value="">— Selecciona área —</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Fecha</label>
-          <input type="date" id="nvFecha" value="">
-        </div>
-        <div class="form-group" style="min-width:120px;">
-          <label>Letra</label>
-          <select id="nvLetra"></select>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:1px;">
-          <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimosNiveles()">⬇ PDF Últimos</button>
-          <button class="btn btn-secondary btn-sm" onclick="openExportHistorialNivelesModal()">⬇ PDF Historial</button>
-        </div>
-      </div>
-    </div>
-    <div id="nvTablaWrap" style="display:none;">
-      <div class="table-wrap" style="margin-bottom:12px;">
-        <table>
-          <thead>
-            <tr>
-              <th style="min-width:160px;">Nivel / Equipo</th>
-              <th style="min-width:130px;">Datos en Control</th>
-              <th style="min-width:130px;">Datos en Campo</th>
-              <th>Observaciones</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="nvTablaBody"></tbody>
-        </table>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-        <button class="btn btn-secondary" onclick="resetTablaNiveles()">🔄 Limpiar</button>
-        <button class="btn btn-secondary" onclick="guardarBorradorNiveles()">💾 Guardar</button>
-        <button class="btn btn-primary" onclick="guardarNiveles()">✅ Guardar en historial</button>
-      </div>
-    </div>
-    <div id="nvEmpty" style="display:none;">
-      <div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">No hay niveles en esta área. Añádelos desde ⚙️ Gestionar.</div></div>
-    </div>
-  </div>
-
-  <!-- CONFIGURACION NIVELES FCC -->
-  <div id="sec-niveles-fcc-config" class="section">
-    <div class="page-header">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button class="btn btn-secondary btn-sm" onclick="showSection('niveles-fcc')">← Volver</button>
-        <div class="page-title">Gestionar Áreas y Niveles</div>
-      </div>
-      <button class="btn btn-primary" onclick="openNvAreaModal()">+ Nueva área</button>
-    </div>
-    <div id="nvConfigContent"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
-  </div>
-
-  <!-- BACKUP -->
-
-  <div id="sec-backup" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Copia de Seguridad</div><div class="page-subtitle">Descarga o restaura todos tus datos</div></div>
-    </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:8px;">⬇️ Descargar copia de seguridad</div>
-      <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Descarga un archivo JSON con todos tus datos actuales.</div>
-      <button class="btn btn-primary" onclick="downloadBackup()">⬇️ Descargar JSON</button>
-    </div>
-    <div class="card">
-      <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:8px;">⬆️ Restaurar copia de seguridad</div>
-      <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Sube un archivo JSON previamente descargado. <strong>Atención: esto reemplazará todos los datos existentes.</strong></div>
-      <input type="file" id="backupInput" accept=".json" style="display:none" onchange="uploadBackup(event)">
-      <button class="btn btn-secondary" onclick="document.getElementById('backupInput').click()">⬆️ Subir JSON</button>
-    </div>
-  </div>
-
-  <!-- CONFIG -->
-  <div id="sec-config" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Configuración</div><div class="page-subtitle">Gestiona las opciones de cada módulo</div></div>
-    </div>
-    <!-- Ciclos Mi Calendario -->
-    <div class="card" style="margin-bottom:16px;">
-      <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:12px;">🗓️ Períodos de Mi Calendario</div>
-      <div id="ciclosList" style="margin-bottom:12px;"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openCicloModal()">+ Añadir período</button>
-    </div>
-    <div id="configContent"><div class="loading"><div class="spinner"></div> Cargando...</div></div>
-  </div>
-
-</main>
-
-<!-- MODALES -->
-<div id="modalDiario" class="modal-overlay" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="modalDiarioTitle">Nuevo registro</div><button class="close-btn" onclick="closeModal('modalDiario')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Fecha *</label><input type="date" id="dFecha"></div>
-        <div class="form-group"><label>Área</label><select id="dArea"></select></div>
-        <div class="form-group"><label>Turno</label><select id="dTurno"></select></div>
-        <div class="form-group"><label>Letra</label><select id="dLetra"></select></div>
-        <div class="form-group"><label>Jefe de Turno</label><select id="dJefe"></select></div>
-        <div class="form-group"><label>Estado Planta</label><select id="dEstadoPlanta"></select></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="dObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalDiario')">Cancelar</button><button class="btn btn-primary" onclick="saveDiario()">Guardar</button></div>
-  </div>
-</div>
-
-<div id="modalHoras" class="modal-overlay" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="modalHorasTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalHoras')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Nombre</label><input type="text" id="hNombre"></div>
-        <div class="form-group"><label>Estado</label><select id="hEstado"></select></div>
-        <div class="form-group"><label>Fecha</label><input type="date" id="hFecha"></div>
-        <div class="form-group"><label>Horas</label><input type="number" id="hHoras" step="0.5"></div>
-        <div class="form-group"><label>Pagado en</label><select id="hPagadoEn"></select></div>
-        <div class="form-group"><label>Tipo</label><select id="hTipo"></select></div>
-        <div class="form-group"><label>Cómo</label><select id="hComo"></select></div>
-        <div class="form-group"><label>Modalidad</label><select id="hModalidad"></select></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="hObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalHoras')">Cancelar</button><button class="btn btn-primary" onclick="saveHoras()">Guardar</button></div>
-  </div>
-</div>
-
-<div id="modalPRL" class="modal-overlay" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="modalPRLTitle">Nueva formación PRL</div><button class="close-btn" onclick="closeModal('modalPRL')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Nombre</label><input type="text" id="pNombre"></div>
-        <div class="form-group"><label>Estado</label><select id="pEstado"></select></div>
-        <div class="form-group"><label>Fecha Realización</label><input type="date" id="pFecha"></div>
-        <div class="form-group"><label>Horas</label><input type="number" id="pHoras" step="0.5"></div>
-        <div class="form-group"><label>Tipo</label><select id="pTipo"></select></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="pObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPRL')">Cancelar</button><button class="btn btn-primary" onclick="savePRL()">Guardar</button></div>
-  </div>
-</div>
-
-<div id="modalVac" class="modal-overlay" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="modalVacTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalVac')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Nombre</label><input type="text" id="vNombre"></div>
-        <div class="form-group"><label>Descripción</label><select id="vDescripcion"></select></div>
-        <div class="form-group"><label>Horas</label><input type="number" id="vHoras" step="0.5"></div>
-        <div class="form-group"><label>Días</label><input type="number" id="vDias" step="0.5"></div>
-        <div class="form-group"><label>Estado</label><select id="vEstado"></select></div>
-        <div class="form-group full" style="flex-direction:row;gap:10px;align-items:center;flex-wrap:wrap;">
-          <label style="width:100%;">Solicitud</label>
-          <button type="button" id="btnSolicitado" class="toggle-btn" onclick="toggleVacBtn('solicitado')">📤 Solicitado</button>
-          <button type="button" id="btnAprobado" class="toggle-btn" onclick="toggleVacBtn('aprobado')">✅ Aprobado</button>
-        </div>
-        <div class="form-group"><label>Fecha Planeada</label><input type="date" id="vPlaneada"></div>
-        <div class="form-group"><label>Fecha Realizada</label><input type="date" id="vRealizada"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="vObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalVac')">Cancelar</button><button class="btn btn-primary" onclick="saveVac()">Guardar</button></div>
-  </div>
-</div>
-
-<div id="modalDormida" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title">Registrar uso de horas</div><button class="close-btn" onclick="closeModal('modalDormida')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Fecha *</label><input type="date" id="dorFecha"></div>
-        <div class="form-group"><label>Turno</label><select id="dorTurno"></select></div>
-        <div class="form-group full"><label>Horas *</label><input type="number" id="dorHoras" step="0.5" min="0.5" max="10"></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalDormida')">Cancelar</button><button class="btn btn-primary" onclick="saveDormida()">Guardar</button></div>
-  </div>
-</div>
-
-<div id="modalInv" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header"><div class="modal-title" id="modalInvTitle">Nuevo artículo</div><button class="close-btn" onclick="closeModal('modalInv')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group full"><label>Nombre *</label><input type="text" id="iNombre"></div>
-        <div class="form-group"><label>Cantidad</label><input type="number" id="iCantidad" min="0"></div>
-        <div class="form-group"><label>Stock Mínimo</label><input type="number" id="iStockMin" min="0"></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalInv')">Cancelar</button><button class="btn btn-primary" onclick="saveInv()">Guardar</button></div>
-  </div>
-</div>
-
-<div id="modalTel" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header"><div class="modal-title" id="modalTelTitle">Nuevo contacto</div><button class="close-btn" onclick="closeModal('modalTel')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group full"><label>Nombre *</label><input type="text" id="tNombre"></div>
-        <div class="form-group full"><label>Número</label><input type="tel" id="tNumero"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="tObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalTel')">Cancelar</button><button class="btn btn-primary" onclick="saveTel()">Guardar</button></div>
-  </div>
-</div>
-
-<!-- Modal Filtros Diario -->
-<div id="modalDiarioFiltros" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <div class="modal-title">🔍 Filtros — Diario de Trabajo</div>
-      <button class="close-btn" onclick="closeDiarioFilters()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Desde</label><input type="date" id="fDiarioDesde"></div>
-        <div class="form-group"><label>Hasta</label><input type="date" id="fDiarioHasta"></div>
-        <div class="form-group"><label>Área</label><select id="fDiarioArea"><option value="">Todas</option></select></div>
-        <div class="form-group"><label>Turno</label><select id="fDiarioTurno"><option value="">Todos</option></select></div>
-        <div class="form-group"><label>Letra</label><select id="fDiarioLetra"><option value="">Todas</option></select></div>
-        <div class="form-group"><label>Jefe Turno</label><select id="fDiarioJefe"><option value="">Todos</option></select></div>
-        <div class="form-group full"><label>Estado Planta</label><select id="fDiarioEstado"><option value="">Todos</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="clearDiarioFilters()">✕ Limpiar</button>
-      <button class="btn btn-primary" onclick="applyDiarioFilters()">Aplicar filtros</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Días Compañeros -->
-<div id="modalDC" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header"><div class="modal-title" id="modalDCTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalDC')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Fecha *</label><input type="date" id="dcFecha"></div>
-        <div class="form-group"><label>Compañero *</label><input type="text" id="dcCompanero" placeholder="Nombre del compañero"></div>
-        <div class="form-group full"><label>Tipo *</label>
-          <div style="display:flex;gap:10px;margin-top:4px;">
-            <button type="button" id="btnLeHago" class="toggle-btn" onclick="setDCTipo('le_hago')" style="flex:1;justify-content:center;">👆 Le hago un día</button>
-            <button type="button" id="btnMeHace" class="toggle-btn" onclick="setDCTipo('me_hace')" style="flex:1;justify-content:center;">🤝 Me hace un día</button>
-          </div>
-        </div>
-        <div class="form-group"><label>Fecha plan. saldar</label><input type="date" id="dcFechaPlanSaldar"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="dcObs" style="min-height:60px;"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalDC')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveDC()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Período Mi Calendario -->
-<div id="modalCiclo" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-header">
-      <div class="modal-title" id="modalCicloTitle">Añadir período</div>
-      <button class="close-btn" onclick="closeModal('modalCiclo')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group full">
-          <label>Tipo de turno</label>
-          <select id="cicloTipo" onchange="toggleCicloTurnoInicial()">
-            <option value="turno">6-4 (Rotativo)</option>
-            <option value="refuerzo">Equipo de Refuerzo</option>
-          </select>
-        </div>
-        <div class="form-group" id="cicloTurnoInicialGroup">
-          <label>Empieza en</label>
-          <select id="cicloTurnoInicial">
-            <option value="M">Mañana</option>
-            <option value="T">Tarde</option>
-            <option value="N">Noche</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Fecha inicio</label><input type="date" id="cicloFechaInicio"></div>
-        <div class="form-group"><label>Fecha fin</label><input type="date" id="cicloFechaFin"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalCiclo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveCiclo()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Editar Día Mi Calendario -->
-<div id="modalEditTurno" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:600px">
-    <div class="modal-header">
-      <div class="modal-title" id="modalEditTurnoTitle">Registro del día</div>
-      <button class="close-btn" onclick="document.getElementById('modalEditTurno').style.display='none'">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Turno</label><select id="editDiaTurno"></select></div>
-        <div class="form-group"><label>Área</label><select id="editDiaArea"></select></div>
-        <div class="form-group"><label>Letra</label><select id="editDiaLetra"></select></div>
-        <div class="form-group"><label>Jefe de Turno</label><select id="editDiaJefe"></select></div>
-        <div class="form-group"><label>Estado Planta</label><select id="editDiaEstadoPlanta"></select></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="editDiaComentario" style="min-height:70px;"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer" id="editTurnoFooter"></div>
-  </div>
-</div>
-
-<!-- Modal Filtros Horas Extras -->
-<div id="modalHorasFiltros" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <div class="modal-title">🔍 Filtros — Horas Extras / Formación</div>
-      <button class="close-btn" onclick="closeHorasFilters()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Desde</label><input type="date" id="fHorasDesde"></div>
-        <div class="form-group"><label>Hasta</label><input type="date" id="fHorasHasta"></div>
-        <div class="form-group"><label>Tipo</label><select id="fHorasTipo"><option value="">Todos</option></select></div>
-        <div class="form-group"><label>Pagado en</label><select id="fHorasPagado"><option value="">Todos</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="clearHorasFilters()">✕ Limpiar</button>
-      <button class="btn btn-primary" onclick="applyHorasFilters()">Aplicar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Filtros PRL -->
-<div id="modalPRLFiltros" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <div class="modal-title">🔍 Filtros — Formación PRL</div>
-      <button class="close-btn" onclick="closePRLFilters()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Desde</label><input type="date" id="fPRLDesde"></div>
-        <div class="form-group"><label>Hasta</label><input type="date" id="fPRLHasta"></div>
-        <div class="form-group full"><label>Tipo</label><select id="fPRLTipo"><option value="">Todos</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="clearPRLFilters()">✕ Limpiar</button>
-      <button class="btn btn-primary" onclick="applyPRLFilters()">Aplicar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Área -->
-<div id="modalArea" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title" id="modalAreaTitle">Nueva área</div><button class="close-btn" onclick="closeModal('modalArea')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label>Nombre del área *</label><input type="text" id="areaNombre"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalArea')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveArea()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Producto -->
-<div id="modalProducto" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title" id="modalProductoTitle">Nuevo producto</div><button class="close-btn" onclick="closeModal('modalProducto')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label>Nombre del producto *</label><input type="text" id="productoNombre"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalProducto')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveProducto()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Registro Inv Químico -->
-<div id="modalInvQuimico" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header"><div class="modal-title" id="modalInvQuimicoTitle">Nuevo registro</div><button class="close-btn" onclick="closeModal('modalInvQuimico')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Fecha *</label><input type="date" id="iqFecha"></div>
-        <div class="form-group"><label>Letra</label><select id="iqLetra"></select></div>
-        <div class="form-group"><label>Dato anterior</label><input type="number" id="iqDatoAnterior" step="any"></div>
-        <div class="form-group"><label>Dato actualizado *</label><input type="number" id="iqDatoActualizado" step="any"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="iqObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalInvQuimico')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveInvQuimico()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Historial -->
-<div id="modalHistorial" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:700px">
-    <div class="modal-header"><div class="modal-title">📋 Historial</div><button class="close-btn" onclick="document.getElementById('modalHistorial').style.display='none'">✕</button></div>
-    <div class="modal-body" id="historialBody"></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="document.getElementById('modalHistorial').style.display='none'">Cerrar</button></div>
-  </div>
-</div>
-
-<!-- Modal Área Niveles -->
-<div id="modalNvArea" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title" id="modalNvAreaTitle">Nueva área</div><button class="close-btn" onclick="closeModal('modalNvArea')">✕</button></div>
-    <div class="modal-body"><div class="form-group"><label>Nombre del área *</label><input type="text" id="nvAreaNombre"></div></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalNvArea')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveNvArea()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Nivel/Equipo -->
-<div id="modalNvEquipo" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title" id="modalNvEquipoTitle">Nuevo nivel</div><button class="close-btn" onclick="closeModal('modalNvEquipo')">✕</button></div>
-    <div class="modal-body"><div class="form-group"><label>Nombre del nivel / equipo *</label><input type="text" id="nvEquipoNombre"></div></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalNvEquipo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveNvEquipo()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Editar Registro Niveles -->
-<div id="modalNvReg" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header"><div class="modal-title" id="modalNvRegTitle">Editar registro</div><button class="close-btn" onclick="closeModal('modalNvReg')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Fecha</label><input type="date" id="nvRegFecha"></div>
-        <div class="form-group"><label>Letra</label><select id="nvRegLetra"></select></div>
-        <div class="form-group"><label>Datos en Control</label><input type="number" step="any" id="nvRegControl"></div>
-        <div class="form-group"><label>Datos en Campo</label><input type="number" step="any" id="nvRegCampo"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="nvRegObs"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalNvReg')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveNvReg()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast-container"></div>
-
-<script></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --blue:#1a56db;--blue-light:#e8f0fe;--blue-dark:#1342b0;
-    --green:#16a34a;--green-light:#dcfce7;--red:#dc2626;--red-light:#fee2e2;
-    --orange:#ea580c;--orange-light:#fff7ed;
-    --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
-    --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;
-    --gray-800:#1f2937;--gray-900:#111827;--white:#ffffff;
-    --shadow-sm:0 1px 2px rgba(0,0,0,.05);--shadow:0 1px 3px rgba(0,0,0,.1);
-    --shadow-md:0 4px 6px rgba(0,0,0,.07);--shadow-lg:0 10px 15px rgba(0,0,0,.1);
-    --radius:8px;--radius-lg:12px;
-    --turno-M:#DBEAFE;--turno-M-text:#1D4ED8;
-    --turno-T:#FEF3C7;--turno-T-text:#92400E;
-    --turno-N:#1E1B4B;--turno-N-text:#C7D2FE;
-    --turno-D:#F1F5F9;--turno-D-text:#64748B;
-    --turno-R:#DCFCE7;--turno-R-text:#166534;
-    --turno-V:#FCE7F3;--turno-V-text:#9D174D;
-    --turno-B:#FEE2E2;--turno-B-text:#991B1B;
-    --border:#E2E8F0;--mc-text:#1E293B;--mc-text2:#64748B;--mc-text3:#94A3B8;
-    --primary-light:#3B82F6;--surface2:#F8FAFC;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-900);min-height:100vh;font-size:14px}
-  #sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--white);border-right:1px solid var(--gray-200);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
-  .sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--gray-200)}
-  .sidebar-logo{font-size:22px;font-weight:700;color:var(--blue);letter-spacing:-.5px}
-  .sidebar-subtitle{font-size:11px;color:var(--gray-400);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
-  .sidebar-nav{flex:1;overflow-y:auto;padding:12px 0}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:var(--gray-600);font-weight:500;transition:all .15s;border-left:3px solid transparent;font-size:13px}
-  .nav-item:hover{background:var(--gray-50);color:var(--gray-900)}
-  .nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue)}
-  .nav-icon{font-size:16px;width:20px;text-align:center}
-  #main{margin-left:240px;min-height:100vh;padding:24px}
-  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-  .page-title{font-size:22px;font-weight:700}
-  .page-subtitle{font-size:13px;color:var(--gray-500);margin-top:2px}
-  .card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:20px;margin-bottom:16px}
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
-  .stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;text-align:center}
-  .stat-value{font-size:26px;font-weight:700;color:var(--blue)}
-  .stat-label{font-size:11px;color:var(--gray-500);margin-top:4px;text-transform:uppercase;letter-spacing:.3px}
-  .tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
-  .tab{padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;background:var(--gray-100);color:var(--gray-600);border:1px solid transparent;transition:all .15s}
-  .tab:hover{background:var(--gray-200)}
-  .tab.active{background:var(--blue);color:white}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit}
-  .btn-primary{background:var(--blue);color:white}
-  .btn-primary:hover{background:var(--blue-dark)}
-  .btn-secondary{background:var(--white);color:var(--gray-700);border:1px solid var(--gray-300)}
-  .btn-secondary:hover{background:var(--gray-50)}
-  .btn-danger{background:var(--red);color:white}
-  .btn-danger:hover{background:#b91c1c}
-  .btn-sm{padding:5px 10px;font-size:12px}
-  .btn-icon{padding:6px 8px}
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-  .form-group{display:flex;flex-direction:column;gap:4px}
-  .form-group.full{grid-column:1/-1}
-  label{font-size:12px;font-weight:500;color:var(--gray-600)}
-  input,select,textarea{padding:8px 10px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:13px;font-family:inherit;color:var(--gray-900);background:var(--white);transition:border-color .15s;width:100%}
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1)}
-  textarea{resize:vertical;min-height:70px}
-  .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--gray-200)}
-  table{width:100%;border-collapse:collapse}
-  thead{background:var(--gray-50)}
-  th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--gray-200);white-space:nowrap}
-  td{padding:10px 12px;border-bottom:1px solid var(--gray-100);font-size:13px;color:var(--gray-700)}
-  tr:last-child td{border-bottom:none}
-  tr:hover td{background:var(--gray-50)}
-  .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
-  .badge-blue{background:var(--blue-light);color:var(--blue)}
-  .badge-green{background:var(--green-light);color:var(--green)}
-  .badge-red{background:var(--red-light);color:var(--red)}
-  .badge-orange{background:var(--orange-light);color:var(--orange)}
-  .badge-gray{background:var(--gray-100);color:var(--gray-600)}
-  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end}
-  .filter-row .form-group{min-width:130px;flex:1}
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
-  .modal{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
-  .modal-header{padding:20px 20px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
-  .modal-title{font-size:16px;font-weight:700}
-  .modal-body{padding:20px}
-  .modal-footer{padding:16px 20px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px}
-  .close-btn{background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-400);padding:4px}
-  .close-btn:hover{color:var(--gray-700)}
-  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .cal-month{font-size:16px;font-weight:700}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-  .cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--gray-400);padding:6px 0;text-transform:uppercase}
-  .cal-day{min-height:72px;padding:4px;border:1px solid var(--gray-100);border-radius:4px;cursor:pointer;transition:background .1s}
-  .cal-day:hover{background:var(--gray-50)}
-  .cal-day.other-month{opacity:.35}
-  .cal-day.today{border-color:var(--blue)}
-  .cal-day-num{font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:2px}
-  .cal-entry{font-size:10px;padding:1px 4px;border-radius:3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-  @media(max-width:768px){
-    .cal-day{min-height:44px;padding:2px;}
-    .cal-day-num{font-size:11px;}
-    .cal-day-name{font-size:10px;padding:4px 0;}
-    .cal-entry{font-size:9px;padding:1px 2px;}
-    .cal-grid{gap:1px;}
-  }
-  .section{display:none}
-  .section.active{display:block}
-  .hamburger{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:8px 10px;cursor:pointer;font-size:18px;box-shadow:var(--shadow)}
-  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:90}
-  @media(max-width:768px){
-    #sidebar{transform:translateX(-100%)}
-    #sidebar.open{transform:translateX(0)}
-    .sidebar-overlay.open{display:block}
-    #main{margin-left:0;padding:16px;padding-top:64px}
-    .hamburger{display:block}
-    .stats-row{grid-template-columns:repeat(2,1fr)}
-    .form-grid{grid-template-columns:1fr}
-    .filter-row{flex-direction:column}
-  }
-  #toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999}
-  .toast{padding:12px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);min-width:200px;animation:slideIn .3s ease}
-  .toast-success{background:var(--green);color:white}
-  .toast-error{background:var(--red);color:white}
-  @keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
-  .empty-state{text-align:center;padding:48px 24px;color:var(--gray-400)}
-  .empty-state-icon{font-size:40px;margin-bottom:12px}
-  .loading{display:flex;align-items:center;justify-content:center;padding:48px;color:var(--gray-400);gap:8px}
-  .spinner{width:20px;height:20px;border:2px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .stock-ok{color:var(--green);font-weight:700}
-  .stock-low{color:var(--red);font-weight:700}
-  .config-section{margin-bottom:24px}
-  .config-title{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray-200)}
-  .config-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-  .config-tag{display:inline-flex;align-items:center;gap:6px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:6px;padding:4px 10px;font-size:12px}
-  .config-tag-del{cursor:pointer;color:var(--gray-400);background:none;border:none;font-size:14px;padding:0;line-height:1}
-  .config-tag-del:hover{color:var(--red)}
-  .config-add{display:flex;gap:6px}
-  .config-add input{flex:1}
-  .upload-area{border:2px dashed var(--gray-300);border-radius:var(--radius-lg);padding:48px;text-align:center;cursor:pointer;transition:border-color .2s}
-  .upload-area:hover{border-color:var(--blue)}
-  .upload-area-icon{font-size:36px;margin-bottom:12px}
-  .upload-area-text{font-size:14px;color:var(--gray-500)}
-
-  /* ── MI CALENDARIO (estilos TurnoX) ── */
-  .turno-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;font-size:12px;font-weight:700;}
-  .turno-badge.M{background:var(--turno-M);color:var(--turno-M-text);}
-  .turno-badge.T{background:var(--turno-T);color:var(--turno-T-text);}
-  .turno-badge.N{background:var(--turno-N);color:var(--turno-N-text);}
-  .turno-badge.D{background:var(--turno-D);color:var(--turno-D-text);}
-  .turno-badge.R{background:var(--turno-R);color:var(--turno-R-text);}
-  .turno-badge.V{background:var(--turno-V);color:var(--turno-V-text);}
-  .turno-badge.S{background:#FFF7ED;color:#C2410C;}
-  .turno-badge.L{background:#1E1B4B;color:#A5B4FC;}
-  .mc-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .mc-cal-btn{width:32px;height:32px;border-radius:6px;background:white;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--mc-text2);cursor:pointer;transition:all .15s;}
-  .mc-cal-btn:hover{border-color:var(--primary-light);color:var(--primary-light);}
-  .mc-month-label{font-size:15px;font-weight:600;min-width:130px;text-align:center;}
-  .mc-legend-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;padding:12px;background:var(--surface2);border-radius:8px;}
-  .mc-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mc-text2);}
-  .ciclo-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--gray-100);}
-  .ciclo-row:last-child{border-bottom:none;}
-
-  /* ── LANDING ── */
-  #landingScreen{position:fixed;inset:0;background:white;z-index:9000;display:flex;flex-direction:column;overflow-y:auto;}
-  .landing-hero{background:linear-gradient(135deg,#1a56db 0%,#0f3490 100%);color:white;padding:60px 24px 80px;text-align:center;}
-  .landing-logo{font-size:52px;font-weight:700;letter-spacing:-2px;margin-bottom:8px;}
-  .landing-tagline{font-size:18px;opacity:.85;margin-bottom:40px;font-weight:300;}
-  .landing-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-  .landing-btn-primary{padding:14px 36px;background:white;color:var(--blue);border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
-  .landing-btn-primary:hover{background:var(--gray-100);}
-  .landing-btn-secondary{padding:14px 36px;background:transparent;color:white;border:2px solid rgba(255,255,255,.6);border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
-  .landing-btn-secondary:hover{border-color:white;background:rgba(255,255,255,.1);}
-  .landing-features{padding:48px 24px;max-width:900px;margin:0 auto;width:100%;}
-  .landing-features-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:32px;}
-  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;}
-  .feature-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;text-align:center;}
-  .feature-icon{font-size:32px;margin-bottom:10px;}
-  .feature-title{font-size:14px;font-weight:700;margin-bottom:4px;}
-  .feature-desc{font-size:12px;color:var(--gray-500);}
-  .landing-footer{text-align:center;padding:24px;color:var(--gray-400);font-size:12px;border-top:1px solid var(--gray-200);margin-top:auto;}
-
-  /* ── AUTH ── */
-  #authScreen{position:fixed;inset:0;background:var(--gray-50);display:none;align-items:center;justify-content:center;z-index:9100;padding:16px;}
-  .auth-box{background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:380px;padding:36px 32px;}
-  .auth-logo{font-size:26px;font-weight:700;color:var(--blue);text-align:center;margin-bottom:4px;}
-  .auth-subtitle{text-align:center;color:var(--gray-400);font-size:13px;margin-bottom:28px;}
-  .auth-title{font-size:18px;font-weight:700;margin-bottom:20px;}
-  .auth-form .form-group{margin-bottom:14px;}
-  .auth-btn{width:100%;padding:11px;background:var(--blue);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;font-family:inherit;transition:background .15s;}
-  .auth-btn:hover{background:var(--blue-dark);}
-  .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--gray-500);}
-  .auth-switch a{color:var(--blue);cursor:pointer;font-weight:500;}
-  .auth-back{text-align:center;margin-top:10px;font-size:13px;}
-  .auth-back a{color:var(--gray-400);cursor:pointer;}
-  .auth-error{background:var(--red-light);color:var(--red);border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none;}
-  .auth-success{background:var(--green-light);color:var(--green);border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none;}
-
-  /* ── USER BAR ── */
-  #userBar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--gray-200);}
-  .user-email{font-size:11px;color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
-  .logout-btn{background:none;border:none;cursor:pointer;font-size:11px;color:var(--gray-400);padding:4px 6px;border-radius:4px;}
-  .logout-btn:hover{background:var(--gray-100);color:var(--red);}
-
-  /* ── ADMIN ── */
-  #adminScreen{position:fixed;inset:0;background:var(--gray-50);z-index:8000;display:none;flex-direction:column;}
-  .admin-header{background:white;border-bottom:1px solid var(--gray-200);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
-  .admin-title{font-size:18px;font-weight:700;}
-  .admin-body{flex:1;overflow-y:auto;padding:24px;}
-
-
-  /* ── STICKY TABLE DIARIO ── */
-  #diarioTableWrap{overflow:auto;max-height:65vh;border-radius:var(--radius);border:1px solid var(--gray-200);}
-  #diarioTableWrap table{border-collapse:separate;border-spacing:0;}
-  #diarioTableWrap thead th{position:sticky;top:0;background:var(--gray-50);z-index:2;border-bottom:1px solid var(--gray-200);}
-  #diarioTableWrap thead th:first-child{position:sticky;top:0;left:0;z-index:3;background:var(--gray-50);}
-  #diarioTableWrap tbody td:first-child{position:sticky;left:0;background:white;z-index:1;border-right:1px solid var(--gray-200);}
-  #diarioTableWrap tbody tr:hover td:first-child{background:var(--gray-50);}
-  #diarioTableWrap th:first-child,#diarioTableWrap td:first-child{min-width:100px;}
-
-
-  /* ── RUTINAS ── */
-  .rutina-card{background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:24px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px;}
-  .rutina-card:hover{border-color:var(--blue);box-shadow:var(--shadow-md);}
-  .rutina-card-icon{font-size:32px;}
-  .rutina-card-title{font-size:16px;font-weight:700;color:var(--gray-900);}
-  .rutina-card-desc{font-size:13px;color:var(--gray-500);}
-  .rutinas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
-  .area-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--blue-light);border-radius:var(--radius);margin-bottom:12px;cursor:pointer;}
-  .area-header-title{font-size:14px;font-weight:700;color:var(--blue);}
-  .area-body{margin-bottom:20px;}
-
-
-  /* ── TOGGLE BUTTONS ── */
-  .toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;border:2px solid var(--gray-300);background:white;cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-500);transition:all .15s;font-family:inherit;}
-  .toggle-btn.active-s{border-color:#ea580c;background:#fff7ed;color:#ea580c;}
-  .toggle-btn.active-a{border-color:#16a34a;background:#dcfce7;color:#16a34a;}
-  .badge-s{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#fff7ed;color:#ea580c;font-size:11px;font-weight:700;border:1px solid #ea580c;}
-  .badge-a{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;border:1px solid #16a34a;}
-</style>
-</head>
-<body>
-
-<!-- LANDING -->
-<div id="landingScreen" style="display:none;">
-  <div class="landing-hero">
-    <div class="landing-logo">MOEVE</div>
-    <div class="landing-tagline">Tu panel de gestión personal</div>
-    <div class="landing-btns">
-      <button class="landing-btn-primary" onclick="showAuth('login')">Iniciar sesión</button>
-      <button class="landing-btn-secondary" onclick="showAuth('register')">Registrarse</button>
-    </div>
-  </div>
-  <div class="landing-features">
-    <div class="landing-features-title">Todo lo que necesitas en un solo lugar</div>
-    <div class="features-grid">
-      <div class="feature-card"><div class="feature-icon">🗓️</div><div class="feature-title">Mi Calendario</div><div class="feature-desc">Turnos generados automáticamente según tus ciclos</div></div>
-      <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Diario de Trabajo</div><div class="feature-desc">Registro diario de turnos, área y estado de planta</div></div>
-      <div class="feature-card"><div class="feature-icon">⏱️</div><div class="feature-title">Horas Extras</div><div class="feature-desc">Controla y gestiona todas tus horas extras</div></div>
-      <div class="feature-card"><div class="feature-icon">🏖️</div><div class="feature-title">Vacaciones</div><div class="feature-desc">Planifica y controla tus días libres</div></div>
-      <div class="feature-card"><div class="feature-icon">📦</div><div class="feature-title">Inventario</div><div class="feature-desc">Gestiona el stock de material con alertas</div></div>
-      <div class="feature-card"><div class="feature-icon">💾</div><div class="feature-title">Copia de Seguridad</div><div class="feature-desc">Exporta e importa todos tus datos</div></div>
-    </div>
-  </div>
-  <div class="landing-footer">MOEVE — Panel de Gestión Personal · 15€/año</div>
-</div>
-
-<!-- AUTH -->
-<div id="authScreen">
-  <div class="auth-box">
-    <div class="auth-logo">MOEVE</div>
-    <div class="auth-subtitle">Panel de Gestión Personal</div>
-    <div id="authLogin">
-      <div class="auth-title">Iniciar sesión</div>
-      <div class="auth-error" id="loginError"></div>
-      <div class="auth-form">
-        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <div class="form-group"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <button class="auth-btn" onclick="doLogin()">Entrar</button>
-      </div>
-      <div class="auth-switch">¿No tienes cuenta? <a onclick="showAuth('register')">Regístrate</a></div>
-      <div class="auth-back"><a onclick="showLanding()">← Volver</a></div>
-    </div>
-    <div id="authRegister" style="display:none;">
-      <div class="auth-title">Crear cuenta</div>
-      <div class="auth-error" id="registerError"></div>
-      <div class="auth-success" id="registerSuccess"></div>
-      <div class="auth-form">
-        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="tu@email.com"></div>
-        <div class="form-group"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 6 caracteres"></div>
-        <div class="form-group"><label>Repetir contraseña</label><input type="password" id="regPass2" onkeydown="if(event.key==='Enter')doRegister()"></div>
-        <button class="auth-btn" onclick="doRegister()">Crear cuenta</button>
-      </div>
-      <div class="auth-switch">¿Ya tienes cuenta? <a onclick="showAuth('login')">Inicia sesión</a></div>
-      <div class="auth-back"><a onclick="showLanding()">← Volver</a></div>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN -->
-<div id="adminScreen">
-  <div class="admin-header">
-    <div class="admin-title">🔐 Panel de Administración</div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">+ Añadir usuario</button>
-      <button class="btn btn-secondary btn-sm" onclick="closeAdmin()">← Volver a la app</button>
-    </div>
-  </div>
-  <div class="admin-body">
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Email</th><th>Registrado</th><th>Estado</th><th>Acciones</th></tr></thead>
-        <tbody id="adminUsersBody"><tr><td colspan="4"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Modal añadir usuario -->
-<div id="modalAddUser" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title">Añadir usuario</div><button class="close-btn" onclick="closeModal('modalAddUser')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label>Email</label><input type="email" id="addUserEmail"></div>
-      <div class="form-group" style="margin-top:12px;"><label>Contraseña temporal</label><input type="password" id="addUserPass"></div>
-      <div class="auth-error" id="addUserError" style="margin-top:10px;"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalAddUser')">Cancelar</button>
-      <button class="btn btn-primary" onclick="doAddUser()">Crear</button>
-    </div>
-  </div>
-</div>
-
-<button class="hamburger" onclick="toggleSidebar()">☰</button>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<nav id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">MOEVE</div>
-    <div class="sidebar-subtitle">Panel de Gestión</div>
-  </div>
-  <div class="sidebar-nav">
-    <div class="nav-item active" onclick="showSection('mi-calendario')"><span class="nav-icon">🗓️</span> Mi Calendario</div>
-    <div class="nav-item" onclick="showSection('diario')"><span class="nav-icon">📋</span> Diario de Trabajo</div>
-    <div class="nav-item" onclick="showSection('horas-extras')"><span class="nav-icon">⏱️</span> Horas Extras / Form.</div>
-    <div class="nav-item" onclick="showSection('formacion-prl')"><span class="nav-icon">🎓</span> Formación PRL</div>
-    <div class="nav-item" onclick="showSection('vacaciones')"><span class="nav-icon">🏖️</span> Vacaciones</div>
-    <div class="nav-item" onclick="showSection('dias-companeros')"><span class="nav-icon">👥</span> Días Compañeros</div>
-    <div class="nav-item" onclick="showSection('horas-dormida')"><span class="nav-icon">😴</span> Horas de Dormida</div>
-    <div class="nav-item" onclick="showSection('calendario')"><span class="nav-icon">📅</span> Calendario Turnos</div>
-    <div class="nav-item" onclick="showSection('inventario')"><span class="nav-icon">📦</span> Inventario</div>
-    <div class="nav-item" onclick="showSection('telefonos')"><span class="nav-icon">📞</span> Teléfonos</div>
-    <div class="nav-item" onclick="showSection('rutinas')"><span class="nav-icon">📝</span> Rutinas</div>
-    <div class="nav-item" onclick="showSection('backup')"><span class="nav-icon">💾</span> Copia de Seguridad</div>
-    <div class="nav-item" onclick="showSection('config')"><span class="nav-icon">⚙️</span> Configuración</div>
-    <div class="nav-item" id="adminNavItem" style="display:none;" onclick="openAdmin()"><span class="nav-icon">🔐</span> Panel Admin</div>
-  </div>
-  <div id="userBar" style="display:none;">
-    <span class="user-email" id="userEmailLabel">—</span>
-    <button class="logout-btn" onclick="doLogout()">Salir</button>
-  </div>
-</nav>
-
-<main id="main">
-
-  <!-- DIARIO -->
-  <div id="sec-diario" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Diario de Trabajo</div><div class="page-subtitle">Registro diario de turnos y actividad</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportDiarioPDF()">⬇ PDF</button>
-        <button class="btn btn-primary" onclick="openDiarioModal()">+ Nuevo registro</button>
-      </div>
-    </div>
-    <div class="tabs">
-      <div class="tab active" onclick="setDiarioView('lista',this)">📋 Lista</div>
-      <div class="tab" onclick="setDiarioView('calendario',this)">📅 Calendario</div>
-    </div>
-    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-      <button class="btn btn-secondary btn-sm" onclick="openDiarioFilters()">🔍 Filtros <span id="filtrosActivosBadge" style="display:none;background:var(--blue);color:white;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;">●</span></button>
-      <button class="btn btn-secondary btn-sm" id="btnLimpiarFiltros" onclick="clearDiarioFilters()" style="display:none;">✕ Limpiar</button>
-    </div>
-    <div id="diarioLista">
-      <div id="diarioTableWrap">
-        <table><thead><tr><th>Fecha</th><th>Área</th><th>Turno</th><th>Letra</th><th>Jefe Turno</th><th>Estado Planta</th><th>Observaciones</th><th></th></tr></thead>
-        <tbody id="diarioBody"><tr><td colspan="8"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-      </div>
-    </div>
-    <div id="diarioCalendario" style="display:none;">
-      <div class="card">
-        <div class="cal-header">
-          <button class="btn btn-secondary btn-sm" onclick="changeCalMonth(-1)">◀</button>
-          <div class="cal-month" id="calMonthTitle"></div>
-          <button class="btn btn-secondary btn-sm" onclick="changeCalMonth(1)">▶</button>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HORAS EXTRAS -->
-  <div id="sec-horas-extras" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Horas Extras / Formación</div><div class="page-subtitle">Control de horas extras y formaciones</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportHorasPDF()">⬇ PDF</button>
-        <button class="btn btn-primary" onclick="openHorasModal()">+ Nuevo registro</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportDCPDF()">⬇ PDF</button>
+        <select id="dcAnioSel" class="btn btn-secondary btn-sm" onchange="loadDC()" style="cursor:pointer;"></select>
+        <button class="btn btn-secondary btn-sm" onclick="crearAnioDC()">+ Año</button>
+        <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
       </div>
     </div>
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="hSumPlanificadas">—</div><div class="stat-label">H. Planificadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="hSumRealizadas">—</div><div class="stat-label">H. Realizadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="hSumPorPagar">—</div><div class="stat-label">H. Por Pagar</div></div>
-      <div class="stat-card"><div class="stat-value" id="hSumPagadas">—</div><div class="stat-label">H. Pagadas</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcTotal">—</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-value" id="dcDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
     </div>
     <div class="tabs">
-      <div class="tab active" onclick="setHorasTab('todas',this)">Todas</div>
-      <div class="tab" onclick="setHorasTab('Planificado',this)">Planificadas</div>
-      <div class="tab" onclick="setHorasTab('Realizado',this)">Realizadas</div>
-      <div class="tab" onclick="setHorasTab('Pagado',this)">Pagadas</div>
-    </div>
-    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-      <button class="btn btn-secondary btn-sm" onclick="openHorasFilters()">🔍 Filtros <span id="horasFiltrosBadge" style="display:none;background:var(--blue);color:white;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;">●</span></button>
-      <button class="btn btn-secondary btn-sm" id="btnLimpiarHorasFiltros" onclick="clearHorasFilters()" style="display:none;">✕ Limpiar</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Estado</th><th>Fecha</th><th>Horas</th><th>Pagado en</th><th>Tipo</th><th>Cómo</th><th>Modalidad</th><th>Obs.</th><th></th></tr></thead>
-      <tbody id="horasBody"><tr><td colspan="10"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
-  <!-- FORMACION PRL -->
-  <div id="sec-formacion-prl" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Formación PRL</div><div class="page-subtitle">Prevención de Riesgos Laborales</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportPRLPDF()">⬇ PDF</button>
-        <button class="btn btn-primary" onclick="openPRLModal()">+ Nuevo registro</button>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="prlSinEmpezar">—</div><div class="stat-label">H. Sin Empezar</div></div>
-      <div class="stat-card"><div class="stat-value" id="prlPlanificadas">—</div><div class="stat-label">H. Planificadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="prlRealizadas">—</div><div class="stat-label">H. Realizadas</div></div>
-    </div>
-    <div class="tabs">
-      <div class="tab active" onclick="setPRLTab('todas',this)">Todas</div>
-      <div class="tab" onclick="setPRLTab('Sin empezar',this)">Sin empezar</div>
-      <div class="tab" onclick="setPRLTab('Planificado',this)">Planificadas</div>
-      <div class="tab" onclick="setPRLTab('Realizada',this)">Realizadas</div>
-    </div>
-    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-      <button class="btn btn-secondary btn-sm" onclick="openPRLFilters()">🔍 Filtros <span id="prlFiltrosBadge" style="display:none;background:var(--blue);color:white;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;">●</span></button>
-      <button class="btn btn-secondary btn-sm" id="btnLimpiarPRLFiltros" onclick="clearPRLFilters()" style="display:none;">✕ Limpiar</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Estado</th><th>Fecha</th><th>Horas</th><th>Tipo</th><th>Observaciones</th><th></th></tr></thead>
-      <tbody id="prlBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
-    </div>
-  </div>
-
-  <!-- VACACIONES -->
-  <div id="sec-vacaciones" class="section">
-    <div class="page-header">
-      <div><div class="page-title">Vacaciones y Días Libres</div><div class="page-subtitle" id="vacAnioSubtitle">2026</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportVacPDF()">⬇ PDF</button>
-        <select id="vacAnioSel" class="btn btn-secondary btn-sm" onchange="loadVacaciones()" style="cursor:pointer;"></select>
-        <button class="btn btn-secondary btn-sm" onclick="crearAnioVac()">+ Año</button>
-        <button class="btn btn-primary" onclick="openVacModal()">+ Entrada</button>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="vacTotal">—</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-value" id="vacDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="vacPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="vacDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
-    </div>
-    <div class="tabs">
-      <div class="tab active" onclick="setVacTab('todas',this)">Todas</div>
-      <div class="tab" onclick="setVacTab('planificadas',this)">Planificadas</div>
-      <div class="tab" onclick="setVacTab('no-planificadas',this)">No Planificadas</div>
-      <div class="tab" onclick="setVacTab('ya-disfrutadas',this)">Ya disfrutadas</div>
+      <div class="tab active" onclick="setDCTab('todas',this)">Todas</div>
+      <div class="tab" onclick="setDCTab('planificadas',this)">Planificadas</div>
+      <div class="tab" onclick="setDCTab('no-planificadas',this)">No Planificadas</div>
+      <div class="tab" onclick="setDCTab('ya-disfrutadas',this)">Ya disfrutadas</div>
     </div>
     <div class="table-wrap">
       <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th></th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
-      <tbody id="vacBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
+      <tbody id="dcBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
     </div>
   </div>
 
-  <!-- HORAS DORMIDA -->
-  
-  <!-- HORAS DORMIDA -->
-  
+  <div id="sec-horas-dormida" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Horas de Dormida</div><div class="page-subtitle">10 horas anuales sin justificar</div></div>
+      <button class="btn btn-primary" onclick="openDormidaModal()">+ Registrar uso</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">10</div><div class="stat-label">Horas Totales</div></div>
+      <div class="stat-card"><div class="stat-value" id="dormidaGastadas" style="color:var(--red)">—</div><div class="stat-label">Horas Gastadas</div></div>
+      <div class="stat-card"><div class="stat-value" id="dormidaRestantes" style="color:var(--green)">—</div><div class="stat-label">Horas Restantes</div></div>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Fecha</th><th>Turno</th><th>Horas</th><th></th></tr></thead>
+      <tbody id="dormidaBody"><tr><td colspan="4"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
+    </div>
+  </div>
+
   <!-- CALENDARIO -->
   <div id="sec-calendario" class="section">
     <div class="page-header">
@@ -2066,26 +952,21 @@
 
 <!-- Modal Días Compañeros -->
 <div id="modalDC" class="modal-overlay" style="display:none">
-  <div class="modal" style="max-width:480px">
+  <div class="modal">
     <div class="modal-header"><div class="modal-title" id="modalDCTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalDC')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>Fecha *</label><input type="date" id="dcFecha"></div>
-        <div class="form-group"><label>Compañero *</label><input type="text" id="dcCompanero" placeholder="Nombre del compañero"></div>
-        <div class="form-group full"><label>Tipo *</label>
-          <div style="display:flex;gap:10px;margin-top:4px;">
-            <button type="button" id="btnLeHago" class="toggle-btn" onclick="setDCTipo('le_hago')" style="flex:1;justify-content:center;">👆 Le hago un día</button>
-            <button type="button" id="btnMeHace" class="toggle-btn" onclick="setDCTipo('me_hace')" style="flex:1;justify-content:center;">🤝 Me hace un día</button>
-          </div>
-        </div>
-        <div class="form-group"><label>Fecha plan. saldar</label><input type="date" id="dcFechaPlanSaldar"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="dcObs" style="min-height:60px;"></textarea></div>
+        <div class="form-group"><label>Nombre</label><input type="text" id="dcNombre"></div>
+        <div class="form-group"><label>Descripción</label><select id="dcDescripcion"></select></div>
+        <div class="form-group"><label>Horas</label><input type="number" id="dcHoras" step="0.5"></div>
+        <div class="form-group"><label>Días</label><input type="number" id="dcDias" step="0.5"></div>
+        <div class="form-group"><label>Estado</label><select id="dcEstado"></select></div>
+        <div class="form-group"><label>Fecha Planeada</label><input type="date" id="dcPlaneada"></div>
+        <div class="form-group"><label>Fecha Realizada</label><input type="date" id="dcRealizada"></div>
+        <div class="form-group full"><label>Observaciones</label><textarea id="dcObs"></textarea></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalDC')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveDC()">Guardar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalDC')">Cancelar</button><button class="btn btn-primary" onclick="saveDC()">Guardar</button></div>
   </div>
 </div>
 
@@ -3257,7 +2138,7 @@ function showSection(id){
   if(id==='horas-extras')loadHorasExtras();
   if(id==='formacion-prl')loadPRL();
   if(id==='vacaciones'){loadVacAnios();loadVacaciones();}
-  if(id==='dias-companeros'){loadDiasCompaneros();}
+  if(id==='dias-companeros'){loadDCAnios();loadDC();}
   if(id==='horas-dormida')loadDormida();
   if(id==='calendario')loadCalImg();
   if(id==='mi-calendario'){loadMiCalendarioCiclos();renderMiCalendario();}
@@ -3832,145 +2713,1058 @@ async function loadDCAnios(){
   if(!anios.length)sel.innerHTML=`<option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>`;
 }
 
-async // DIAS COMPANEROS
-let dcTab = 'pendientes';
-let dcEditId = null;
-let dcTipoSel = null;
-
-function setDCTab(tab, el){
-  dcTab=tab;
-  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
-  if(el)el.classList.add('active');
-  loadDiasCompaneros();
+async function crearAnioDC(){
+  const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
+  await sb.from('dias_companeros').insert({user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
+  toast(`Año ${anio} creado`);loadDCAnios();loadDC();
 }
 
-async function loadDiasCompaneros(){
+async function loadDC(){
+  const anio=document.getElementById('dcAnioSel').value||new Date().getFullYear();
+  document.getElementById('dcAnioSubtitle').textContent=anio;
+  const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).eq('anio',anio);
+  let all=data||[];
+  all.sort((a,b)=>{
+    if(!a.fecha_planeada&&!b.fecha_planeada)return 0;
+    if(!a.fecha_planeada)return 1;if(!b.fecha_planeada)return -1;
+    return a.fecha_planeada.localeCompare(b.fecha_planeada);
+  });
+  if(dcTab==='planificadas')all=all.filter(r=>r.fecha_planeada&&r.estado!=='Ya disfrutada');
+  if(dcTab==='no-planificadas')all=all.filter(r=>!r.fecha_planeada);
+  if(dcTab==='ya-disfrutadas')all=all.filter(r=>r.estado==='Ya disfrutada');
+  document.getElementById('dcTotal').textContent=all.length;
+  document.getElementById('dcDisfrutadas').textContent=all.filter(r=>r.estado==='Ya disfrutada').length;
+  document.getElementById('dcPendientes').textContent=all.filter(r=>r.estado==='Pendiente').length;
+  document.getElementById('dcDiasTotales').textContent=all.reduce((s,r)=>s+(r.dias||0),0);
   const tbody=document.getElementById('dcBody');
-  tbody.innerHTML='<tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
-
-  let q=sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).order('fecha',{ascending:false});
-  if(dcTab==='pendientes') q=q.eq('saldado',false);
-  else if(dcTab==='saldados') q=q.eq('saldado',true);
-
-  const{data}=await q;
-  const all=data||[];
-
-  // Calculate saldo
-  const pendientes=all.filter(r=>!r.saldado||(dcTab==='todos'&&!r.saldado));
-  const todosP=(await sb.from('dias_companeros').select('tipo,saldado').eq('user_id',currentUser.id).eq('saldado',false)).data||[];
-  const meDeben=todosP.filter(r=>r.tipo==='le_hago').length;
-  const debo=todosP.filter(r=>r.tipo==='me_hace').length;
-  document.getElementById('dcSaldoMeDeben').textContent=meDeben;
-  document.getElementById('dcSaldoDebo').textContent=debo;
-
-  if(!all.length){
-    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No hay entradas</div></div></td></tr>';
-    return;
-  }
-
-  tbody.innerHTML=all.map(r=>{
-    const tipoLabel=r.tipo==='le_hago'
-      ?'<span style="color:#16a34a;font-weight:600;">👆 Le hago</span>'
-      :'<span style="color:#2563eb;font-weight:600;">🤝 Me hace</span>';
-    const estado=r.saldado
-      ?'<span class="badge badge-green">✅ Saldado</span>'
-      :'<span class="badge badge-red">⏳ Pendiente</span>';
-    const saldoBtn=!r.saldado
-      ?`<button class="btn btn-secondary btn-sm" onclick="saldarDC('${r.id}')" title="Marcar como saldado">✅ Saldar</button>`
-      :'';
-    return `<tr>
-      <td>${fmtDate(r.fecha)}</td>
-      <td><strong>${r.companero||'—'}</strong></td>
-      <td>${tipoLabel}</td>
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.observaciones||'—'}</td>
-      <td>${fmtDate(r.fecha_planificada_saldar)}</td>
-      <td>${estado}</td>
-      <td style="white-space:nowrap;display:flex;gap:4px;">
-        ${saldoBtn}
-        <button class="btn btn-secondary btn-sm btn-icon" onclick="openDCModal('${r.id}')">✏️</button>
-        <button class="btn btn-danger btn-sm btn-icon" onclick="delDC('${r.id}')">🗑</button>
-      </td>
-    </tr>`;
-  }).join('');
+  if(!all.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No hay entradas</div></div></td></tr>`;return;}
+  tbody.innerHTML=all.map(r=>`<tr><td>${r.nombre||'—'}</td><td>${r.descripcion||'—'}</td><td>${r.horas||'—'}</td><td>${r.dias||'—'}</td><td>${estadoBadge(r.estado)}</td><td>${fmtDate(r.fecha_planeada)}</td><td>${fmtDate(r.fecha_realizada)}</td><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.observaciones||'—'}</td>${actionBtns(`editDC('${r.id}')`,`delDC('${r.id}')`)}</tr>`).join('');
 }
 
-function openDCModal(id=null){
-  dcEditId=id||null;
-  dcTipoSel=null;
-  document.getElementById('modalDCTitle').textContent=id?'Editar entrada':'Nueva entrada';
-  document.getElementById('dcFecha').value=new Date().toISOString().split('T')[0];
-  document.getElementById('dcCompanero').value='';
-  document.getElementById('dcFechaPlanSaldar').value='';
-  document.getElementById('dcObs').value='';
-  setDCTipoBtn(null);
+function setDCTab(tab,el){dcTab=tab;document.querySelectorAll('#sec-dias-companeros .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');loadDC();}
 
+async function openDCModal(id=null){
+  editingId=id;document.getElementById('modalDCTitle').textContent=id?'Editar entrada':'Nueva entrada';
+  fillSelect('dcDescripcion','dias_companeros','descripcion');
+  fillSelect('dcEstado','dias_companeros','estado');
   if(id){
-    sb.from('dias_companeros').select('*').eq('id',id).single().then(({data})=>{
-      if(!data)return;
-      document.getElementById('dcFecha').value=data.fecha||'';
-      document.getElementById('dcCompanero').value=data.companero||'';
-      document.getElementById('dcFechaPlanSaldar').value=data.fecha_planificada_saldar||'';
-      document.getElementById('dcObs').value=data.observaciones||'';
-      dcTipoSel=data.tipo||null;
-      setDCTipoBtn(data.tipo);
-    });
+    const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).eq('id',id).single();
+    if(data){document.getElementById('dcNombre').value=data.nombre||'';document.getElementById('dcDescripcion').value=data.descripcion||'';document.getElementById('dcHoras').value=data.horas||'';document.getElementById('dcDias').value=data.dias||'';document.getElementById('dcEstado').value=data.estado||'';document.getElementById('dcPlaneada').value=data.fecha_planeada||'';document.getElementById('dcRealizada').value=data.fecha_realizada||'';document.getElementById('dcObs').value=data.observaciones||'';}
+  }else{
+    ['dcNombre','dcHoras','dcDias','dcPlaneada','dcRealizada','dcObs'].forEach(i=>document.getElementById(i).value='');
+    ['dcDescripcion','dcEstado'].forEach(i=>document.getElementById(i).value='');
   }
   openModal('modalDC');
 }
 
-function setDCTipo(tipo){
-  dcTipoSel=tipo;
-  setDCTipoBtn(tipo);
-}
-
-function setDCTipoBtn(tipo){
-  const btnLe=document.getElementById('btnLeHago');
-  const btnMe=document.getElementById('btnMeHace');
-  if(!btnLe||!btnMe)return;
-  btnLe.style.borderColor=tipo==='le_hago'?'#16a34a':'var(--gray-300)';
-  btnLe.style.background=tipo==='le_hago'?'#dcfce7':'white';
-  btnLe.style.color=tipo==='le_hago'?'#16a34a':'var(--gray-500)';
-  btnMe.style.borderColor=tipo==='me_hace'?'#2563eb':'var(--gray-300)';
-  btnMe.style.background=tipo==='me_hace'?'#eff6ff':'white';
-  btnMe.style.color=tipo==='me_hace'?'#2563eb':'var(--gray-500)';
-}
+async function editDC(id){openDCModal(id);}
 
 async function saveDC(){
-  const fecha=document.getElementById('dcFecha').value;
-  const companero=document.getElementById('dcCompanero').value.trim();
-  if(!fecha||!companero){toast('Fecha y compañero son obligatorios','error');return;}
-  if(!dcTipoSel){toast('Selecciona el tipo de día','error');return;}
-  const payload={
-    user_id:currentUser.id,
-    fecha,
-    companero,
-    tipo:dcTipoSel,
-    fecha_planificada_saldar:document.getElementById('dcFechaPlanSaldar').value||null,
-    observaciones:document.getElementById('dcObs').value||null,
-    saldado:false,
-  };
+  const anio=parseInt(document.getElementById('dcAnioSel').value||new Date().getFullYear());
+  const payload={user_id:currentUser.id,anio,nombre:document.getElementById('dcNombre').value||null,descripcion:document.getElementById('dcDescripcion').value||null,horas:parseFloat(document.getElementById('dcHoras').value)||null,dias:parseFloat(document.getElementById('dcDias').value)||null,estado:document.getElementById('dcEstado').value||null,fecha_planeada:document.getElementById('dcPlaneada').value||null,fecha_realizada:document.getElementById('dcRealizada').value||null,observaciones:document.getElementById('dcObs').value||null};
   let err;
-  if(dcEditId){({error:err}=await sb.from('dias_companeros').update(payload).eq('id',dcEditId));}
+  if(editingId){({error:err}=await sb.from('dias_companeros').update(payload).eq('id',editingId));}
   else{({error:err}=await sb.from('dias_companeros').insert(payload));}
   if(err){toast('Error al guardar','error');return;}
-  toast(dcEditId?'Actualizado':'Entrada añadida');
-  closeModal('modalDC');
-  loadDiasCompaneros();
+  toast(editingId?'Actualizado':'Añadido');closeModal('modalDC');loadDC();
 }
 
-async function saldarDC(id){
-  if(!confirm('¿Marcar este día como saldado?'))return;
-  const{error}=await sb.from('dias_companeros').update({saldado:true,fecha_saldado:new Date().toISOString().split('T')[0]}).eq('id',id);
-  if(error){toast('Error','error');return;}
-  toast('✅ Día saldado');
-  loadDiasCompaneros();
+async function delDC(id){if(!confirm('¿Eliminar?'))return;await sb.from('dias_companeros').delete().eq('id',id);toast('Eliminado');loadDC();}
+
+function exportDCPDF(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
+  doc.setFontSize(16);doc.text(`Días Compañeros ${document.getElementById('dcAnioSel').value} - MOEVE`,14,18);
+  const rows=[];document.querySelectorAll('#dcBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});
+  doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});
+  doc.save('dias_companeros_moeve.pdf');
 }
 
-async function delDC(id){
-  if(!confirm('¿Eliminar esta entrada?'))return;
-  await sb.from('dias_companeros').delete().eq('id',id);
+// ── MI CALENDARIO ──
+const PATRON_64 = ['M','M','T','T','N','N','D','D','D','D'];
+let miCiclos = [];
+let miCalYear = new Date().getFullYear();
+let miCalMonth = new Date().getMonth();
+
+function getTurnoDelDia(fecha) {
+  const d = new Date(fecha + 'T12:00:00');
+  const fechaStr = fecha;
+  for (const ciclo of miCiclos) {
+    const inicio = new Date(ciclo.fecha_inicio + 'T12:00:00');
+    const fin = new Date(ciclo.fecha_fin + 'T12:00:00');
+    if (d >= inicio && d <= fin) {
+      if (ciclo.tipo === 'refuerzo') {
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) return 'D';
+        return 'R';
+      } else {
+        const offsets = { 'M': 0, 'T': 2, 'N': 4, 'D': 6 };
+        const offset = offsets[ciclo.turno_inicial] || 0;
+        const base = new Date(ciclo.fecha_inicio + 'T12:00:00');
+        base.setDate(base.getDate() - offset);
+        const diffMs = d.getTime() - base.getTime();
+        const diffDays = Math.round(diffMs / 86400000);
+        const pos = ((diffDays % 10) + 10) % 10;
+        return PATRON_64[pos];
+      }
+    }
+  }
+  return '';
+}
+
+async function loadMiCalendarioCiclos() {
+  const { data } = await sb.from('mi_calendario_ciclos').select('*').eq('user_id',currentUser.id).order('fecha_inicio');
+  miCiclos = data || [];
+  const cont = document.getElementById('ciclosList');
+  if (!miCiclos.length) {
+    cont.innerHTML = '<div style="color:var(--gray-400);font-size:13px;">No hay períodos configurados. Añade uno con el botón de arriba.</div>';
+    return;
+  }
+  const tipoLabel = { 'turno': '6-4 Rotativo', 'refuerzo': 'Equipo de Refuerzo' };
+  const turnoLabel = { 'M': 'Mañana', 'T': 'Tarde', 'N': 'Noche' };
+  cont.innerHTML = miCiclos.map(c => `
+    <div class="ciclo-row">
+      <span class="badge badge-blue">${tipoLabel[c.tipo]||c.tipo}</span>
+      ${c.turno_inicial ? `<span class="badge badge-orange">Empieza: ${turnoLabel[c.turno_inicial]||c.turno_inicial}</span>` : ''}
+      <span style="font-size:13px;color:var(--gray-700);">${fmtDate(c.fecha_inicio)} → ${fmtDate(c.fecha_fin)}</span>
+      <button class="btn btn-danger btn-sm btn-icon" style="margin-left:auto;" onclick="delCiclo('${c.id}')">🗑</button>
+    </div>`).join('');
+}
+
+// Store manual overrides in memory and Supabase
+let turnoOverrides = {};
+
+const TURNO_A_LETRA = {'Mañana':'M','Tarde':'T','Noche':'N','Descanso':'D','Vacaciones':'V','Refuerzo':'R','Baja':'B','Sol 12h':'S','Luna 12h':'L','Sol':'S','Luna':'L'};
+function normalizaTurno(t){ return t ? (TURNO_A_LETRA[t] || t) : t; }
+
+async function loadTurnoOverrides() {
+  const firstDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-01`;
+  const lastDay = `${miCalYear}-${String(miCalMonth+1).padStart(2,'0')}-${new Date(miCalYear,miCalMonth+1,0).getDate()}`;
+  turnoOverrides={};
+  // Load manual overrides
+  const{data:ovData}=await sb.from('mi_calendario_overrides').select('*').eq('user_id',currentUser.id).gte('fecha',firstDay).lte('fecha',lastDay);
+  (ovData||[]).forEach(r=>{turnoOverrides[r.fecha]={turno:r.turno,comentario:r.comentario||''};});
+  // Load diario records - these take priority over auto calculation
+  const{data:diData}=await sb.from('diario_trabajo').select('fecha,turno,observaciones').gte('fecha',firstDay).lte('fecha',lastDay);
+  (diData||[]).forEach(r=>{
+    turnoOverrides[r.fecha] = {
+      turno: normalizaTurno(r.turno) || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].turno : null),
+      comentario: r.observaciones || (turnoOverrides[r.fecha] ? turnoOverrides[r.fecha].comentario : '')
+    };
+  });
+}
+
+async function renderMiCalendario() {
+  await loadTurnoOverrides();
+  const year = miCalYear;
+  const mes = miCalMonth;
+  const diasMes = new Date(year, mes+1, 0).getDate();
+  const nombresMes = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const hoy = new Date().toISOString().split('T')[0];
+
+  let html = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">';
+  html += '<button class="mc-cal-btn" onclick="changeMiCalMes(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>';
+  html += '<span class="mc-month-label">' + nombresMes[mes] + ' ' + year + '</span>';
+  html += '<button class="mc-cal-btn" onclick="changeMiCalMes(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>';
+  html += '</div>';
+
+  html += '<div class="mc-cal-grid">';
+  ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d => {
+    html += '<div style="text-align:center;font-size:10px;font-weight:700;color:var(--text3);padding:4px">' + d + '</div>';
+  });
+
+  const firstDay = new Date(year, mes, 1).getDay();
+  const offset = firstDay === 0 ? 6 : firstDay - 1;
+  for (let i = 0; i < offset; i++) html += '<div></div>';
+
+  for (let i = 1; i <= diasMes; i++) {
+    const d = new Date(year, mes, i);
+    const ds = year + '-' + String(mes+1).padStart(2,'0') + '-' + String(i).padStart(2,'0');
+    const turnoAuto = getTurnoDelDia(ds) || 'D';
+    const ovr = turnoOverrides[ds];
+    const turno = (ovr && ovr.turno) ? ovr.turno : turnoAuto;
+    const hasComment = ovr && ovr.comentario;
+    const isToday = ds === hoy;
+    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+
+    html += '<div style="border-radius:8px;border:1px solid ' + (isToday ? 'var(--primary-light)' : 'var(--border)') + ';background:' + (isToday ? '#EFF6FF' : 'white') + ';padding:6px;text-align:center;min-height:52px;cursor:pointer;position:relative;" onclick="editTurnoDia(\'' + ds + '\',\'' + turno + '\')">';
+    if (hasComment) html += '<div style="position:absolute;top:3px;right:3px;width:7px;height:7px;background:#EF4444;border-radius:50%;"></div>';
+    html += '<div style="font-size:10px;color:' + (isWeekend ? '#EF4444' : 'var(--text3)') + ';font-weight:600">' + dayNames[d.getDay()] + '</div>';
+    html += '<div style="font-size:14px;font-weight:700;color:' + (isToday ? 'var(--primary-light)' : 'var(--text)') + '">' + i + '</div>';
+    html += '<span class="turno-badge ' + turno + '" style="margin-top:2px">' + turno + '</span>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="mc-legend-row">';
+  [['M','Mañana'],['T','Tarde'],['N','Noche'],['D','Descanso'],['R','Refuerzo'],['S','Sol 12h'],['L','Luna 12h'],['V','Vacaciones'],['B','Baja']].forEach(([k,v]) => {
+    html += '<div class="mc-legend-item"><span class="turno-badge ' + k + '">' + k + '</span> ' + v + '</div>';
+  });
+  html += '</div>';
+
+  document.getElementById('miCalContainer').innerHTML = html;
+}
+
+async function editTurnoDia(fecha, turnoActual) {
+  // Fill selects with options
+  fillSelect('editDiaTurno','diario_trabajo','turno');
+  // Add extra turn options not in config
+  const extraTurnos = ['S','L','V','B'];
+  const extraLabels = {'S':'Sol 12h','L':'Luna 12h','V':'Vacaciones','B':'Baja'};
+  const turnoSel = document.getElementById('editDiaTurno');
+  extraTurnos.forEach(t => {
+    if (![...turnoSel.options].some(o => o.value === t)) {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = extraLabels[t];
+      turnoSel.appendChild(opt);
+    }
+  });
+  fillSelect('editDiaArea','diario_trabajo','area');
+  fillSelect('editDiaLetra','diario_trabajo','letra');
+  fillSelect('editDiaJefe','diario_trabajo','jefe_turno');
+  fillSelect('editDiaEstadoPlanta','diario_trabajo','estado_planta');
+
+  document.getElementById('modalEditTurnoTitle').textContent = '📅 ' + fmtDate(fecha);
+
+  // Check if diario record exists for this date
+  const { data: existing } = await sb.from('diario_trabajo').select('*').eq('user_id',currentUser.id).eq('fecha', fecha).maybeSingle();
+  const override = turnoOverrides[fecha];
+
+  // Set values
+  const turno = existing ? existing.turno : (override ? (typeof override === 'object' ? override.turno : override) : turnoActual);
+  document.getElementById('editDiaTurno').value = turno || '';
+  document.getElementById('editDiaArea').value = existing ? (existing.area||'') : '';
+  document.getElementById('editDiaLetra').value = existing ? (existing.letra||'') : '';
+  document.getElementById('editDiaJefe').value = existing ? (existing.jefe_turno||'') : '';
+  document.getElementById('editDiaEstadoPlanta').value = existing ? (existing.estado_planta||'') : '';
+  const comentario = existing ? (existing.observaciones||'') : (override && typeof override === 'object' ? override.comentario||'' : '');
+  document.getElementById('editDiaComentario').value = comentario;
+
+  // Footer buttons
+  let footer = '';
+  if (existing) footer += `<button class="btn btn-danger btn-sm" onclick="delDiarioDesdeCalendario('${existing.id}','${fecha}')">🗑 Eliminar</button>`;
+  footer += `<button class="btn btn-secondary" onclick="document.getElementById('modalEditTurno').style.display='none'">Cancelar</button>`;
+  footer += `<button class="btn btn-primary" onclick="guardarDiaCalendario('${fecha}','${existing ? existing.id : ''}')">Guardar</button>`;
+  document.getElementById('editTurnoFooter').innerHTML = footer;
+
+  window._editDiaFecha = fecha;
+  document.getElementById('modalEditTurno').style.display = 'flex';
+}
+
+async function guardarDiaCalendario(fecha, existingId) {
+  const payload = {
+    user_id:currentUser.id,
+    fecha,
+    turno: document.getElementById('editDiaTurno').value || null,
+    area: document.getElementById('editDiaArea').value || null,
+    letra: document.getElementById('editDiaLetra').value || null,
+    jefe_turno: document.getElementById('editDiaJefe').value || null,
+    estado_planta: document.getElementById('editDiaEstadoPlanta').value || null,
+    observaciones: document.getElementById('editDiaComentario').value || null,
+  };
+  let err;
+  if (existingId) {
+    ({error:err} = await sb.from('diario_trabajo').update(payload).eq('id', existingId));
+  } else {
+    ({error:err} = await sb.from('diario_trabajo').insert(payload));
+  }
+  if (err) { toast('Error al guardar', 'error'); return; }
+
+  toast(existingId ? 'Registro actualizado' : 'Registro creado');
+  document.getElementById('modalEditTurno').style.display = 'none';
+  renderMiCalendario();
+}
+
+async function delDiarioDesdeCalendario(id, fecha) {
+  if (!confirm('¿Eliminar el registro de este día?')) return;
+  await sb.from('diario_trabajo').delete().eq('id', id);
+  await sb.from('mi_calendario_overrides').delete().eq('user_id',currentUser.id).eq('fecha', fecha);
+  toast('Registro eliminado');
+  document.getElementById('modalEditTurno').style.display = 'none';
+  renderMiCalendario();
+}
+
+async function setTurnoDia(fecha, turno, comentario='') {
+  document.getElementById('modalEditTurno').style.display = 'none';
+  if (turno === '') {
+    await sb.from('mi_calendario_overrides').delete().eq('user_id',currentUser.id).eq('fecha', fecha);
+  } else {
+    await sb.from('mi_calendario_overrides').upsert({user_id:currentUser.id, fecha, turno, comentario}, {onConflict:'fecha'});
+  }
+  renderMiCalendario();
+}
+
+function changeMiCalMes(dir) {
+  miCalMonth += dir;
+  if (miCalMonth > 11) { miCalMonth = 0; miCalYear++; }
+  if (miCalMonth < 0) { miCalMonth = 11; miCalYear--; }
+  renderMiCalendario();
+}
+
+function toggleCicloTurnoInicial() {
+  const tipo = document.getElementById('cicloTipo').value;
+  document.getElementById('cicloTurnoInicialGroup').style.display = tipo === 'turno' ? 'flex' : 'none';
+}
+
+function openCicloModal() {
+  editingId = null;
+  document.getElementById('modalCicloTitle').textContent = 'Añadir período';
+  document.getElementById('cicloTipo').value = 'turno';
+  document.getElementById('cicloTurnoInicial').value = 'M';
+  document.getElementById('cicloFechaInicio').value = '';
+  document.getElementById('cicloFechaFin').value = '';
+  document.getElementById('cicloTurnoInicialGroup').style.display = 'flex';
+  openModal('modalCiclo');
+}
+
+async function saveCiclo() {
+  const tipo = document.getElementById('cicloTipo').value;
+  const fechaInicio = document.getElementById('cicloFechaInicio').value;
+  const fechaFin = document.getElementById('cicloFechaFin').value;
+  if (!fechaInicio || !fechaFin) { toast('Las fechas son obligatorias', 'error'); return; }
+  if (fechaFin < fechaInicio) { toast('La fecha fin debe ser posterior a la fecha inicio', 'error'); return; }
+  const payload = {
+    user_id:currentUser.id,
+    tipo,
+    turno_inicial: tipo === 'turno' ? document.getElementById('cicloTurnoInicial').value : null,
+    fecha_inicio: fechaInicio,
+    fecha_fin: fechaFin,
+    orden: miCiclos.length + 1
+  };
+  const { error } = await sb.from('mi_calendario_ciclos').insert(payload);
+  if (error) { toast('Error al guardar', 'error'); return; }
+  toast('Período añadido');
+  closeModal('modalCiclo');
+  await loadMiCalendarioCiclos();
+  renderMiCalendario();
+}
+
+async function delCiclo(id) {
+  if (!confirm('¿Eliminar este período?')) return;
+  await sb.from('mi_calendario_ciclos').delete().eq('id', id);
+  toast('Período eliminado');
+  await loadMiCalendarioCiclos();
+  renderMiCalendario();
+}
+
+// ── RUTINAS ──
+function loadRutinas(){} // placeholder, grid is static for now
+
+// ── INVENTARIO PRODUCTOS QUIMICOS ──
+
+async function showSection_invQuimico(){
+  showSection('inv-quimico');
+  loadInvQuimico();
+}
+
+
+async function loadInvQuimico(){
+  const cont = document.getElementById('invQuimicoContent');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  const{data:areas} = await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+
+  if(!areas||!areas.length){
+    cont.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-text">No hay áreas. Añade una con el botón + Área</div></div>';
+    return;
+  }
+
+  // Export buttons at top
+  let html = `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn btn-secondary btn-sm" onclick="abrirPDFUltimos()">⬇ PDF Últimos datos</button>
+    <button class="btn btn-secondary btn-sm" onclick="openExportHistorialModal()">⬇ PDF Historial</button>
+  </div>`;
+
+  for(const area of areas){
+    const{data:productos} = await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    const collapsed = areaCollapsed[area.id] || false;
+    const arrow = collapsed ? '▶' : '▼';
+
+    html += `<div class="area-body">
+      <div class="area-header" onclick="toggleArea('${area.id}')">
+        <div class="area-header-title">${arrow} 📍 ${area.nombre}</div>
+        <div style="display:flex;gap:6px;" onclick="event.stopPropagation()">
+          <button class="btn btn-primary btn-sm" onclick="openProductoModal('${area.id}')">+ Producto</button>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="openAreaModal('${area.id}','${area.nombre.replace(/'/g,"\'")}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="delArea('${area.id}','${area.nombre}')">🗑</button>
+        </div>
+      </div>
+      <div id="area-body-${area.id}" style="display:${collapsed?'none':'block'}">`;
+
+    if(!productos||!productos.length){
+      html += '<div style="color:var(--gray-400);font-size:13px;padding:8px 0 16px;">No hay productos en esta área.</div>';
+    } else {
+      for(const prod of productos){
+        const{data:registros} = await sb.from('rutina_inv_quimico').select('*').eq('producto_id',prod.id).eq('user_id',currentUser.id).order('fecha',{ascending:false}).limit(1);
+        const ult = registros&&registros.length ? registros[0] : null;
+        html += `<div class="card" style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${ult?'10px':'0'};">
+            <div style="font-size:14px;font-weight:700;">🧪 ${prod.nombre}</div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-primary btn-sm" onclick="openInvQuimicoModal('${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">+ Registro</button>
+              <button class="btn btn-secondary btn-sm" onclick="verHistorial('${prod.id}','${prod.nombre.replace(/'/g,"\'")}')">📋 Historial</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="delProducto('${prod.id}','${prod.nombre}')">🗑</button>
+            </div>
+          </div>`;
+        if(ult){
+          html += `<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--gray-600);">
+            <span>📅 <strong>${fmtDate(ult.fecha)}</strong></span>
+            <span>Anterior: <strong>${ult.dato_anterior??'—'}</strong></span>
+            <span>Actualizado: <strong style="color:var(--blue);">${ult.dato_actualizado??'—'}</strong></span>
+            <span>Letra: <strong>${ult.letra||'—'}</strong></span>
+          </div>`;
+        } else {
+          html += '<div style="color:var(--gray-400);font-size:13px;">Sin registros aún.</div>';
+        }
+        html += '</div>';
+      }
+    }
+    html += '</div></div>';
+  }
+  cont.innerHTML = html;
+}
+
+function toggleArea(areaId){
+  areaCollapsed[areaId] = !areaCollapsed[areaId];
+  const body = document.getElementById('area-body-'+areaId);
+  if(body) body.style.display = areaCollapsed[areaId] ? 'none' : 'block';
+  // Update arrow
+  loadInvQuimico();
+}
+
+// Área
+function openAreaModal(id=null, nombre=''){
+  areaEditId=id;
+  document.getElementById('modalAreaTitle').textContent = id ? 'Editar área' : 'Nueva área';
+  document.getElementById('areaNombre').value = nombre;
+  openModal('modalArea');
+}
+async function saveArea(){
+  const nombre = document.getElementById('areaNombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio','error');return;}
+  let err;
+  if(areaEditId){
+    ({error:err}=await sb.from('rutina_areas').update({nombre}).eq('id',areaEditId));
+  } else {
+    const{data:areas}=await sb.from('rutina_areas').select('orden').eq('user_id',currentUser.id).order('orden',{ascending:false}).limit(1);
+    const orden=(areas&&areas.length)?areas[0].orden+1:0;
+    ({error:err}=await sb.from('rutina_areas').insert({user_id:currentUser.id,nombre,orden}));
+  }
+  if(err){toast('Error al guardar','error');return;}
+  toast(areaEditId?'Área actualizada':'Área añadida');
+  closeModal('modalArea');
+  loadInvQuimico();
+}
+async function delArea(id,nombre){
+  if(!confirm(`¿Eliminar el área "${nombre}" y todos sus productos?`))return;
+  await sb.from('rutina_areas').delete().eq('id',id);
+  toast('Área eliminada');loadInvQuimico();
+}
+
+// Producto
+function openProductoModal(areaId, prodId=null, nombre=''){
+  prodAreaId=areaId; prodEditId=prodId||null;
+  document.getElementById('modalProductoTitle').textContent = prodId ? 'Editar producto' : 'Nuevo producto';
+  document.getElementById('productoNombre').value = nombre||'';
+  openModal('modalProducto');
+}
+async function saveProducto(){
+  const nombre = document.getElementById('productoNombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio','error');return;}
+  let err;
+  if(prodEditId){
+    ({error:err}=await sb.from('rutina_productos').update({nombre}).eq('id',prodEditId));
+  } else {
+    const{data:prods}=await sb.from('rutina_productos').select('orden').eq('area_id',prodAreaId).order('orden',{ascending:false}).limit(1);
+    const orden=(prods&&prods.length)?prods[0].orden+1:0;
+    ({error:err}=await sb.from('rutina_productos').insert({user_id:currentUser.id,area_id:prodAreaId,nombre,orden}));
+  }
+  if(err){toast('Error al guardar','error');return;}
+  toast(prodEditId?'Producto actualizado':'Producto añadido');
+  closeModal('modalProducto');
+  loadInvQuimico();
+}
+async function delProducto(id,nombre){
+  if(!confirm(`¿Eliminar el producto "${nombre}" y todos sus registros?`))return;
+  await sb.from('rutina_productos').delete().eq('id',id);
+  toast('Producto eliminado');loadInvQuimico();
+}
+
+// Registro Inv Químico
+function openInvQuimicoModal(productoId, productoNombre, id=null){
+  currentProductoId=productoId; iqEditingId=id;
+  document.getElementById('modalInvQuimicoTitle').textContent = `🧪 ${productoNombre}`;
+  fillSelect('iqLetra','diario_trabajo','letra');
+  document.getElementById('iqFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('iqDatoAnterior').value='';
+  document.getElementById('iqDatoActualizado').value='';
+  document.getElementById('iqObs').value='';
+  document.getElementById('iqLetra').value='';
+  openModal('modalInvQuimico');
+}
+async function saveInvQuimico(){
+  const fecha=document.getElementById('iqFecha').value;
+  const datoActualizado=document.getElementById('iqDatoActualizado').value;
+  if(!fecha||datoActualizado===''){toast('Fecha y dato actualizado son obligatorios','error');return;}
+  const payload={
+    user_id:currentUser.id,
+    producto_id:currentProductoId,
+    fecha,
+    dato_anterior:parseFloat(document.getElementById('iqDatoAnterior').value)||null,
+    dato_actualizado:parseFloat(datoActualizado),
+    letra:document.getElementById('iqLetra').value||null,
+    observaciones:document.getElementById('iqObs').value||null,
+  };
+  let err;
+  if(iqEditingId){
+    ({error:err}=await sb.from('rutina_inv_quimico').update(payload).eq('id',iqEditingId));
+  } else {
+    ({error:err}=await sb.from('rutina_inv_quimico').insert(payload));
+  }
+  if(err){toast('Error al guardar','error');return;}
+  toast(iqEditingId?'Registro actualizado':'Registro añadido');
+  iqEditingId=null;
+  closeModal('modalInvQuimico');
+  loadInvQuimico();
+}
+
+// Historial
+
+async function verHistorial(productoId, productoNombre, desde='', hasta=''){
+  historialProductoId=productoId; historialProductoNombre=productoNombre;
+  let q = sb.from('rutina_inv_quimico').select('*').eq('producto_id',productoId).eq('user_id',currentUser.id).order('fecha',{ascending:false});
+  if(desde) q=q.gte('fecha',desde);
+  if(hasta) q=q.lte('fecha',hasta);
+  const{data}=await q;
+  const rows=(data||[]).map(r=>`<tr>
+    <td>${fmtDate(r.fecha)}</td>
+    <td>${r.dato_anterior??'—'}</td>
+    <td><strong style="color:var(--blue);">${r.dato_actualizado??'—'}</strong></td>
+    <td>${r.letra||'—'}</td>
+    <td>${r.observaciones||'—'}</td>
+    <td style="white-space:nowrap;">
+      <button class="btn btn-secondary btn-sm btn-icon" onclick="editRegistroIQ('${r.id}','${productoId}','${productoNombre}')">✏️</button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="delRegistroIQ('${r.id}','${productoId}','${productoNombre}')">🗑</button>
+    </td>
+  </tr>`).join('');
+
+  const body=`<div style="font-size:14px;font-weight:700;margin-bottom:12px;">🧪 ${productoNombre}</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="form-group"><label>Desde</label><input type="date" id="histDesde" value="${desde}" onchange="verHistorial('${productoId}','${productoNombre}',this.value,document.getElementById('histHasta').value)"></div>
+      <div class="form-group"><label>Hasta</label><input type="date" id="histHasta" value="${hasta}" onchange="verHistorial('${productoId}','${productoNombre}',document.getElementById('histDesde').value,this.value)"></div>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('histDesde').value='';document.getElementById('histHasta').value='';verHistorial('${productoId}','${productoNombre}')">✕ Limpiar</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportHistorialPDF('${productoId}','${productoNombre}')">⬇ PDF</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Anterior</th><th>Actualizado</th><th>Letra</th><th>Obs.</th><th></th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="6"><div class="empty-state"><div class="empty-state-text">Sin registros</div></div></td></tr>'}</tbody>
+    </table></div>`;
+  document.getElementById('historialBody').innerHTML=body;
+  document.getElementById('modalHistorial').style.display='flex';
+}
+
+async function editRegistroIQ(id, productoId, productoNombre){
+  const{data}=await sb.from('rutina_inv_quimico').select('*').eq('id',id).single();
+  if(!data)return;
+  currentProductoId=productoId; iqEditingId=id;
+  document.getElementById('modalInvQuimicoTitle').textContent='✏️ Editar registro — '+productoNombre;
+  fillSelect('iqLetra','diario_trabajo','letra');
+  document.getElementById('iqFecha').value=data.fecha||'';
+  document.getElementById('iqDatoAnterior').value=data.dato_anterior??'';
+  document.getElementById('iqDatoActualizado').value=data.dato_actualizado??'';
+  document.getElementById('iqObs').value=data.observaciones||'';
+  document.getElementById('iqLetra').value=data.letra||'';
+  document.getElementById('modalHistorial').style.display='none';
+  openModal('modalInvQuimico');
+}
+
+async function delRegistroIQ(id,productoId,productoNombre){
+  if(!confirm('¿Eliminar este registro?'))return;
+  await sb.from('rutina_inv_quimico').delete().eq('id',id);
   toast('Eliminado');
-  loadDiasCompaneros();
+  verHistorial(productoId,productoNombre);
+  loadInvQuimico();
 }
 
+function exportHistorialPDF(productoId, productoNombre){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  doc.setFontSize(14);doc.text('Historial: '+productoNombre,14,18);
+  doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  const rows=[];
+  document.querySelectorAll('#historialBody tbody tr').forEach(tr=>{
+    const tds=tr.querySelectorAll('td');
+    if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));
+  });
+  doc.autoTable({head:[['Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
+  doc.save('historial_'+productoNombre.replace(/\s/g,'_')+'.pdf');
+}
 
+async function abrirPDFUltimos(){
+  const{data:areas}=await sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+  document.getElementById('historialBody').innerHTML=
+    '<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Selecciona el área para exportar los últimos datos.</div>'+
+    '<div class="form-group"><label>Área</label><select id="exportAreaUlt">'+areaOpts+'</select></div>';
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='PDF Últimos Datos';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML=
+    '<button class="btn btn-secondary" onclick="closeModal(&apos;modalHistorial&apos;)">Cancelar</button>'+
+    '<button class="btn btn-primary" onclick="exportIQUltimos()">Exportar PDF</button>';
+}
+
+async function exportIQUltimos(){
+  const areaFiltro=document.getElementById('exportAreaUlt')?document.getElementById('exportAreaUlt').value:'';
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF('l');
+  doc.setFontSize(14);doc.text('Inventario Productos Químicos — Últimos datos',14,18);
+  doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
+  const rows=[];
+  for(const area of (areas||[])){
+    const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    for(const prod of (productos||[])){
+      const{data:regs}=await sb.from('rutina_inv_quimico').select('*').eq('producto_id',prod.id).eq('user_id',currentUser.id).order('fecha',{ascending:false}).limit(1);
+      const ult=regs&&regs.length?regs[0]:null;
+      rows.push([area.nombre,prod.nombre,ult?fmtDate(ult.fecha):'—',ult?ult.dato_anterior??'—':'—',ult?ult.dato_actualizado??'—':'—',ult?ult.letra||'—':'—',ult?ult.observaciones||'—':'—']);
+    }
+  }
+  if(!rows.length){toast('No hay datos','error');return;}
+  doc.autoTable({head:[['Área','Producto','Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
+  doc.save('inv_quimico_ultimos.pdf');
+  toast('PDF generado');
+  document.getElementById('modalHistorial').style.display='none';
+}
+
+function openExportHistorialModal(){
+  const body=`<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Filtra por fecha para exportar el historial completo de todos los productos.</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Desde</label><input type="date" id="exportDesde"></div>
+      <div class="form-group"><label>Hasta</label><input type="date" id="exportHasta"></div>
+    </div>`;
+  document.getElementById('historialBody').innerHTML=body;
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='⬇ Exportar Historial PDF';
+  // Change footer
+  const footer=document.querySelector('#modalHistorial .modal-footer');
+  if(!footer){
+    const f=document.createElement('div');
+    f.className='modal-footer';
+    f.innerHTML='<button class="btn btn-secondary" onclick="closeModal(\'modalHistorial\')">Cancelar</button><button class="btn btn-primary" onclick="exportIQHistorialCompleto()">Exportar PDF</button>';
+    document.querySelector('#modalHistorial .modal').appendChild(f);
+  }
+}
+
+async function exportIQHistorialCompleto(){
+  const desde=document.getElementById('exportDesde')?document.getElementById('exportDesde').value:'';
+  const hasta=document.getElementById('exportHasta')?document.getElementById('exportHasta').value:'';
+  const areaFiltro=document.getElementById('exportArea')?document.getElementById('exportArea').value:'';
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF('l');
+  doc.setFontSize(14);doc.text('Historial Inventario Productos Químicos',14,18);
+  doc.setFontSize(10);
+  const rango=desde||hasta?(desde?'Desde '+fmtDate(desde):'')+(hasta?' Hasta '+fmtDate(hasta):''):'Completo';
+  doc.text('Período: '+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  let areasQ=sb.from('rutina_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro) areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
+  const rows=[];
+  for(const area of (areas||[])){
+    const{data:productos}=await sb.from('rutina_productos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    for(const prod of (productos||[])){
+      let q=sb.from('rutina_inv_quimico').select('*').eq('producto_id',prod.id).eq('user_id',currentUser.id).order('fecha',{ascending:false});
+      if(desde)q=q.gte('fecha',desde);
+      if(hasta)q=q.lte('fecha',hasta);
+      const{data:regs}=await q;
+      for(const r of (regs||[])){
+        rows.push([area.nombre,prod.nombre,fmtDate(r.fecha),r.dato_anterior??'—',r.dato_actualizado??'—',r.letra||'—',r.observaciones||'—']);
+      }
+    }
+  }
+  if(!rows.length){toast('No hay datos para exportar','error');return;}
+  doc.autoTable({head:[['Área','Producto','Fecha','Anterior','Actualizado','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:8}});
+  doc.save('inv_quimico_historial.pdf');
+  toast('PDF generado');
+  document.getElementById('modalHistorial').style.display='none';
+}
+
+function closeMH(){document.getElementById('modalHistorial').style.display='none';}
+// ════════════════════════════════════════
+// RUTINA NIVELES FCC
+// ════════════════════════════════════════
+
+async function initNiveles(){
+  const{data:areas}=await sb.from('niveles_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const sel=document.getElementById('nvAreaSel');
+  const curVal=sel.value;
+  sel.innerHTML='<option value="">— Selecciona área —</option>';
+  (areas||[]).forEach(a=>{sel.innerHTML+=`<option value="${a.id}">${a.nombre}</option>`;});
+  sel.value=curVal;
+  if(!document.getElementById('nvFecha').value)
+    document.getElementById('nvFecha').value=new Date().toISOString().split('T')[0];
+  fillSelect('nvLetra','diario_trabajo','letra');
+  loadTablaNiveles();
+}
+
+async function loadTablaNiveles(){
+  const areaId=document.getElementById('nvAreaSel').value;
+  const wrap=document.getElementById('nvTablaWrap');
+  const empty=document.getElementById('nvEmpty');
+  const tbody=document.getElementById('nvTablaBody');
+  if(!areaId){wrap.style.display='none';empty.style.display='none';return;}
+  const{data:equipos}=await sb.from('niveles_equipos').select('*').eq('area_id',areaId).eq('user_id',currentUser.id).order('orden');
+  if(!equipos||!equipos.length){wrap.style.display='none';empty.style.display='block';return;}
+  wrap.style.display='block';empty.style.display='none';
+  nvEquiposActivos=equipos.map(e=>e.id);
+  // Load borrador
+  const{data:borradores}=await sb.from('niveles_borrador').select('*').eq('user_id',currentUser.id).in('equipo_id',nvEquiposActivos);
+  const bMap={};(borradores||[]).forEach(b=>{bMap[b.equipo_id]=b;});
+  tbody.innerHTML=equipos.map(e=>{
+    const b=bMap[e.id]||{};
+    return `<tr>
+      <td style="font-weight:600;">${e.nombre}</td>
+      <td><input type="number" step="any" id="nvc_${e.id}" value="${b.dato_control??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><input type="number" step="any" id="nvf_${e.id}" value="${b.dato_campo??''}" placeholder="0" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><input type="text" id="nvo_${e.id}" value="${b.observaciones||''}" placeholder="—" style="width:100%;padding:7px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;font-family:inherit;"></td>
+      <td><button class="btn btn-secondary btn-sm btn-icon" onclick="verHistorialNiveles('${e.id}','${e.nombre.replace(/'/g,"\'")}')">📋</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function resetTablaNiveles(){
+  nvEquiposActivos.forEach(id=>{
+    ['nvc_','nvf_','nvo_'].forEach(pre=>{
+      const el=document.getElementById(pre+id);
+      if(el)el.value='';
+    });
+  });
+}
+
+async function guardarBorradorNiveles(){
+  let guardados=0;
+  for(const id of nvEquiposActivos){
+    const cEl=document.getElementById('nvc_'+id);
+    const fEl=document.getElementById('nvf_'+id);
+    const oEl=document.getElementById('nvo_'+id);
+    const{error}=await sb.from('niveles_borrador').upsert({
+      user_id:currentUser.id,
+      equipo_id:id,
+      dato_control:parseFloat(cEl.value)||null,
+      dato_campo:parseFloat(fEl.value)||null,
+      observaciones:oEl.value||null,
+      updated_at:new Date().toISOString(),
+    },{onConflict:'user_id,equipo_id'});
+    if(!error)guardados++;
+  }
+  toast(guardados>0?'💾 Borrador guardado':'No hay datos que guardar', guardados>0?'success':'error');
+}
+
+async function guardarNiveles(){
+  const fecha=document.getElementById('nvFecha').value;
+  const letra=document.getElementById('nvLetra').value;
+  if(!fecha){toast('Introduce la fecha','error');return;}
+  let guardados=0;
+  for(const id of nvEquiposActivos){
+    const cEl=document.getElementById('nvc_'+id);
+    const fEl=document.getElementById('nvf_'+id);
+    if((!cEl||cEl.value==='')&&(!fEl||fEl.value==='')) continue;
+    const{error}=await sb.from('niveles_registros').insert({
+      user_id:currentUser.id,equipo_id:id,fecha,
+      dato_control:parseFloat(cEl.value)||null,
+      dato_campo:parseFloat(fEl.value)||null,
+      letra:letra||null,
+      observaciones:document.getElementById('nvo_'+id).value||null,
+    });
+    if(!error)guardados++;
+  }
+  if(!guardados){toast('No hay datos que guardar','error');return;}
+  toast('✅ '+guardados+' niveles guardados en historial');
+  for(const id of nvEquiposActivos){
+    sb.from('niveles_borrador').delete().eq('user_id',currentUser.id).eq('equipo_id',id);
+  }
+  resetTablaNiveles();
+}
+
+// ── CONFIG NIVELES ──
+async function loadNivelesConfig(){
+  const cont=document.getElementById('nvConfigContent');
+  cont.innerHTML='<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  const{data:areas}=await sb.from('niveles_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(!areas||!areas.length){
+    cont.innerHTML='<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">No hay áreas. Añade una con + Nueva área</div></div>';
+    return;
+  }
+  let html='';
+  for(const area of areas){
+    const{data:equipos}=await sb.from('niveles_equipos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    html+=`<div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:15px;font-weight:700;color:var(--blue);">📍 ${area.nombre}</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-primary btn-sm" onclick="openNvEquipoModal('${area.id}')">+ Nivel</button>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="openNvAreaModal('${area.id}','${area.nombre.replace(/'/g,"\'")}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="delNvArea('${area.id}','${area.nombre}')">🗑</button>
+        </div>
+      </div>`;
+    if(!equipos||!equipos.length){
+      html+='<div style="color:var(--gray-400);font-size:13px;">Sin niveles. Añade uno con + Nivel.</div>';
+    } else {
+      html+='<div style="display:flex;flex-direction:column;gap:4px;">';
+      for(const e of equipos){
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--gray-50);border-radius:6px;border:1px solid var(--gray-200);">
+          <span style="font-size:13px;font-weight:500;">📊 ${e.nombre}</span>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-secondary btn-sm btn-icon" onclick="openNvEquipoModal('${area.id}','${e.id}','${e.nombre.replace(/'/g,"\'")}')">✏️</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="delNvEquipo('${e.id}','${e.nombre}')">🗑</button>
+          </div>
+        </div>`;
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+  cont.innerHTML=html;
+}
+
+function openNvAreaModal(id=null,nombre=''){
+  nvAreaEditId=id||null;
+  document.getElementById('modalNvAreaTitle').textContent=id?'Editar área':'Nueva área';
+  document.getElementById('nvAreaNombre').value=nombre||'';
+  openModal('modalNvArea');
+}
+async function saveNvArea(){
+  const nombre=document.getElementById('nvAreaNombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio','error');return;}
+  let err;
+  if(nvAreaEditId){
+    ({error:err}=await sb.from('niveles_areas').update({nombre}).eq('id',nvAreaEditId));
+  } else {
+    const{data:ex}=await sb.from('niveles_areas').select('orden').eq('user_id',currentUser.id).order('orden',{ascending:false}).limit(1);
+    const orden=(ex&&ex.length)?ex[0].orden+1:0;
+    ({error:err}=await sb.from('niveles_areas').insert({user_id:currentUser.id,nombre,orden}));
+  }
+  if(err){toast('Error al guardar','error');return;}
+  toast(nvAreaEditId?'Área actualizada':'Área añadida');
+  closeModal('modalNvArea');loadNivelesConfig();initNiveles();
+}
+async function delNvArea(id,nombre){
+  if(!confirm('¿Eliminar el área "'+nombre+'" y todos sus niveles?'))return;
+  await sb.from('niveles_areas').delete().eq('id',id);
+  toast('Área eliminada');loadNivelesConfig();initNiveles();
+}
+
+function openNvEquipoModal(areaId,equipoId=null,nombre=''){
+  nvEquipoAreaId=areaId;nvEquipoEditId=equipoId||null;
+  document.getElementById('modalNvEquipoTitle').textContent=equipoId?'Editar nivel':'Nuevo nivel';
+  document.getElementById('nvEquipoNombre').value=nombre||'';
+  openModal('modalNvEquipo');
+}
+async function saveNvEquipo(){
+  const nombre=document.getElementById('nvEquipoNombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio','error');return;}
+  let err;
+  if(nvEquipoEditId){
+    ({error:err}=await sb.from('niveles_equipos').update({nombre}).eq('id',nvEquipoEditId));
+  } else {
+    const{data:ex}=await sb.from('niveles_equipos').select('orden').eq('area_id',nvEquipoAreaId).order('orden',{ascending:false}).limit(1);
+    const orden=(ex&&ex.length)?ex[0].orden+1:0;
+    ({error:err}=await sb.from('niveles_equipos').insert({user_id:currentUser.id,area_id:nvEquipoAreaId,nombre,orden}));
+  }
+  if(err){toast('Error al guardar','error');return;}
+  toast(nvEquipoEditId?'Nivel actualizado':'Nivel añadido');
+  closeModal('modalNvEquipo');loadNivelesConfig();loadTablaNiveles();
+}
+async function delNvEquipo(id,nombre){
+  if(!confirm('¿Eliminar el nivel "'+nombre+'"?'))return;
+  await sb.from('niveles_equipos').delete().eq('id',id);
+  toast('Nivel eliminado');loadNivelesConfig();loadTablaNiveles();
+}
+
+// ── HISTORIAL NIVELES ──
+async function verHistorialNiveles(equipoId,equipoNombre,desde='',hasta=''){
+  nvHistorialId=equipoId;nvHistorialNombre=equipoNombre;
+  let q=sb.from('niveles_registros').select('*').eq('equipo_id',equipoId).eq('user_id',currentUser.id).order('fecha',{ascending:false});
+  if(desde)q=q.gte('fecha',desde);
+  if(hasta)q=q.lte('fecha',hasta);
+  const{data}=await q;
+  const rows=(data||[]).map(r=>`<tr>
+    <td>${fmtDate(r.fecha)}</td>
+    <td>${r.dato_control??'—'}</td>
+    <td><strong style="color:var(--blue);">${r.dato_campo??'—'}</strong></td>
+    <td>${r.letra||'—'}</td>
+    <td>${r.observaciones||'—'}</td>
+    <td style="white-space:nowrap;">
+      <button class="btn btn-secondary btn-sm btn-icon" onclick="editNvReg('${r.id}','${equipoId}')">✏️</button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="delNvReg('${r.id}','${equipoId}','${equipoNombre.replace(/'/g,"\'")}')">🗑</button>
+    </td>
+  </tr>`).join('');
+
+  document.getElementById('historialBody').innerHTML=
+    '<div style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 '+equipoNombre+'</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:flex-end;">'+
+    '<div class="form-group"><label>Desde</label><input type="date" id="histDesde" value="'+desde+'"></div>'+
+    '<div class="form-group"><label>Hasta</label><input type="date" id="histHasta" value="'+hasta+'"></div>'+
+    '<button class="btn btn-secondary btn-sm" onclick="filtrarHistorialNiveles()">Filtrar</button>'+
+    '<button class="btn btn-secondary btn-sm" onclick="exportNvHistorialPDF()">⬇ PDF</button>'+
+    '</div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>D. Control</th><th>D. Campo</th><th>Letra</th><th>Obs.</th><th></th></tr></thead>'+
+    '<tbody>'+(rows||'<tr><td colspan="6"><div class="empty-state"><div class="empty-state-text">Sin registros</div></div></td></tr>')+'</tbody></table></div>';
+
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='📋 Historial';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML='<button class="btn btn-secondary" onclick="closeMH()">Cerrar</button>';
+}
+
+function filtrarHistorialNiveles(){
+  const desde=document.getElementById('histDesde').value;
+  const hasta=document.getElementById('histHasta').value;
+  verHistorialNiveles(nvHistorialId,nvHistorialNombre,desde,hasta);
+}
+
+async function editNvReg(id,equipoId){
+  const{data}=await sb.from('niveles_registros').select('*').eq('id',id).single();
+  if(!data)return;
+  nvRegEditId=id;nvRegEquipoId=equipoId;
+  fillSelect('nvRegLetra','diario_trabajo','letra');
+  document.getElementById('nvRegFecha').value=data.fecha||'';
+  document.getElementById('nvRegControl').value=data.dato_control??'';
+  document.getElementById('nvRegCampo').value=data.dato_campo??'';
+  document.getElementById('nvRegObs').value=data.observaciones||'';
+  document.getElementById('nvRegLetra').value=data.letra||'';
+  document.getElementById('modalHistorial').style.display='none';
+  openModal('modalNvReg');
+}
+
+async function saveNvReg(){
+  const payload={
+    fecha:document.getElementById('nvRegFecha').value,
+    dato_control:parseFloat(document.getElementById('nvRegControl').value)||null,
+    dato_campo:parseFloat(document.getElementById('nvRegCampo').value)||null,
+    letra:document.getElementById('nvRegLetra').value||null,
+    observaciones:document.getElementById('nvRegObs').value||null,
+  };
+  const{error}=await sb.from('niveles_registros').update(payload).eq('id',nvRegEditId);
+  if(error){toast('Error al guardar','error');return;}
+  toast('Registro actualizado');closeModal('modalNvReg');
+  verHistorialNiveles(nvRegEquipoId,nvHistorialNombre);
+}
+
+async function delNvReg(id,equipoId,equipoNombre){
+  if(!confirm('¿Eliminar este registro?'))return;
+  await sb.from('niveles_registros').delete().eq('id',id);
+  toast('Eliminado');verHistorialNiveles(equipoId,equipoNombre);
+}
+
+function exportNvHistorialPDF(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  doc.setFontSize(14);doc.text('Historial: '+nvHistorialNombre,14,18);
+  doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  const rows=[];
+  document.querySelectorAll('#historialBody tbody tr').forEach(tr=>{
+    const tds=tr.querySelectorAll('td');
+    if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));
+  });
+  doc.autoTable({head:[['Fecha','D. Control','D. Campo','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
+  doc.save('historial_'+nvHistorialNombre.replace(/\s/g,'_')+'.pdf');
+}
+
+async function abrirPDFUltimosNiveles(){
+  const{data:areas}=await sb.from('niveles_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+  document.getElementById('historialBody').innerHTML=
+    '<div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Selecciona área para exportar.</div>'+
+    '<div class="form-group"><label>Área</label><select id="exportNvAreaUlt">'+areaOpts+'</select></div>';
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='⬇ PDF Últimos datos';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML=
+    '<button class="btn btn-secondary" onclick="closeMH()">Cancelar</button>'+
+    '<button class="btn btn-primary" onclick="exportNvUltimos()">Exportar PDF</button>';
+}
+
+async function exportNvUltimos(){
+  const areaFiltro=document.getElementById('exportNvAreaUlt')?document.getElementById('exportNvAreaUlt').value:'';
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
+  doc.setFontSize(14);doc.text('Rutina Niveles FCC — Últimos datos',14,18);
+  doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  let areasQ=sb.from('niveles_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro)areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
+  const rows=[];
+  for(const area of (areas||[])){
+    const{data:equipos}=await sb.from('niveles_equipos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    for(const e of (equipos||[])){
+      const{data:regs}=await sb.from('niveles_registros').select('*').eq('equipo_id',e.id).eq('user_id',currentUser.id).order('fecha',{ascending:false}).limit(1);
+      const ult=regs&&regs.length?regs[0]:null;
+      rows.push([area.nombre,e.nombre,ult?fmtDate(ult.fecha):'—',ult?ult.dato_control??'—':'—',ult?ult.dato_campo??'—':'—',ult?ult.letra||'—':'—',ult?ult.observaciones||'—':'—']);
+    }
+  }
+  if(!rows.length){toast('No hay datos','error');return;}
+  doc.autoTable({head:[['Área','Nivel/Equipo','Fecha','D. Control','D. Campo','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
+  doc.save('niveles_fcc_ultimos.pdf');toast('PDF generado');closeMH();
+}
+
+async function openExportHistorialNivelesModal(){
+  const{data:areas}=await sb.from('niveles_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  const areaOpts='<option value="">Todas las áreas</option>'+(areas||[]).map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('');
+  document.getElementById('historialBody').innerHTML=
+    '<div class="form-grid">'+
+    '<div class="form-group full"><label>Área</label><select id="exportNvArea">'+areaOpts+'</select></div>'+
+    '<div class="form-group"><label>Desde</label><input type="date" id="exportNvDesde"></div>'+
+    '<div class="form-group"><label>Hasta</label><input type="date" id="exportNvHasta"></div>'+
+    '</div>';
+  document.getElementById('modalHistorial').style.display='flex';
+  document.querySelector('#modalHistorial .modal-title').textContent='⬇ PDF Historial';
+  document.querySelector('#modalHistorial .modal-footer').innerHTML=
+    '<button class="btn btn-secondary" onclick="closeMH()">Cancelar</button>'+
+    '<button class="btn btn-primary" onclick="exportNvHistorialCompleto()">Exportar PDF</button>';
+}
+
+async function exportNvHistorialCompleto(){
+  const desde=document.getElementById('exportNvDesde')?document.getElementById('exportNvDesde').value:'';
+  const hasta=document.getElementById('exportNvHasta')?document.getElementById('exportNvHasta').value:'';
+  const areaFiltro=document.getElementById('exportNvArea')?document.getElementById('exportNvArea').value:'';
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
+  doc.setFontSize(14);doc.text('Historial Rutina Niveles FCC',14,18);
+  doc.setFontSize(10);
+  const rango=desde||hasta?(desde?'Desde '+fmtDate(desde):'')+(hasta?' Hasta '+fmtDate(hasta):''):'Completo';
+  doc.text('Período: '+rango+' — Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  let areasQ=sb.from('niveles_areas').select('*').eq('user_id',currentUser.id).order('orden');
+  if(areaFiltro)areasQ=areasQ.eq('id',areaFiltro);
+  const{data:areas}=await areasQ;
+  const rows=[];
+  for(const area of (areas||[])){
+    const{data:equipos}=await sb.from('niveles_equipos').select('*').eq('area_id',area.id).eq('user_id',currentUser.id).order('orden');
+    for(const e of (equipos||[])){
+      let q=sb.from('niveles_registros').select('*').eq('equipo_id',e.id).eq('user_id',currentUser.id).order('fecha',{ascending:false});
+      if(desde)q=q.gte('fecha',desde);if(hasta)q=q.lte('fecha',hasta);
+      const{data:regs}=await q;
+      for(const r of (regs||[])) rows.push([area.nombre,e.nombre,fmtDate(r.fecha),r.dato_control??'—',r.dato_campo??'—',r.letra||'—',r.observaciones||'—']);
+    }
+  }
+  if(!rows.length){toast('No hay datos','error');return;}
+  doc.autoTable({head:[['Área','Nivel/Equipo','Fecha','D. Control','D. Campo','Letra','Obs.']],body:rows,startY:32,styles:{fontSize:8}});
+  doc.save('niveles_fcc_historial.pdf');toast('PDF generado');closeMH();
+}
+
+function filtrarHistorial(){
+  const desde=document.getElementById('histDesde').value;
+  const hasta=document.getElementById('histHasta').value;
+  verHistorial(historialProductoId,historialProductoNombre,desde,hasta);
+}
+
+function toggleVacBtn(tipo){
+  const btn=document.getElementById(tipo==='solicitado'?'btnSolicitado':'btnAprobado');
+  const cls=tipo==='solicitado'?'active-s':'active-a';
+  btn.classList.toggle(cls);
+}
+function setVacBtnState(tipo,val){
+  const btn=document.getElementById(tipo==='solicitado'?'btnSolicitado':'btnAprobado');
+  const cls=tipo==='solicitado'?'active-s':'active-a';
+  if(val)btn.classList.add(cls);else btn.classList.remove(cls);
+}
+
+init();
+</script>
+</body>
+</html>
