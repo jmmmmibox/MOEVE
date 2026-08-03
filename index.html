@@ -2799,7 +2799,7 @@ async function saveDC(){
   var comp=document.getElementById('dcCompanero').value.trim();
   if(!fecha||!comp){toast('Fecha y companero obligatorios','error');return;}
   if(!dcTipoSel){toast('Selecciona el tipo','error');return;}
-  var p={user_id:currentUser.id,fecha:fecha,companero:comp,tipo:dcTipoSel,
+  var p={user_id:currentUser.id,anio:new Date().getFullYear(),fecha:fecha,companero:comp,tipo:dcTipoSel,
     fecha_planificada_saldar:document.getElementById('dcFechaPlanSaldar').value||null,
     observaciones:document.getElementById('dcObs').value||null,saldado:false};
   var err;
