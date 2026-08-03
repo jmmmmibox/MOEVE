@@ -503,33 +503,34 @@
     </div>
   </div>
 
-  <!-- HORAS DORMIDA -->
   <!-- DIAS COMPANEROS -->
   <div id="sec-dias-companeros" class="section">
     <div class="page-header">
-      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle" id="dcAnioSubtitle">2026</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="exportDCPDF()">⬇ PDF</button>
-        <select id="dcAnioSel" class="btn btn-secondary btn-sm" onchange="loadDC()" style="cursor:pointer;"></select>
-        <button class="btn btn-secondary btn-sm" onclick="crearAnioDC()">+ Año</button>
-        <button class="btn btn-primary" onclick="openDCModal()">+ Entrada</button>
+      <div><div class="page-title">Dias Companeros</div><div class="page-subtitle">Intercambio de dias con companeros</div></div>
+      <button class="btn btn-primary" onclick="openDCModal(null)">+ Entrada</button>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px;">Me deben</div>
+        <div id="dcSaldoMeDeben" style="font-size:28px;font-weight:700;color:#16a34a;">0</div>
+        <div style="font-size:11px;color:var(--gray-400);">dias</div>
+      </div>
+      <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px;">Debo</div>
+        <div id="dcSaldoDebo" style="font-size:28px;font-weight:700;color:#dc2626;">0</div>
+        <div style="font-size:11px;color:var(--gray-400);">dias</div>
       </div>
     </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="dcTotal">—</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="dcDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
-    </div>
-    <div class="tabs">
-      <div class="tab active" onclick="setDCTab('todas',this)">Todas</div>
-      <div class="tab" onclick="setDCTab('planificadas',this)">Planificadas</div>
-      <div class="tab" onclick="setDCTab('no-planificadas',this)">No Planificadas</div>
-      <div class="tab" onclick="setDCTab('ya-disfrutadas',this)">Ya disfrutadas</div>
+    <div class="tabs" style="margin-bottom:16px;">
+      <button class="tab active" onclick="setDCTab('pendientes',this)">Pendientes</button>
+      <button class="tab" onclick="setDCTab('saldados',this)">Saldados</button>
+      <button class="tab" onclick="setDCTab('todos',this)">Todos</button>
     </div>
     <div class="table-wrap">
-      <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Horas</th><th>Días</th><th>Estado</th><th></th><th>Planeada</th><th>Realizada</th><th>Obs.</th><th></th></tr></thead>
-      <tbody id="dcBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody></table>
+      <table>
+        <thead><tr><th>Fecha</th><th>Companero</th><th>Tipo</th><th>Observaciones</th><th>Plan. saldar</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="dcBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
+      </table>
     </div>
   </div>
 
@@ -950,23 +951,28 @@
   </div>
 </div>
 
-<!-- Modal Días Compañeros -->
+<!-- Modal Dias Companeros -->
 <div id="modalDC" class="modal-overlay" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="modalDCTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalDC')">✕</button></div>
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><div class="modal-title" id="modalDCTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalDC')">&#10005;</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>Nombre</label><input type="text" id="dcNombre"></div>
-        <div class="form-group"><label>Descripción</label><select id="dcDescripcion"></select></div>
-        <div class="form-group"><label>Horas</label><input type="number" id="dcHoras" step="0.5"></div>
-        <div class="form-group"><label>Días</label><input type="number" id="dcDias" step="0.5"></div>
-        <div class="form-group"><label>Estado</label><select id="dcEstado"></select></div>
-        <div class="form-group"><label>Fecha Planeada</label><input type="date" id="dcPlaneada"></div>
-        <div class="form-group"><label>Fecha Realizada</label><input type="date" id="dcRealizada"></div>
-        <div class="form-group full"><label>Observaciones</label><textarea id="dcObs"></textarea></div>
+        <div class="form-group"><label>Fecha</label><input type="date" id="dcFecha"></div>
+        <div class="form-group"><label>Companero</label><input type="text" id="dcCompanero" placeholder="Nombre"></div>
+        <div class="form-group full"><label>Tipo</label>
+          <div style="display:flex;gap:10px;margin-top:4px;">
+            <button type="button" id="btnLeHago" class="toggle-btn" onclick="setDCTipo('le_hago')" style="flex:1;justify-content:center;">Le hago un dia</button>
+            <button type="button" id="btnMeHace" class="toggle-btn" onclick="setDCTipo('me_hace')" style="flex:1;justify-content:center;">Me hace un dia</button>
+          </div>
+        </div>
+        <div class="form-group"><label>Fecha plan. saldar</label><input type="date" id="dcFechaPlanSaldar"></div>
+        <div class="form-group full"><label>Observaciones</label><textarea id="dcObs" style="min-height:60px;"></textarea></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalDC')">Cancelar</button><button class="btn btn-primary" onclick="saveDC()">Guardar</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalDC')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDC()">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -2138,7 +2144,7 @@ function showSection(id){
   if(id==='horas-extras')loadHorasExtras();
   if(id==='formacion-prl')loadPRL();
   if(id==='vacaciones'){loadVacAnios();loadVacaciones();}
-  if(id==='dias-companeros'){loadDCAnios();loadDC();}
+  if(id==='dias-companeros'){loadDiasCompaneros();}
   if(id==='horas-dormida')loadDormida();
   if(id==='calendario')loadCalImg();
   if(id==='mi-calendario'){loadMiCalendarioCiclos();renderMiCalendario();}
@@ -2702,74 +2708,122 @@ async function uploadBackup(event) {
   reader.readAsText(file);
 }
 
-// DÍAS COMPAÑEROS
-let dcTab='todas';
+// DIAS COMPANEROS
+let dcTab='pendientes';
+let dcEditId=null;
+let dcTipoSel=null;
 
-async function loadDCAnios(){
-  const{data}=await sb.from('dias_companeros').select('anio').order('anio');
-  const anios=[...new Set((data||[]).map(r=>r.anio))];
-  const sel=document.getElementById('dcAnioSel');const cur=sel.value||String(new Date().getFullYear());
-  sel.innerHTML=anios.map(a=>`<option value="${a}" ${a==cur?'selected':''}>${a}</option>`).join('');
-  if(!anios.length)sel.innerHTML=`<option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>`;
+function setDCTab(tab,el){
+  dcTab=tab;
+  document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
+  if(el)el.classList.add('active');
+  loadDiasCompaneros();
 }
 
-async function crearAnioDC(){
-  const anio=prompt('¿Qué año quieres crear?',String(new Date().getFullYear()+1));if(!anio)return;
-  await sb.from('dias_companeros').insert({user_id:currentUser.id,anio:parseInt(anio),nombre:'Nueva entrada',estado:'Pendiente'});
-  toast(`Año ${anio} creado`);loadDCAnios();loadDC();
+async function loadDiasCompaneros(){
+  var tbody=document.getElementById('dcBody');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
+  var q=sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).order('fecha',{ascending:false});
+  if(dcTab==='pendientes')q=q.eq('saldado',false);
+  else if(dcTab==='saldados')q=q.eq('saldado',true);
+  var res1=await q;
+  var all=res1.data||[];
+  var res2=await sb.from('dias_companeros').select('tipo,saldado').eq('user_id',currentUser.id).eq('saldado',false);
+  var todos=res2.data||[];
+  document.getElementById('dcSaldoMeDeben').textContent=todos.filter(function(r){return r.tipo==='le_hago';}).length;
+  document.getElementById('dcSaldoDebo').textContent=todos.filter(function(r){return r.tipo==='me_hace';}).length;
+  if(!all.length){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">&#128101;</div><div class="empty-state-text">No hay entradas</div></div></td></tr>';
+    return;
+  }
+  var html='';
+  for(var i=0;i<all.length;i++){
+    var r=all[i];
+    var tl=r.tipo==='le_hago'?'<span style="color:#16a34a;font-weight:600;">Le hago</span>':'<span style="color:#2563eb;font-weight:600;">Me hace</span>';
+    var est=r.saldado?'<span class="badge badge-green">Saldado</span>':'<span class="badge badge-red">Pendiente</span>';
+    html+='<tr>';
+    html+='<td>'+fmtDate(r.fecha)+'</td>';
+    html+='<td><strong>'+(r.companero||'-')+'</strong></td>';
+    html+='<td>'+tl+'</td>';
+    html+='<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(r.observaciones||'-')+'</td>';
+    html+='<td>'+fmtDate(r.fecha_planificada_saldar)+'</td>';
+    html+='<td>'+est+'</td>';
+    html+='<td style="white-space:nowrap;">';
+    if(!r.saldado){html+='<button class="btn btn-secondary btn-sm" data-dcid="'+r.id+'" onclick="saldarDC(this)">Saldar</button> ';}
+    html+='<button class="btn btn-secondary btn-sm btn-icon" data-dcid="'+r.id+'" onclick="editDCBtn(this)">&#9999;</button> ';
+    html+='<button class="btn btn-danger btn-sm btn-icon" data-dcid="'+r.id+'" onclick="delDCBtn(this)">&#128465;</button>';
+    html+='</td></tr>';
+  }
+  tbody.innerHTML=html;
 }
 
-async function loadDC(){
-  const anio=document.getElementById('dcAnioSel').value||new Date().getFullYear();
-  document.getElementById('dcAnioSubtitle').textContent=anio;
-  const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).eq('anio',anio);
-  let all=data||[];
-  all.sort((a,b)=>{
-    if(!a.fecha_planeada&&!b.fecha_planeada)return 0;
-    if(!a.fecha_planeada)return 1;if(!b.fecha_planeada)return -1;
-    return a.fecha_planeada.localeCompare(b.fecha_planeada);
-  });
-  if(dcTab==='planificadas')all=all.filter(r=>r.fecha_planeada&&r.estado!=='Ya disfrutada');
-  if(dcTab==='no-planificadas')all=all.filter(r=>!r.fecha_planeada);
-  if(dcTab==='ya-disfrutadas')all=all.filter(r=>r.estado==='Ya disfrutada');
-  document.getElementById('dcTotal').textContent=all.length;
-  document.getElementById('dcDisfrutadas').textContent=all.filter(r=>r.estado==='Ya disfrutada').length;
-  document.getElementById('dcPendientes').textContent=all.filter(r=>r.estado==='Pendiente').length;
-  document.getElementById('dcDiasTotales').textContent=all.reduce((s,r)=>s+(r.dias||0),0);
-  const tbody=document.getElementById('dcBody');
-  if(!all.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No hay entradas</div></div></td></tr>`;return;}
-  tbody.innerHTML=all.map(r=>`<tr><td>${r.nombre||'—'}</td><td>${r.descripcion||'—'}</td><td>${r.horas||'—'}</td><td>${r.dias||'—'}</td><td>${estadoBadge(r.estado)}</td><td>${fmtDate(r.fecha_planeada)}</td><td>${fmtDate(r.fecha_realizada)}</td><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.observaciones||'—'}</td>${actionBtns(`editDC('${r.id}')`,`delDC('${r.id}')`)}</tr>`).join('');
-}
-
-function setDCTab(tab,el){dcTab=tab;document.querySelectorAll('#sec-dias-companeros .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');loadDC();}
-
-async function openDCModal(id=null){
-  editingId=id;document.getElementById('modalDCTitle').textContent=id?'Editar entrada':'Nueva entrada';
-  fillSelect('dcDescripcion','dias_companeros','descripcion');
-  fillSelect('dcEstado','dias_companeros','estado');
+function openDCModal(id){
+  dcEditId=id||null;dcTipoSel=null;
+  document.getElementById('modalDCTitle').textContent=id?'Editar entrada':'Nueva entrada';
+  document.getElementById('dcFecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('dcCompanero').value='';
+  document.getElementById('dcFechaPlanSaldar').value='';
+  document.getElementById('dcObs').value='';
+  setDCTipoBtn(null);
   if(id){
-    const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).eq('id',id).single();
-    if(data){document.getElementById('dcNombre').value=data.nombre||'';document.getElementById('dcDescripcion').value=data.descripcion||'';document.getElementById('dcHoras').value=data.horas||'';document.getElementById('dcDias').value=data.dias||'';document.getElementById('dcEstado').value=data.estado||'';document.getElementById('dcPlaneada').value=data.fecha_planeada||'';document.getElementById('dcRealizada').value=data.fecha_realizada||'';document.getElementById('dcObs').value=data.observaciones||'';}
-  }else{
-    ['dcNombre','dcHoras','dcDias','dcPlaneada','dcRealizada','dcObs'].forEach(i=>document.getElementById(i).value='');
-    ['dcDescripcion','dcEstado'].forEach(i=>document.getElementById(i).value='');
+    sb.from('dias_companeros').select('*').eq('id',id).single().then(function(res){
+      var d=res.data;if(!d)return;
+      document.getElementById('dcFecha').value=d.fecha||'';
+      document.getElementById('dcCompanero').value=d.companero||'';
+      document.getElementById('dcFechaPlanSaldar').value=d.fecha_planificada_saldar||'';
+      document.getElementById('dcObs').value=d.observaciones||'';
+      dcTipoSel=d.tipo||null;setDCTipoBtn(d.tipo);
+    });
   }
   openModal('modalDC');
 }
 
-async function editDC(id){openDCModal(id);}
+function editDCBtn(el){openDCModal(el.dataset.dcid);}
+function setDCTipo(t){dcTipoSel=t;setDCTipoBtn(t);}
 
-async function saveDC(){
-  const anio=parseInt(document.getElementById('dcAnioSel').value||new Date().getFullYear());
-  const payload={user_id:currentUser.id,anio,nombre:document.getElementById('dcNombre').value||null,descripcion:document.getElementById('dcDescripcion').value||null,horas:parseFloat(document.getElementById('dcHoras').value)||null,dias:parseFloat(document.getElementById('dcDias').value)||null,estado:document.getElementById('dcEstado').value||null,fecha_planeada:document.getElementById('dcPlaneada').value||null,fecha_realizada:document.getElementById('dcRealizada').value||null,observaciones:document.getElementById('dcObs').value||null};
-  let err;
-  if(editingId){({error:err}=await sb.from('dias_companeros').update(payload).eq('id',editingId));}
-  else{({error:err}=await sb.from('dias_companeros').insert(payload));}
-  if(err){toast('Error al guardar','error');return;}
-  toast(editingId?'Actualizado':'Añadido');closeModal('modalDC');loadDC();
+function setDCTipoBtn(t){
+  var bl=document.getElementById('btnLeHago');
+  var bm=document.getElementById('btnMeHace');
+  if(!bl||!bm)return;
+  bl.style.borderColor=t==='le_hago'?'#16a34a':'var(--gray-300)';
+  bl.style.background=t==='le_hago'?'#dcfce7':'white';
+  bl.style.color=t==='le_hago'?'#16a34a':'var(--gray-500)';
+  bm.style.borderColor=t==='me_hace'?'#2563eb':'var(--gray-300)';
+  bm.style.background=t==='me_hace'?'#eff6ff':'white';
+  bm.style.color=t==='me_hace'?'#2563eb':'var(--gray-500)';
 }
 
-async function delDC(id){if(!confirm('¿Eliminar?'))return;await sb.from('dias_companeros').delete().eq('id',id);toast('Eliminado');loadDC();}
+async function saveDC(){
+  var fecha=document.getElementById('dcFecha').value;
+  var comp=document.getElementById('dcCompanero').value.trim();
+  if(!fecha||!comp){toast('Fecha y companero obligatorios','error');return;}
+  if(!dcTipoSel){toast('Selecciona el tipo','error');return;}
+  var p={user_id:currentUser.id,fecha:fecha,companero:comp,tipo:dcTipoSel,
+    fecha_planificada_saldar:document.getElementById('dcFechaPlanSaldar').value||null,
+    observaciones:document.getElementById('dcObs').value||null,saldado:false};
+  var err;
+  if(dcEditId){var r1=await sb.from('dias_companeros').update(p).eq('id',dcEditId);err=r1.error;}
+  else{var r2=await sb.from('dias_companeros').insert(p);err=r2.error;}
+  if(err){toast('Error al guardar','error');return;}
+  toast(dcEditId?'Actualizado':'Entrada anadida');
+  closeModal('modalDC');loadDiasCompaneros();
+}
+
+async function saldarDC(el){
+  var id=el.dataset.dcid;
+  if(!confirm('Marcar como saldado?'))return;
+  var res=await sb.from('dias_companeros').update({saldado:true,fecha_saldado:new Date().toISOString().split('T')[0]}).eq('id',id);
+  if(res.error){toast('Error','error');return;}
+  toast('Dia saldado');loadDiasCompaneros();
+}
+
+function delDCBtn(el){
+  var id=el.dataset.dcid;
+  if(!confirm('Eliminar?'))return;
+  sb.from('dias_companeros').delete().eq('id',id).then(function(){toast('Eliminado');loadDiasCompaneros();});
+}
+
 
 function exportDCPDF(){
   const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
