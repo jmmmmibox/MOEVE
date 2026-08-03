@@ -2461,7 +2461,10 @@ async function loadVacaciones(){
     if(!b.fecha_realizada) return -1;
     return a.fecha_realizada.localeCompare(b.fecha_realizada);
   });
-  if(vacTab==='planificadas') all=all.filter(r=>r.fecha_planeada && r.estado!=='Ya disfrutada');
+  if(vacTab==='planificadas'){
+    all=all.filter(r=>r.fecha_planeada && r.estado!=='Ya disfrutada');
+    all.sort((a,b)=>a.fecha_planeada.localeCompare(b.fecha_planeada));
+  }
   if(vacTab==='no-planificadas') all=all.filter(r=>!r.fecha_planeada);
   if(vacTab==='ya-disfrutadas') all=all.filter(r=>r.estado==='Ya disfrutada');
   const disfrutadas=all.filter(r=>r.estado==='Ya disfrutada');
