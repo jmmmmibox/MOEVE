@@ -2805,7 +2805,7 @@ async function saveDC(){
   var err;
   if(dcEditId){var r1=await sb.from('dias_companeros').update(p).eq('id',dcEditId);err=r1.error;}
   else{var r2=await sb.from('dias_companeros').insert(p);err=r2.error;}
-  if(err){toast('Error al guardar','error');return;}
+  if(err){toast('Error: '+err.message,'error');return;}
   toast(dcEditId?'Actualizado':'Entrada anadida');
   closeModal('modalDC');loadDiasCompaneros();
 }
