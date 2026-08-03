@@ -506,7 +506,7 @@
   <!-- DIAS COMPANEROS -->
   <div id="sec-dias-companeros" class="section">
     <div class="page-header">
-      <div><div class="page-title">Dias Companeros</div><div class="page-subtitle">Intercambio de dias con companeros</div></div>
+      <div><div class="page-title">Días Compañeros</div><div class="page-subtitle">Intercambio de días con compañeros</div></div>
       <button class="btn btn-primary" onclick="openDCModal(null)">+ Entrada</button>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
@@ -528,7 +528,7 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Fecha</th><th>Companero</th><th>Tipo</th><th>Observaciones</th><th>Plan. saldar</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Compañero</th><th>Tipo</th><th>Observaciones</th><th>Plan. saldar</th><th>Estado</th><th></th></tr></thead>
         <tbody id="dcBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
       </table>
     </div>
@@ -951,18 +951,18 @@
   </div>
 </div>
 
-<!-- Modal Dias Companeros -->
+<!-- Modal Días Compañeros -->
 <div id="modalDC" class="modal-overlay" style="display:none">
   <div class="modal" style="max-width:480px">
     <div class="modal-header"><div class="modal-title" id="modalDCTitle">Nueva entrada</div><button class="close-btn" onclick="closeModal('modalDC')">&#10005;</button></div>
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group"><label>Fecha</label><input type="date" id="dcFecha"></div>
-        <div class="form-group"><label>Companero</label><input type="text" id="dcCompanero" placeholder="Nombre"></div>
+        <div class="form-group"><label>Compañero</label><input type="text" id="dcCompanero" placeholder="Nombre del compañero"></div>
         <div class="form-group full"><label>Tipo</label>
           <div style="display:flex;gap:10px;margin-top:4px;">
-            <button type="button" id="btnLeHago" class="toggle-btn" onclick="setDCTipo('le_hago')" style="flex:1;justify-content:center;">Le hago un dia</button>
-            <button type="button" id="btnMeHace" class="toggle-btn" onclick="setDCTipo('me_hace')" style="flex:1;justify-content:center;">Me hace un dia</button>
+            <button type="button" id="btnLeHago" class="toggle-btn" onclick="setDCTipo('le_hago')" style="flex:1;justify-content:center;">Le hago un día</button>
+            <button type="button" id="btnMeHace" class="toggle-btn" onclick="setDCTipo('me_hace')" style="flex:1;justify-content:center;">Me hace un día</button>
           </div>
         </div>
         <div class="form-group"><label>Fecha plan. saldar</label><input type="date" id="dcFechaPlanSaldar"></div>
@@ -2373,7 +2373,7 @@ async function saveHoras(){
   toast(editingId?'Actualizado':'Añadido');closeModal('modalHoras');loadHorasExtras();
 }
 
-async function delHoras(id){if(!confirm('¿Eliminar?'))return;await sb.from('horas_extras').delete().eq('id',id);toast('Eliminado');loadHorasExtras();}
+async function delHoras(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('horas_extras').delete().eq('id',id);toast('Eliminado');loadHorasExtras();}
 
 function exportHorasPDF(){
   const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
@@ -2430,7 +2430,7 @@ async function savePRL(){
   if(err){toast('Error al guardar','error');return;}
   toast(editingId?'Actualizado':'Añadido');closeModal('modalPRL');loadPRL();
 }
-async function delPRL(id){if(!confirm('¿Eliminar?'))return;await sb.from('formacion_prl').delete().eq('id',id);toast('Eliminado');loadPRL();}
+async function delPRL(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('formacion_prl').delete().eq('id',id);toast('Eliminado');loadPRL();}
 function exportPRLPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(16);doc.text('Formación PRL - MOEVE',14,18);const rows=[];document.querySelectorAll('#prlBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Estado','Fecha','Horas','Tipo','Observaciones']],body:rows,startY:26,styles:{fontSize:9}});doc.save('formacion_prl_moeve.pdf');}
 
 // VACACIONES
@@ -2491,7 +2491,7 @@ async function saveVac(){
   if(err){toast('Error al guardar','error');return;}
   toast(editingId?'Actualizado':'Añadido');closeModal('modalVac');loadVacaciones();
 }
-async function delVac(id){if(!confirm('¿Eliminar?'))return;await sb.from('vacaciones').delete().eq('id',id);toast('Eliminado');loadVacaciones();}
+async function delVac(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('vacaciones').delete().eq('id',id);toast('Eliminado');loadVacaciones();}
 function exportVacPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l');doc.setFontSize(16);doc.text(`Vacaciones ${document.getElementById('vacAnioSel').value} - MOEVE`,14,18);const rows=[];document.querySelectorAll('#vacBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});doc.save('vacaciones_moeve.pdf');}
 
 // HORAS DORMIDA
@@ -2523,7 +2523,7 @@ async function saveDormida(){
   if(err){toast('Error al guardar','error');return;}
   toast(editingId?'Actualizado':'Registrado');closeModal('modalDormida');loadDormida();
 }
-async function delDormida(id){if(!confirm('¿Eliminar?'))return;await sb.from('horas_dormida').delete().eq('id',id);toast('Eliminado');loadDormida();}
+async function delDormida(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('horas_dormida').delete().eq('id',id);toast('Eliminado');loadDormida();}
 
 // CALENDARIO IMAGEN
 async function loadCalImg(){
@@ -2797,7 +2797,7 @@ function setDCTipoBtn(t){
 async function saveDC(){
   var fecha=document.getElementById('dcFecha').value;
   var comp=document.getElementById('dcCompanero').value.trim();
-  if(!fecha||!comp){toast('Fecha y companero obligatorios','error');return;}
+  if(!fecha||!comp){toast('Fecha y compañero obligatorios','error');return;}
   if(!dcTipoSel){toast('Selecciona el tipo','error');return;}
   var p={user_id:currentUser.id,anio:new Date().getFullYear(),fecha:fecha,companero:comp,tipo:dcTipoSel,
     fecha_planificada_saldar:document.getElementById('dcFechaPlanSaldar').value||null,
@@ -2806,21 +2806,21 @@ async function saveDC(){
   if(dcEditId){var r1=await sb.from('dias_companeros').update(p).eq('id',dcEditId);err=r1.error;}
   else{var r2=await sb.from('dias_companeros').insert(p);err=r2.error;}
   if(err){toast('Error: '+err.message,'error');return;}
-  toast(dcEditId?'Actualizado':'Entrada anadida');
+  toast(dcEditId?'Actualizado':'Entrada añadida');
   closeModal('modalDC');loadDiasCompaneros();
 }
 
 async function saldarDC(el){
   var id=el.dataset.dcid;
-  if(!confirm('Marcar como saldado?'))return;
+  if(!confirm('¿Marcar como saldado?'))return;
   var res=await sb.from('dias_companeros').update({saldado:true,fecha_saldado:new Date().toISOString().split('T')[0]}).eq('id',id);
   if(res.error){toast('Error','error');return;}
-  toast('Dia saldado');loadDiasCompaneros();
+  toast('Día saldado');loadDiasCompaneros();
 }
 
 function delDCBtn(el){
   var id=el.dataset.dcid;
-  if(!confirm('Eliminar?'))return;
+  if(!confirm('¿Eliminar esta entrada?'))return;
   sb.from('dias_companeros').delete().eq('id',id).then(function(){toast('Eliminado');loadDiasCompaneros();});
 }
 
