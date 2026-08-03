@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-Turnos — Panel de Gestión</title>
+<title>MixTurnox — Panel de Gestión</title>
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="M-Turnos">
+<meta name="apple-mobile-web-app-title" content="MixTurnox">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -258,7 +258,7 @@
 <!-- LANDING -->
 <div id="landingScreen" style="display:none;">
   <div class="landing-hero">
-    <div class="landing-logo">M-Turnos</div>
+    <div class="landing-logo">MixTurnox</div>
     <div class="landing-tagline">Tu panel de gestión personal</div>
     <div class="landing-btns">
       <button class="landing-btn-primary" onclick="showAuth('login')">Iniciar sesión</button>
@@ -276,13 +276,13 @@
       <div class="feature-card"><div class="feature-icon">💾</div><div class="feature-title">Copia de Seguridad</div><div class="feature-desc">Exporta e importa todos tus datos</div></div>
     </div>
   </div>
-  <div class="landing-footer">M-Turnos — Panel de Gestión Personal · 15€/año</div>
+  <div class="landing-footer">MixTurnox — Panel de Gestión Personal · 15€/año</div>
 </div>
 
 <!-- AUTH -->
 <div id="authScreen">
   <div class="auth-box">
-    <div class="auth-logo">M-Turnos</div>
+    <div class="auth-logo">MixTurnox</div>
     <div class="auth-subtitle">Panel de Gestión Personal</div>
     <div id="authLogin">
       <div class="auth-title">Iniciar sesión</div>
@@ -351,7 +351,7 @@
 
 <nav id="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-logo">M-Turnos</div>
+    <div class="sidebar-logo">MixTurnox</div>
     <div class="sidebar-subtitle">Panel de Gestión</div>
   </div>
   <div class="sidebar-nav">
@@ -596,7 +596,7 @@
   <!-- TELEFONOS -->
   <div id="sec-telefonos" class="section">
     <div class="page-header">
-      <div><div class="page-title">Teléfonos M-Turnos</div><div class="page-subtitle">Directorio de contactos</div></div>
+      <div><div class="page-title">Teléfonos MixTurnox</div><div class="page-subtitle">Directorio de contactos</div></div>
       <button class="btn btn-secondary btn-sm" onclick="exportTelPDF()">&#11015; PDF</button>
       <button class="btn btn-primary" onclick="openTelModal()">+ Contacto</button>
     </div>
@@ -2313,7 +2313,7 @@ async function delDiario(id){if(!confirm('¿Eliminar este registro?'))return;awa
 
 function exportDiarioPDF(){
   const{jsPDF}=window.jspdf;const doc=new jsPDF();
-  doc.setFontSize(16);doc.text('Diario de Trabajo - M-Turnos',14,18);
+  doc.setFontSize(16);doc.text('Diario de Trabajo - MixTurnox',14,18);
   doc.setFontSize(10);doc.text(`Exportado: ${new Date().toLocaleDateString('es-ES')}`,14,26);
   const rows=diarioData.map(r=>[fmtDate(r.fecha),r.area||'',r.turno||'',r.letra||'',r.jefe_turno||'',r.estado_planta||'',r.observaciones||'']);
   doc.autoTable({head:[['Fecha','Área','Turno','Letra','Jefe Turno','Estado','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
@@ -2380,7 +2380,7 @@ async function delHoras(id){if(!confirm('¿¿Eliminar esta entrada?'))return;awa
 
 function exportHorasPDF(){
   const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
-  doc.setFontSize(16);doc.text('Horas Extras / Formación - M-Turnos',14,18);
+  doc.setFontSize(16);doc.text('Horas Extras / Formación - MixTurnox',14,18);
   const rows=[];document.querySelectorAll('#horasBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});
   doc.autoTable({head:[['Nombre','Estado','Fecha','Horas','Pagado en','Tipo','Cómo','Modalidad','Obs.']],body:rows,startY:26,styles:{fontSize:8}});
   doc.save('horas_extras_moeve.pdf');
@@ -2434,7 +2434,7 @@ async function savePRL(){
   toast(editingId?'Actualizado':'Añadido');closeModal('modalPRL');loadPRL();
 }
 async function delPRL(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('formacion_prl').delete().eq('id',id);toast('Eliminado');loadPRL();}
-function exportPRLPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(16);doc.text('Formación PRL - M-Turnos',14,18);const rows=[];document.querySelectorAll('#prlBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Estado','Fecha','Horas','Tipo','Observaciones']],body:rows,startY:26,styles:{fontSize:9}});doc.save('formacion_prl_moeve.pdf');}
+function exportPRLPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(16);doc.text('Formación PRL - MixTurnox',14,18);const rows=[];document.querySelectorAll('#prlBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Estado','Fecha','Horas','Tipo','Observaciones']],body:rows,startY:26,styles:{fontSize:9}});doc.save('formacion_prl_moeve.pdf');}
 
 // VACACIONES
 async function loadVacAnios(){
@@ -2502,7 +2502,7 @@ async function saveVac(){
   toast(editingId?'Actualizado':'Añadido');closeModal('modalVac');loadVacaciones();
 }
 async function delVac(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('vacaciones').delete().eq('id',id);toast('Eliminado');loadVacaciones();}
-function exportVacPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l');doc.setFontSize(16);doc.text(`Vacaciones ${document.getElementById('vacAnioSel').value} - M-Turnos`,14,18);const rows=[];document.querySelectorAll('#vacBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});doc.save('vacaciones_moeve.pdf');}
+function exportVacPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l');doc.setFontSize(16);doc.text(`Vacaciones ${document.getElementById('vacAnioSel').value} - MixTurnox`,14,18);const rows=[];document.querySelectorAll('#vacBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});doc.save('vacaciones_moeve.pdf');}
 
 // HORAS DORMIDA
 async function loadDormida(){
@@ -2590,7 +2590,7 @@ async function saveInv(){
   toast(editingId?'Actualizado':'Artículo añadido');closeModal('modalInv');loadInventario();
 }
 async function delInv(id){if(!confirm('¿Eliminar artículo?'))return;await sb.from('inventario').delete().eq('id',id);toast('Eliminado');loadInventario();}
-function exportInvPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(16);doc.text('Inventario Material Letra ER - M-Turnos',14,18);doc.setFontSize(10);doc.text(`Exportado: ${new Date().toLocaleDateString('es-ES')}`,14,26);const rows=[];document.querySelectorAll('#invBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Artículo','Cantidad','Stock Mínimo','Estado Stock']],body:rows,startY:32,styles:{fontSize:9}});doc.save('inventario_moeve.pdf');}
+function exportInvPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(16);doc.text('Inventario Material Letra ER - MixTurnox',14,18);doc.setFontSize(10);doc.text(`Exportado: ${new Date().toLocaleDateString('es-ES')}`,14,26);const rows=[];document.querySelectorAll('#invBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Artículo','Cantidad','Stock Mínimo','Estado Stock']],body:rows,startY:32,styles:{fontSize:9}});doc.save('inventario_moeve.pdf');}
 
 // TELEFONOS
 async function loadTelefonos(){
@@ -2850,7 +2850,7 @@ async function exportDCPDF(){
 async function exportTelPDF(){
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF();
-  doc.setFontSize(14);doc.text('Telefonos M-Turnos',14,18);
+  doc.setFontSize(14);doc.text('Telefonos MixTurnox',14,18);
   doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
   const{data}=await sb.from('telefonos').select('*').eq('user_id',currentUser.id).order('nombre');
   const rows=(data||[]).map(function(r){return[r.nombre||'-',r.numero||'-',r.observaciones||'-'];});
