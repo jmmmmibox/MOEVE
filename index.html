@@ -486,10 +486,12 @@
       </div>
     </div>
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="vacTotal">—</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-value" id="vacDisfrutadas">—</div><div class="stat-label">Disfrutadas</div></div>
-      <div class="stat-card"><div class="stat-value" id="vacPendientes">—</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="vacDiasTotales">—</div><div class="stat-label">Días Totales</div></div>
+      <div class="stat-card"><div class="stat-value" id="vacHorasDisfrutadas">—</div><div class="stat-label">Horas disfrutadas</div></div>
+      <div class="stat-card"><div class="stat-value" id="vacHorasPendientes">—</div><div class="stat-label">Horas pendientes</div></div>
+      <div class="stat-card"><div class="stat-value" id="vacHorasTotal">—</div><div class="stat-label">Total horas</div></div>
+      <div class="stat-card"><div class="stat-value" id="vacDiasDisfrutados">—</div><div class="stat-label">Días disfrutados</div></div>
+      <div class="stat-card"><div class="stat-value" id="vacDiasPendientes">—</div><div class="stat-label">Días pendientes</div></div>
+      <div class="stat-card"><div class="stat-value" id="vacDiasTotales">—</div><div class="stat-label">Total días</div></div>
     </div>
     <div class="tabs">
       <div class="tab active" onclick="setVacTab('todas',this)">Todas</div>
@@ -2462,9 +2464,13 @@ async function loadVacaciones(){
   if(vacTab==='planificadas') all=all.filter(r=>r.fecha_planeada && r.estado!=='Ya disfrutada');
   if(vacTab==='no-planificadas') all=all.filter(r=>!r.fecha_planeada);
   if(vacTab==='ya-disfrutadas') all=all.filter(r=>r.estado==='Ya disfrutada');
-  document.getElementById('vacTotal').textContent=all.length;
-  document.getElementById('vacDisfrutadas').textContent=all.filter(r=>r.estado==='Ya disfrutada').length;
-  document.getElementById('vacPendientes').textContent=all.filter(r=>r.estado==='Pendiente').length;
+  const disfrutadas=all.filter(r=>r.estado==='Ya disfrutada');
+  const pendientes=all.filter(r=>r.estado!=='Ya disfrutada');
+  document.getElementById('vacHorasDisfrutadas').textContent=disfrutadas.reduce((s,r)=>s+(r.horas||0),0);
+  document.getElementById('vacHorasPendientes').textContent=pendientes.reduce((s,r)=>s+(r.horas||0),0);
+  document.getElementById('vacHorasTotal').textContent=all.reduce((s,r)=>s+(r.horas||0),0);
+  document.getElementById('vacDiasDisfrutados').textContent=disfrutadas.reduce((s,r)=>s+(r.dias||0),0);
+  document.getElementById('vacDiasPendientes').textContent=pendientes.reduce((s,r)=>s+(r.dias||0),0);
   document.getElementById('vacDiasTotales').textContent=all.reduce((s,r)=>s+(r.dias||0),0);
   const tbody=document.getElementById('vacBody');
   if(!all.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon">🏖️</div><div class="empty-state-text">No hay entradas</div></div></td></tr>`;return;}
