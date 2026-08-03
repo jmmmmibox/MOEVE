@@ -363,9 +363,9 @@
     <div class="nav-item" onclick="showSection('dias-companeros')"><span class="nav-icon">👥</span> Días Compañeros</div>
     <div class="nav-item" onclick="showSection('horas-dormida')"><span class="nav-icon">😴</span> Horas de Dormida</div>
     <div class="nav-item" onclick="showSection('calendario')"><span class="nav-icon">📅</span> Calendario Turnos</div>
-    <div class="nav-item" onclick="showSection('inventario')"><span class="nav-icon">📦</span> Inventario</div>
-    <div class="nav-item" onclick="showSection('telefonos')"><span class="nav-icon">📞</span> Teléfonos</div>
-    <div class="nav-item" onclick="showSection('rutinas')"><span class="nav-icon">📝</span> Rutinas</div>
+    <div class="nav-item" id="nav-inventario" onclick="showSection('inventario')"><span class="nav-icon">📦</span> Inventario</div>
+    <div class="nav-item" id="nav-telefonos" onclick="showSection('telefonos')"><span class="nav-icon">📞</span> Teléfonos</div>
+    <div class="nav-item" id="nav-rutinas" onclick="showSection('rutinas')"><span class="nav-icon">📝</span> Rutinas</div>
     <div class="nav-item" onclick="showSection('backup')"><span class="nav-icon">💾</span> Copia de Seguridad</div>
     <div class="nav-item" onclick="showSection('config')"><span class="nav-icon">⚙️</span> Configuración</div>
     <div class="nav-item" id="adminNavItem" style="display:none;" onclick="openAdmin()"><span class="nav-icon">🔐</span> Panel Admin</div>
@@ -509,6 +509,7 @@
   <div id="sec-dias-companeros" class="section">
     <div class="page-header">
       <div><div class="page-title">Días Compañeros</div><div class="page-subtitle">Intercambio de días con compañeros</div></div>
+      <button class="btn btn-secondary btn-sm" onclick="exportDCPDF()">&#11015; PDF</button>
       <button class="btn btn-primary" onclick="openDCModal(null)">+ Entrada</button>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
@@ -526,7 +527,6 @@
     <div class="tabs" style="margin-bottom:16px;">
       <button class="tab active" onclick="setDCTab('pendientes',this)">Pendientes</button>
       <button class="tab" onclick="setDCTab('saldados',this)">Saldados</button>
-      <button class="tab" onclick="setDCTab('todos',this)">Todos</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -597,6 +597,7 @@
   <div id="sec-telefonos" class="section">
     <div class="page-header">
       <div><div class="page-title">Teléfonos MOEVE</div><div class="page-subtitle">Directorio de contactos</div></div>
+      <button class="btn btn-secondary btn-sm" onclick="exportTelPDF()">&#11015; PDF</button>
       <button class="btn btn-primary" onclick="openTelModal()">+ Contacto</button>
     </div>
     <div class="card" style="margin-bottom:16px;">
@@ -1316,7 +1317,7 @@ async function init(){
       if(currentUser.email===ADMIN_EMAIL)document.getElementById('adminNavItem').style.display='flex';
       await loadOpciones();
       populateFilters();
-      showSection('mi-calendario');
+      showSection('mi-calendario');initSeccionesVisibles();
     } else {
       currentUser=null;
       document.getElementById('userBar').style.display='none';
@@ -2834,13 +2835,53 @@ function delDCBtn(el){
 }
 
 
-function exportDCPDF(){
-  const{jsPDF}=window.jspdf;const doc=new jsPDF('l');
-  doc.setFontSize(16);doc.text(`Días Compañeros ${document.getElementById('dcAnioSel').value} - MOEVE`,14,18);
-  const rows=[];document.querySelectorAll('#dcBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});
-  doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});
-  doc.save('dias_companeros_moeve.pdf');
+async function exportDCPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  doc.setFontSize(14);doc.text('Dias Companeros',14,18);
+  doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  const{data}=await sb.from('dias_companeros').select('*').eq('user_id',currentUser.id).order('fecha',{ascending:false});
+  const rows=(data||[]).map(function(r){return[fmtDate(r.fecha),r.companero||'-',r.tipo==='le_hago'?'Le hago':'Me hace',r.saldado?'Saldado':'Pendiente',fmtDate(r.fecha_planificada_saldar),r.observaciones||'-'];});
+  doc.autoTable({head:[['Fecha','Companero','Tipo','Estado','Plan. saldar','Obs.']],body:rows,startY:32,styles:{fontSize:9}});
+  doc.save('dias_companeros.pdf');
+  toast('PDF generado');
 }
+
+async function exportTelPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  doc.setFontSize(14);doc.text('Telefonos MOEVE',14,18);
+  doc.setFontSize(10);doc.text('Exportado: '+new Date().toLocaleDateString('es-ES'),14,26);
+  const{data}=await sb.from('telefonos').select('*').eq('user_id',currentUser.id).order('nombre');
+  const rows=(data||[]).map(function(r){return[r.nombre||'-',r.numero||'-',r.observaciones||'-'];});
+  doc.autoTable({head:[['Nombre','Numero','Observaciones']],body:rows,startY:32,styles:{fontSize:10}});
+  doc.save('telefonos_moeve.pdf');
+  toast('PDF generado');
+}
+
+function toggleSeccion(key,visible){
+  var nav=document.getElementById('nav-'+key);
+  if(nav)nav.style.display=visible?'flex':'none';
+  var cfg=JSON.parse(localStorage.getItem('seccionesVisibles')||'{}');
+  cfg[key]=visible;
+  localStorage.setItem('seccionesVisibles',JSON.stringify(cfg));
+}
+
+function initSeccionesVisibles(){
+  var defaults={inventario:true,telefonos:true,rutinas:true};
+  var cfg=JSON.parse(localStorage.getItem('seccionesVisibles')||JSON.stringify(defaults));
+  var keys=['inventario','telefonos','rutinas'];
+  keys.forEach(function(key){
+    var val=cfg[key]!==undefined?cfg[key]:true;
+    var id='cfgShow'+key.charAt(0).toUpperCase()+key.slice(1);
+    var chk=document.getElementById(id);
+    if(chk)chk.checked=val;
+    var nav=document.getElementById('nav-'+key);
+    if(nav)nav.style.display=val?'flex':'none';
+  });
+}
+
+
 
 // ── MI CALENDARIO ──
 const PATRON_64 = ['M','M','T','T','N','N','D','D','D','D'];
