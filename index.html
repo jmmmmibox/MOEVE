@@ -2868,8 +2868,10 @@ function toggleSeccion(key,visible){
 }
 
 function initSeccionesVisibles(){
-  var defaults={inventario:true,telefonos:true,rutinas:true};
+  var defaults={inventario:false,telefonos:true,rutinas:true};
   var cfg=JSON.parse(localStorage.getItem('seccionesVisibles')||JSON.stringify(defaults));
+  cfg.inventario=false; // Forzar oculto
+  localStorage.setItem('seccionesVisibles',JSON.stringify(cfg));
   var keys=['inventario','telefonos','rutinas'];
   keys.forEach(function(key){
     var val=cfg[key]!==undefined?cfg[key]:true;
