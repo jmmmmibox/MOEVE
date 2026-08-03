@@ -2502,7 +2502,7 @@ async function saveVac(){
   toast(editingId?'Actualizado':'Añadido');closeModal('modalVac');loadVacaciones();
 }
 async function delVac(id){if(!confirm('¿¿Eliminar esta entrada?'))return;await sb.from('vacaciones').delete().eq('id',id);toast('Eliminado');loadVacaciones();}
-function exportVacPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l');doc.setFontSize(16);doc.text(`Vacaciones ${document.getElementById('vacAnioSel').value} - M-Turnos\`,14,18);const rows=[];document.querySelectorAll('#vacBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});doc.save('vacaciones_moeve.pdf');}
+function exportVacPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l');doc.setFontSize(16);doc.text(`Vacaciones ${document.getElementById('vacAnioSel').value} - M-Turnos`,14,18);const rows=[];document.querySelectorAll('#vacBody tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>2)rows.push([...tds].slice(0,-1).map(td=>td.textContent.trim()));});doc.autoTable({head:[['Nombre','Descripción','Horas','Días','Estado','Planeada','Realizada','Obs.']],body:rows,startY:26,styles:{fontSize:8}});doc.save('vacaciones_moeve.pdf');}
 
 // HORAS DORMIDA
 async function loadDormida(){
